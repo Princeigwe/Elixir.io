@@ -9,8 +9,9 @@ services:
 # Backend service for Elixir.io
   backend:
     container_name: elixir_backend
-    build: ./backend
-    target: development # build only development section of the docker image
+    build: 
+      context: ./backend
+      target: development # build only development section of the docker image
     ports:
       - 9229:9229
       - 3000:3000
