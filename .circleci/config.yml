@@ -3,9 +3,10 @@ jobs:
   build:
     docker:
       - image: cimg/node:18.7.0
-    working_directory: ~/elixir.io # setting working directory
+    working_directory: ~/elixir.io/backend # setting working directory
     steps:
       - checkout
+        path: ~/elixir.io
       - run:
           name: test
-          command: cd backend && npm run build
+          command: npm run build
