@@ -1,0 +1,11 @@
+version: 2.1
+
+jobs:
+  run_npm_test: #job name
+    docker:
+      image: cimg/node:18.7.0 # NOde Docker image
+    steps:
+      - run:
+        name: Tests
+        command:
+          npm test
