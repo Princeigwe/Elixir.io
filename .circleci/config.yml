@@ -8,4 +8,4 @@ jobs:
       - run:
         name: Tests
         command:
-          npm test
+          echo "helloworld"
