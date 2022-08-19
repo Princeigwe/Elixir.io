@@ -10,5 +10,6 @@ jobs:
       - run:
           name: test
           command: |
-            npm install rimraf
+            npm install rimraf 
             npm run build
+
