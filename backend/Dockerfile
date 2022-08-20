@@ -2,8 +2,8 @@
 
 FROM node:17-alpine As development
 
-# setting the image working directory
-WORKDIR /usr/src/app
+# setting the image working directory which the backend folder of the root directory
+WORKDIR /usr/src/app/backend
 
 # copy package.json and package-lock.json to the image working directory
 COPY package*.json ./
