@@ -2,21 +2,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import {UsersService } from './users.service';
 
-var ObjectID = require('mongodb').ObjectID;
-var objectId = new ObjectID();
 
 describe('UsersController', () => {
   let controller: UsersController;
 
   const mockUsersService = {
-    createUser:  jest.fn((email: string, password: string) => {
-      return {
-        email: email,
-	      password: password,
-	      _id: "1234567",
-	      __v: 0
+    createUser:  jest.fn((email: string, password: string) => (
+        {
+          email: email,
+          password: password,
+          _id: "1234567",
+          __v: 0
       }
-    })
+    ))
   }
 
   beforeEach(async () => {
