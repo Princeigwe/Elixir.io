@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+
+  backend:
+    container_name: elixir_backend_test
+    build: 
+      context: ./backend
+      target: development
+    ports:
+      - 9229:9229
+      - 3000:3000
+    command: npm run test

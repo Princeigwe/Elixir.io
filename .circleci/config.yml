@@ -6,7 +6,7 @@ jobs:
     working_directory: ~/elixir.io/backend # setting working directory
     steps:
       - checkout:
-          path: ~/elixir.io
+          path: ~/elixir.io # circleci should work on the subdirectories of elixir.io
       - run:
           name: test
           command: |
