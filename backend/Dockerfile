@@ -30,8 +30,8 @@ ARG NODE_ENV=production
 # setting node environment variable to production
 ENV NODE_ENV=${NODE_ENV}
 
-# setting the working directory of image
-WORKDIR /usr/src/app
+# setting the image working directory which the backend folder of the root directory
+WORKDIR /usr/src/app/backend
 
 # copy package.json and package-lock.json to the image working directory
 COPY package*.json ./
