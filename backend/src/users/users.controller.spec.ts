@@ -14,7 +14,24 @@ describe('UsersController', () => {
           _id: "1234567",
           __v: 0
       }
-    ))
+    )),
+
+    getUsers:  jest.fn( () => ([
+      
+      {
+        email: "testuser1",
+        password: "testpass123",
+        _id: "1234567",
+        __v: 0
+    },
+    {
+      email: "testuser2",
+      password: "testpass123",
+      _id: "12345678",
+      __v: 0
+    }
+
+    ]) )
   }
 
   beforeEach(async () => {
@@ -42,4 +59,21 @@ describe('UsersController', () => {
       }
     )
   })
+
+  it("should return array of users", async () => {
+    let users = [ {
+        email: "testuser1",
+        password: "testpass123",
+        _id: "1234567",
+        __v: 0
+    },
+      {
+        email: "testuser2",
+        password: "testpass123",
+        _id: "12345678",
+        __v: 0
+    } ]
+    expect(await controller.getUsers()).toEqual(users)
+  })
+
 });
