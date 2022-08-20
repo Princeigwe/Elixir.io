@@ -6,8 +6,11 @@ services:
     container_name: elixir_backend_test
     build: 
       context: ./backend
-      target: development
+      target: testing
     ports:
       - 9229:9229
       - 3000:3000
-    command: npm run test
+    command: npm run test:watch
+    volumes:
+      - .:/usr/src/app/ # mounting the directory inside the container
+      - /usr/src/app/backend/node_modules # mounting node_modules inside the backend container

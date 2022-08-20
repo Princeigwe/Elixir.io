@@ -19,8 +19,8 @@ services:
     # environment:
     #   - name=value
     volumes:
-      - .:/usr/src/app # mounting the current directory inside the container
-      - /usr/src/app/node_modules # mounting node_modules inside the container
+      - .:/usr/src/app/ # mounting the directory inside the container
+      - /usr/src/app/backend/node_modules # mounting node_modules inside the backend container
     env_file:
       - .env
     depends_on:

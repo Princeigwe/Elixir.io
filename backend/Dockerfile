@@ -19,6 +19,31 @@ COPY . .
 #  build the application
 RUN npm run build
 
+# Docker image for elixir.io backend for testing envoronment
+FROM node:18 As testing
+
+# these RUN commands solves the docker-compose jest watchmode error
+RUN apt-get update -qq 
+RUN apt-get install -y build-essential
+RUN apt-get install -y git
+
+# setting the image working directory which the backend folder of the root directory
+WORKDIR /usr/src/app/backend
+
+# copy package.json and package-lock.json to the image working directory
+COPY package*.json ./
+
+# install development dependencies
+RUN npm install --only=development --force
+
+# copy the application code to the working directory of image
+COPY . .
+
+# EXPOSE 3000
+
+#  build the application
+RUN npm run build
+
 
 # Docker image for elixir.io backend for production envoronment
 
