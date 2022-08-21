@@ -100,5 +100,15 @@ describe('UsersController', () => {
     expect(await controller.getUsers("testuser@gmail.com")).toEqual(user)
   })
 
+  // todo: test on how to return an exception
+  // it("should not get a user by email", async () =>{
+  //   let user = {
+  //     email: "testuser@gmail.com",
+  //     password: "testpass123",
+  //     _id: "1234567",
+  //     __v: 0
+  // }
+  //   expect(await controller.getUsers("testuser4@gmail.com")).toEqual(user)
+  // })
 
 });

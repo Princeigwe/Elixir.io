@@ -28,6 +28,12 @@ export class UsersService {
         return user
     }
 
+    async getUserByID(_id: any) {
+        const user = await this.userModel.findOne({"_id": _id})
+        if(!user) { throw new NotFoundException("User Not Found") }
+        return user
+    }
+
     async deleteUsers() {}
 
     /**
