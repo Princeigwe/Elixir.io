@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {User, UserDocument} from '../users/users.schema'
@@ -23,7 +23,9 @@ export class UsersService {
     }
 
     async getUserByEmail(email: string) {
-        return await this.userModel.find({"email": email}).exec()
+        const user = await this.userModel.findOne({"email": email}).exec()
+        if(!user) { throw new NotFoundException("User Not Found") }
+        return user
     }
 
     async deleteUsers() {}
@@ -33,8 +35,7 @@ export class UsersService {
      * @param {string} email - string - This is the email of the user that we want to delete.
      * @returns The user is being returned
      */
-    async deleteUserByEmail(email: string) {
+    async deleteUserByEmail(email?: string) {
         await this.userModel.deleteOne({"email": email})
-        return {message: "User deleted"}
     }
 }
