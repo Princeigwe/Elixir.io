@@ -100,7 +100,7 @@ describe('UsersController', () => {
     expect(await controller.getUsers("testuser@gmail.com")).toEqual(user)
   })
 
-  // todo: test on how to return an exception
+  // todo: check on how to return an exception in unit test
   // it("should not get a user by email", async () =>{
   //   let user = {
   //     email: "testuser@gmail.com",

@@ -45,7 +45,11 @@ export class UsersService {
      * @param {string} email - string - This is the email of the user that we want to delete.
      * @returns The user is being returned
      */
-    async deleteUserByEmail(email?: string) {
+    async deleteUserByEmail(email: string) {
         await this.userModel.deleteOne({"email": email})
+    }
+
+    async deleteUserByID(_id: any) {
+        await this.userModel.deleteOne({"_id": _id})
     }
 }
