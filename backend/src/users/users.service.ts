@@ -46,10 +46,10 @@ export class UsersService {
      * @returns The user is being returned
      */
     async deleteUserByEmail(email: string) {
-        await this.userModel.deleteOne({"email": email})
+        await this.userModel.deleteOne({"email": email}).exec()
     }
 
     async deleteUserByID(_id: any) {
-        await this.userModel.deleteOne({"_id": _id})
+        await this.userModel.deleteOne({"_id": _id}).exec()
     }
 }

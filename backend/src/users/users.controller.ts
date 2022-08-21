@@ -22,6 +22,12 @@ export class UsersController {
         return await this.usersService.getUsers()
     }
 
+    @Delete(':_id')
+    async deleteUserByID(@Param('_id') _id:any) {
+        await this.usersService.deleteUserByID(_id)
+        return {message: 'User Deleted'}
+    }
+
     @Delete()
     async deleteUsers(@Query('email') email: string) {
         if (email) {
