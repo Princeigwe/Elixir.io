@@ -1,6 +1,6 @@
-import { Controller, Post, Get, Delete, Body } from '@nestjs/common';
-import {UsersService} from '../users/users.service'
-import {CreateUserDto} from '../users/dtos/createUser.dto'
+import { Controller, Post, Get, Delete, Body, Query } from '@nestjs/common';
+import {UsersService} from './users.service'
+import {CreateUserDto} from './dtos/createUser.dto'
 
 @Controller('users')
 export class UsersController {
@@ -12,7 +12,8 @@ export class UsersController {
     }
 
     @Get()
-    async getUsers() {
+    async getUsers(@Query('email') email?: string) {
+        if (email) {return await this.usersService.getUserByEmail(email)}
         return await this.usersService.getUsers()
     }
 }

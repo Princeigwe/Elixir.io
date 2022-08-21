@@ -19,19 +19,29 @@ describe('UsersController', () => {
     getUsers:  jest.fn( () => ([
       
       {
-        email: "testuser1",
+        email: "testuser@gmail.com",
         password: "testpass123",
         _id: "1234567",
         __v: 0
     },
     {
-      email: "testuser2",
+      email: "testuser2@gmail.com",
       password: "testpass123",
       _id: "12345678",
       __v: 0
     }
 
-    ]) )
+    ]) ),
+
+
+    getUserByEmail: jest.fn( (email: string) => {
+      return {
+        email: "testuser@gmail.com",
+        password: "testpass123",
+        _id: "1234567",
+        __v: 0
+      }
+    } )
   }
 
   beforeEach(async () => {
@@ -45,9 +55,11 @@ describe('UsersController', () => {
     controller = module.get<UsersController>(UsersController);
   });
 
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
 
   it('should create a User', async () => {
     expect(await controller.createUser({email: "testuser@gmail.com", password: "testpass123"})).toEqual(
@@ -60,20 +72,33 @@ describe('UsersController', () => {
     )
   })
 
+
   it("should return array of users", async () => {
     let users = [ {
-        email: "testuser1",
+        email: "testuser@gmail.com",
         password: "testpass123",
         _id: "1234567",
         __v: 0
     },
       {
-        email: "testuser2",
+        email: "testuser2@gmail.com",
         password: "testpass123",
         _id: "12345678",
         __v: 0
     } ]
     expect(await controller.getUsers()).toEqual(users)
   })
+
+
+  it("should return a user by email", async () => {
+    let user = {
+          email: "testuser@gmail.com",
+          password: "testpass123",
+          _id: "1234567",
+          __v: 0
+      }
+    expect(await controller.getUsers("testuser@gmail.com")).toEqual(user)
+  })
+
 
 });
