@@ -77,4 +77,7 @@ export class UsersService {
     async deleteUserByID(_id: any) {
         await this.userModel.deleteOne({"_id": _id}).exec()
     }
+
+    // this method will be used to change or reset the user's password'
+    async updateUser(password: string) {}
 }
