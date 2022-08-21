@@ -19,7 +19,9 @@ export class UsersService {
     }
 
     async getUsers() {
-        return this.userModel.find().exec()
+        const users =  await this.userModel.find().exec()
+        if(!users.length) {throw new NotFoundException("Users Not Found")}
+        return users
     }
 
     async getUserByEmail(email: string) {
@@ -29,12 +31,14 @@ export class UsersService {
     }
 
     async getUserByID(_id: any) {
-        const user = await this.userModel.findOne({"_id": _id})
+        const user = await this.userModel.findOne({"_id": _id}).exec()
         if(!user) { throw new NotFoundException("User Not Found") }
         return user
     }
 
-    async deleteUsers() {}
+    async deleteUsers() {
+        await this.userModel.deleteMany().exec()
+    }
 
     /**
      * It deletes a user from the database by email

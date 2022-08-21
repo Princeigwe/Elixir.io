@@ -21,4 +21,10 @@ export class UsersController {
         if (email) {return await this.usersService.getUserByEmail(email)}
         return await this.usersService.getUsers()
     }
+
+    @Delete()
+    async deleteUsers() {
+        await this.usersService.deleteUsers()
+        return {message: 'Users Deleted'}
+    }
 }
