@@ -3,7 +3,7 @@ import {UsersService} from '../users/users.service'
 
 import { createCipheriv, randomBytes, createDecipheriv, scrypt } from 'crypto'
 import {JwtService} from '@nestjs/jwt'
-import { promisify } from 'util';
+import * as bcrypt from 'bcrypt';
 
 // variables responsible for encrypting password during user registration
 
@@ -17,42 +17,23 @@ export class AuthService {
         private jwtService: JwtService // service that will sign a token to the authenticated user payload
     ) {}
 
-    /**
-     * It takes an email and password, encrypts the password, and then creates a user with the email
-     * and encrypted password
-     * @param {string} email - the email of the user
-     * @param {string} password - the password that the user entered
-     * @returns The userService.createUser function is being returned.
-     */
+
     async registerUser(email: string, password: string) {
-        // steps to encrypt the password
-        const cipher = createCipheriv(algorithm, secretKey, initVector) // the cipher function
-        let encryptedPassword = cipher.update(password, "utf-8", "hex"); // encrypting the password
-        encryptedPassword += cipher.final("hex"); // stopping the encryption process
-        
-        return this.userService.createUser(email, encryptedPassword)
+        // steps to hashing user password 
+        const salt = await bcrypt.genSalt(10) // generate salt
+        const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
+        return this.userService.createUser(email, hashedPassword)
     }
 
 
 
-    /**
-     * It takes in an email and password, gets the user from the database, decrypts the password, and
-     * compares it to the password that was passed in. If they match, it returns the user. If they
-     * don't match, it throws an error
-     * @param {string} email - The email of the user
-     * @param {string} password - The password to be encrypted.
-     * @returns The user is being returned.
-     */
     async getValidatedUser(email: string, password: string) {
         const user = await this.userService.getUserByEmail(email)
-        let encryptedPassword = user.password
 
-        // to check if the login password is decrypted encryptedPassword
-        const decipher = createDecipheriv(algorithm, secretKey, initVector); // decipher function
-        let decryptedPassword = decipher.update(encryptedPassword, "hex", "utf-8") //decrypting password
-        decryptedPassword += decipher.final("utf-8"); // stopping decryption process
-
-        if (decryptedPassword == password) {
+        // steps to validate hashedPassword
+        const hashedPassword = user.password
+        const validPassword = await bcrypt.compare(password, hashedPassword)
+        if(validPassword) {
             return user
         }else{
             throw new HttpException('Invalid Credentials', HttpStatus.BAD_REQUEST) 
