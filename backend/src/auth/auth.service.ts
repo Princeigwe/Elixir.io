@@ -13,6 +13,13 @@ const algorithm = 'aes-256-cbc' // the algorithm for encrypting the data
 export class AuthService {
     constructor(private userService: UsersService) {}
 
+    /**
+     * It takes an email and password, encrypts the password, and then creates a user with the email
+     * and encrypted password
+     * @param {string} email - the email of the user
+     * @param {string} password - the password that the user entered
+     * @returns The userService.createUser function is being returned.
+     */
     async registerUser(email: string, password: string) {
         // steps to encrypt the password
         const cipher = createCipheriv(algorithm, secretKey, initVector) // the cipher function
@@ -24,6 +31,14 @@ export class AuthService {
 
 
 
+    /**
+     * It takes in an email and password, gets the user from the database, decrypts the password, and
+     * compares it to the password that was passed in. If they match, it returns the user. If they
+     * don't match, it throws an error
+     * @param {string} email - The email of the user
+     * @param {string} password - The password to be encrypted.
+     * @returns The user is being returned.
+     */
     async getValidatedUser(email: string, password: string) {
         const user = await this.userService.getUserByEmail(email)
         let encryptedPassword = user.password
@@ -36,7 +51,7 @@ export class AuthService {
         if (decryptedPassword == password) {
             return user
         }else{
-            throw new HttpException('User with this email already exists', HttpStatus.BAD_REQUEST) 
+            throw new HttpException('Invalid Credentials', HttpStatus.BAD_REQUEST) 
         }
 
     }
