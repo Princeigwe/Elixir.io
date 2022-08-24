@@ -5,11 +5,6 @@ import { createCipheriv, randomBytes, createDecipheriv, scrypt } from 'crypto'
 import {JwtService} from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt';
 
-// variables responsible for encrypting password during user registration
-
-const initVector = randomBytes(16); // used to generate 16 bytes of random data
-const secretKey = randomBytes(32); // used to generate 32 bytes of random data as secret key
-const algorithm = 'aes-256-cbc' // the algorithm for encrypting the data
 @Injectable()
 export class AuthService {
     constructor(
