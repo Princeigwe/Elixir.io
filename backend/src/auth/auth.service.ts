@@ -2,6 +2,7 @@ import { Injectable, HttpException, HttpStatus} from '@nestjs/common';
 import {UsersService} from '../users/users.service'
 
 import { createCipheriv, randomBytes, createDecipheriv, scrypt } from 'crypto'
+import {JwtService} from '@nestjs/jwt'
 import { promisify } from 'util';
 
 // variables responsible for encrypting password during user registration
@@ -11,7 +12,10 @@ const secretKey = randomBytes(32); // used to generate 32 bytes of random data a
 const algorithm = 'aes-256-cbc' // the algorithm for encrypting the data
 @Injectable()
 export class AuthService {
-    constructor(private userService: UsersService) {}
+    constructor(
+        private userService: UsersService,
+        private jwtService: JwtService // service that will sign a token to the authenticated user payload
+    ) {}
 
     /**
      * It takes an email and password, encrypts the password, and then creates a user with the email
@@ -54,5 +58,11 @@ export class AuthService {
             throw new HttpException('Invalid Credentials', HttpStatus.BAD_REQUEST) 
         }
 
+    }
+
+    async putJwtInCookieOnLogin(userId: any) {
+        const payload = { userId: userId }
+        const token = this.jwtService.sign(payload)
+        return `Authentication=${token}; HttpOnly; Path=/; Max-Age=120`;
     }
 }
