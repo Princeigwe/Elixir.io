@@ -46,7 +46,7 @@ export class AuthService {
         // to check if the login password is decrypted encryptedPassword
         const decipher = createDecipheriv(algorithm, secretKey, initVector); // decipher function
         let decryptedPassword = decipher.update(encryptedPassword, "hex", "utf-8") //decrypting password
-        decryptedPassword += decipher.final("utf8"); // stopping decryption process
+        decryptedPassword += decipher.final("utf-8"); // stopping decryption process
 
         if (decryptedPassword == password) {
             return user
