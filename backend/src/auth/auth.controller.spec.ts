@@ -7,15 +7,15 @@ describe('AuthController', () => {
 
   const mockAuthService = {
 
-    registerUser: jest.fn((email: string, password: string) => (
-      {
-        "email": "testuser3@gmail.com",
-	      "password": "testpass123",
-        "role": "User",
-	      "_id": "123456",
-	      "__v": 0
-      }
-    )),
+    // registerUser: jest.fn((email: string, password: string) => (
+    //   {
+    //     "email": "testuser3@gmail.com",
+	  //     "password": "testpass123",
+    //     "role": "User",
+	  //     "_id": "123456",
+	  //     "__v": 0
+    //   }
+    // )),
 
     registerAdmin: jest.fn((email: string, password: string) => (
       {
@@ -27,7 +27,7 @@ describe('AuthController', () => {
       }
     )),
 
-    registerPatient: jest.fn((email: string, password: string) => (
+    registerUserPatient: jest.fn((email: string, password: string) => (
       {
         "email": "testuser2@gmail.com",
         "password": "testpass123",
@@ -37,6 +37,17 @@ describe('AuthController', () => {
 	      "__v": 0
       }
     )),
+
+    registerUserMedicalProvider: jest.fn((email: string, password: string) => (
+      {
+        "email": "testuser3@gmail.com",
+        "password": "testpass123",
+	      "_id": "123456789",
+        "role": "User",
+        "category": "Medical Provider",
+	      "__v": 0
+      }
+    ))
 
   }
 
@@ -55,16 +66,16 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return a registered user', async() => {
-    const user = {
-      "email": "testuser3@gmail.com",
-      "password": "testpass123",
-      "_id": "123456",
-      "role": "User",
-      "__v": 0
-    }
-    expect(await controller.registerUser({email: 'testuser3@gmail.com', password: 'testpass123'})).toEqual(user)
-  })
+  // it('should return a registered user', async() => {
+  //   const user = {
+  //     "email": "testuser3@gmail.com",
+  //     "password": "testpass123",
+  //     "_id": "123456",
+  //     "role": "User",
+  //     "__v": 0
+  //   }
+  //   expect(await controller.registerUser({email: 'testuser3@gmail.com', password: 'testpass123'})).toEqual(user)
+  // })
 
   it('should return a registered admin', async () => {
     const user = {
@@ -77,7 +88,7 @@ describe('AuthController', () => {
     expect(await controller.registerAdmin({email: 'testuser1@gmail.com', password: 'testpass123'})).toEqual(user)
   })
 
-  it("should return a registered patient", () => {
+  it("should return a registered patient", async () => {
     const patient = {
       "email": "testuser2@gmail.com",
       "password": "testpass123",
@@ -86,6 +97,19 @@ describe('AuthController', () => {
       "category": "Patient",
       "__v": 0
     }
-    expect(controller.registerUserPatient({email: 'testuser2@gmail.com', password: 'testpass123'})).toBe(patient)
+    expect(await controller.registerUserPatient({email: 'testuser2@gmail.com', password: 'testpass123'})).toEqual(patient)
   })
+
+  it("should return a registered medical provider", async () => {
+    const medicalProvider = {
+      "email": "testuser3@gmail.com",
+      "password": "testpass123",
+      "_id": "123456789",
+      "role": "User",
+      "category": "Medical Provider",
+      "__v": 0
+    }
+    expect(await controller.registerUserMedicalProvider({email: "testuser3@gmail.com", password: "testpass123",})).toEqual(medicalProvider)
+  })
+
 });
