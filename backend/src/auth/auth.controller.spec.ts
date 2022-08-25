@@ -7,11 +7,11 @@ describe('AuthController', () => {
 
   const mockAuthService = {
 
-    registerUser: jest.fn(() => (
+    registerUser: jest.fn((email: string, password: string) => (
       {
         "email": "testuser3@gmail.com",
-	      "password": "$2b$10$RkL9RZeAfcLuJZ7FjcLAGOmbV9qEJ6dTaR.v8hkbCzkvcEmU3Qsmi",
-	      "_id": "6306bf09da10b393973a01ea",
+	      "password": "testpass123",
+	      "_id": "123456",
 	      "__v": 0
       }
     ))
@@ -32,4 +32,13 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
+  it('should return a registered user', async() => {
+    const user = {
+      "email": "testuser3@gmail.com",
+      "password": "testpass123",
+      "_id": "123456",
+      "__v": 0
+    }
+    expect(await controller.registerUser({email: 'testuser3@gmail.com', password: 'testpass123'})).toEqual(user)
+  })
 });
