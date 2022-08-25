@@ -10,11 +10,6 @@ export class AuthController {
 
     // role based registration for user and admin 
 
-    @Post('register-user')
-    async registerUser(@Body() body: RegisterUserAdminDto) {
-        return this.authService.registerUser(body.email, body.password)
-    }
-
     @Post('register-admin')
     async registerAdmin(@Body() body: RegisterUserAdminDto) {
         return this.authService.registerAdmin(body.email, body.password)

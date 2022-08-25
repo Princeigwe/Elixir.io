@@ -11,20 +11,6 @@ export class AuthService {
     ) {}
 
 
-    /**
-     * The function takes in an email and password, generates a salt, hashes the password with the
-     * salt, and then creates a user with the email and hashed password
-     * @param {string} email - string, password: string
-     * @param {string} password - The password that the user is trying to register with.
-     * @returns The userService.createUser method is being returned.
-     */
-    async registerUser(email: string, password: string) {
-        // steps to hashing user password 
-        const salt = await bcrypt.genSalt(10) // generate salt
-        const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
-        return this.userService.createUser(email, hashedPassword)
-    }
-
     // this method is responsible to register an admin
     async registerAdmin(email: string, password: string) {
         const salt = await bcrypt.genSalt(10) // generate salt
