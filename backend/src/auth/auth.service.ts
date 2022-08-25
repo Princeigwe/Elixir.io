@@ -32,6 +32,13 @@ export class AuthService {
         return this.userService.createAdmin(email, hashedPassword)
     }
 
+    // this method registers a user as a patient
+    async registerUserPatient(email: string, password: string) { 
+        const salt = await bcrypt.genSalt(10) // generate salt
+        const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
+        return this.userService.createUserPatient(email, hashedPassword)
+    }
+
 
     /**
    * We're going to get a user by email, then we're going to compare the password that was passed in

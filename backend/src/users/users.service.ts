@@ -3,6 +3,7 @@ import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {User, UserDocument} from '../users/users.schema'
 import {Role} from '../enums/role.enum'
+import {UserCategory} from '../enums/user.category.enum'
 
 
 @Injectable()
@@ -24,14 +25,30 @@ export class UsersService {
         return user.save();
     }
 
+    /**
+     * It creates a new user with the role of Admin
+     * @param {string} email - string, password: string
+     * @param {string} password - string - the password that the user will use to login
+     * @returns The user is being returned.
+     */
     async createAdmin(email: string, password: string) {
         const existingUser = await this.userModel.findOne({email: email}).exec();
         if (existingUser) { 
-            throw new HttpException('User with this email already exists', HttpStatus.BAD_REQUEST) 
+            throw new HttpException('An administrator with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const role = Role.Admin
         const user = new this.userModel({email: email, password: password, role: role})
         return user.save()
+    }
+
+
+    async createUserPatient(email: string, password: string) {
+        const existingUser = await this.userModel.findOne({email: email}).exec();
+        if (existingUser) { 
+            throw new HttpException('A patient with this email already exists', HttpStatus.BAD_REQUEST) 
+        }
+        const user = new this.userModel({email: email, password: password});
+        return user.save();
     }
 
 

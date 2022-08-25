@@ -8,6 +8,8 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 export class AuthController {
     constructor(private authService: AuthService) {}
 
+    // role based registration for user and admin 
+
     @Post('register-user')
     async registerUser(@Body() body: RegisterUserAdminDto) {
         return this.authService.registerUser(body.email, body.password)
@@ -16,6 +18,14 @@ export class AuthController {
     @Post('register-admin')
     async registerAdmin(@Body() body: RegisterUserAdminDto) {
         return this.authService.registerAdmin(body.email, body.password)
+    }
+
+
+    // user category based registration for patients and medical professionals
+
+    @Post('register-user-patient')
+    async registerUserPatient(@Body() body: RegisterUserAdminDto) {
+        return this.authService.registerUserPatient(body.email, body.password)
     }
 
 

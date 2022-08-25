@@ -25,7 +25,18 @@ describe('AuthController', () => {
         "role": "Admin",
 	      "__v": 0
       }
-    ))
+    )),
+
+    registerPatient: jest.fn((email: string, password: string) => (
+      {
+        "email": "testuser2@gmail.com",
+        "password": "testpass123",
+	      "_id": "12345678",
+        "role": "User",
+        "category": "Patient",
+	      "__v": 0
+      }
+    )),
 
   }
 
@@ -64,5 +75,17 @@ describe('AuthController', () => {
       "__v": 0
     }
     expect(await controller.registerAdmin({email: 'testuser1@gmail.com', password: 'testpass123'})).toEqual(user)
+  })
+
+  it("should return a registered patient", () => {
+    const patient = {
+      "email": "testuser2@gmail.com",
+      "password": "testpass123",
+      "_id": "12345678",
+      "role": "User",
+      "category": "Patient",
+      "__v": 0
+    }
+    expect(controller.registerUserPatient({email: 'testuser2@gmail.com', password: 'testpass123'})).toBe(patient)
   })
 });
