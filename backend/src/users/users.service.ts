@@ -2,6 +2,8 @@ import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestj
 import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {User, UserDocument} from '../users/users.schema'
+import {Role} from '../enums/role.enum'
+
 
 @Injectable()
 export class UsersService {
@@ -21,6 +23,17 @@ export class UsersService {
         const user = new this.userModel({email: email, password: password});
         return user.save();
     }
+
+    async createAdmin(email: string, password: string) {
+        const existingUser = await this.userModel.findOne({email: email}).exec();
+        if (existingUser) { 
+            throw new HttpException('User with this email already exists', HttpStatus.BAD_REQUEST) 
+        }
+        const role = Role.Admin
+        const user = new this.userModel({email: email, password: password, role: role})
+        return user.save()
+    }
+
 
     /**
      * It returns a list of users from the database

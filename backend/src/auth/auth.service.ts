@@ -25,9 +25,15 @@ export class AuthService {
         return this.userService.createUser(email, hashedPassword)
     }
 
+    // this method is responsible to register an admin
+    async registerAdmin(email: string, password: string) {
+        const salt = await bcrypt.genSalt(10) // generate salt
+        const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
+        return this.userService.createAdmin(email, hashedPassword)
+    }
 
 
-  /**
+    /**
    * We're going to get a user by email, then we're going to compare the password that was passed in
    * with the hashed password that we got from the database. If they match, we'll return the user. If
    * they don't match, we'll throw an error

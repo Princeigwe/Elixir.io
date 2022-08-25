@@ -1,6 +1,7 @@
 import {IsNotEmpty, IsString} from 'class-validator'
 
-export class RegisterUserDto {
+// dto for user and admin registration
+export class RegisterUserAdminDto {
 
     @IsString()
     @IsNotEmpty()
