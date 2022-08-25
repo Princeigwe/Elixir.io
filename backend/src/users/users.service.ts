@@ -34,7 +34,7 @@ export class UsersService {
     async createAdmin(email: string, password: string) {
         const existingUser = await this.userModel.findOne({email: email}).exec();
         if (existingUser) { 
-            throw new HttpException('An administrator with this email already exists', HttpStatus.BAD_REQUEST) 
+            throw new HttpException('An user with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const role = Role.Admin
         const category = "__"
@@ -43,20 +43,22 @@ export class UsersService {
     }
 
 
+    // this method is creates a user as a patient
     async createUserPatient(email: string, password: string) {
         const existingUser = await this.userModel.findOne({email: email}).exec();
         if (existingUser) { 
-            throw new HttpException('A patient with this email already exists', HttpStatus.BAD_REQUEST) 
+            throw new HttpException('A user with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const user = new this.userModel({email: email, password: password});
         return user.save();
     }
 
 
+    // this method create a user as a MedicalProvider
     async createUserMedicalProvider(email: string, password: string) {
         const existingUser = await this.userModel.findOne({email: email}).exec();
         if (existingUser) { 
-            throw new HttpException('A medical provider with this email already exists', HttpStatus.BAD_REQUEST) 
+            throw new HttpException('A user with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const category = UserCategory.MedicalProvider
         const user = new this.userModel({email: email, password: password, category: category})
