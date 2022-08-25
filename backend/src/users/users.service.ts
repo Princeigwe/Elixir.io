@@ -37,7 +37,8 @@ export class UsersService {
             throw new HttpException('An administrator with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const role = Role.Admin
-        const user = new this.userModel({email: email, password: password, role: role})
+        const category = "__"
+        const user = new this.userModel({email: email, password: password, role: role, category: category})
         return user.save()
     }
 
