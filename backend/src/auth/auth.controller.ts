@@ -28,6 +28,12 @@ export class AuthController {
         return this.authService.registerUserPatient(body.email, body.password)
     }
 
+    @Post('register-user-medic')
+    async registerUserMedicalProvider(@Body() body: RegisterUserAdminDto) {
+        return this.authService.registerUserMedicalProvider(body.email, body.password)
+
+    }
+
 
     @UseGuards(LocalAuthGuard)
     @Post('login')

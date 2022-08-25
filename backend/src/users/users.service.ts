@@ -52,6 +52,17 @@ export class UsersService {
     }
 
 
+    async createUserMedicalProvider(email: string, password: string) {
+        const existingUser = await this.userModel.findOne({email: email}).exec();
+        if (existingUser) { 
+            throw new HttpException('A medical provider with this email already exists', HttpStatus.BAD_REQUEST) 
+        }
+        const category = UserCategory.MedicalProvider
+        const user = new this.userModel({email: email, password: password, category: category})
+        return user.save()
+    }
+
+
     /**
      * It returns a list of users from the database
      * @returns An array of users

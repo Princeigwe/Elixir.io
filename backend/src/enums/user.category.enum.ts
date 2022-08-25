@@ -2,5 +2,5 @@
 
 export enum UserCategory {
     Patient = "Patient", 
-    MedicalProfessional = "MedicalProfessional"
+    MedicalProvider = "Medical Provider"
 }
