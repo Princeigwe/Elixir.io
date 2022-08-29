@@ -7,9 +7,17 @@ jobs:
     steps:
       - checkout:
           path: ~/elixir.io # circleci should work on the subdirectories of elixir.io
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: test
           command: |
             npm install rimraf 
             npm test
+      - run:
+          name: build Docker image
+          command: docker build -t princeigwe/elixir.io:latest .
+      - run: 
+          name: push Docker image
+          command: docker push princeigwe/elixir.io:latest
 
