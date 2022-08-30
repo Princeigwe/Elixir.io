@@ -23,12 +23,20 @@ export class PatientService {
         return patients
     }
 
-    async getPatientProfileById(_id: any) {
+    async getPatientProfileById(_id: string) {
         const patient = await this.patientModel.findOne({'_id': _id}).exec()
         if (!patient) {throw new NotFoundException("Patient Not Found")}
         return patient
     }
 
+    // this method will help patient fill up or edit profile without touching medical details and user object id
+    async editBasicPatientProfileById(_id: string, attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation'>) {
+        const patient = await this.getPatientProfileById(_id)
+        Object.assign(patient, attrs)
+        return patient.save()
+    }
+
+    async addToPatientPrescriptionById(id: string) {}
 
     async assignDoctorToPatient() {}
 
