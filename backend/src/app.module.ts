@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ProfilesModule } from './profiles/profiles.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ProfilesModule } from './profiles/profiles.module';
     UsersModule,
     AuthModule,
     ProfilesModule,
+    EventEmitterModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService],

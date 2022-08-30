@@ -4,11 +4,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import {User, UserDocument} from '../users/users.schema'
 import {Role} from '../enums/role.enum'
 import {UserCategory} from '../enums/user.category.enum'
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {NewUserEvent} from '../events/createProfileByUser.event'
 
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+    constructor(
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
+        private eventEmitter: EventEmitter2
+    ) {}
 
     /**
      * It creates a new user in the database if the email doesn't already exist
@@ -50,6 +55,7 @@ export class UsersService {
             throw new HttpException('A user with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const user = new this.userModel({email: email, password: password});
+        this.eventEmitter.emit('new.user', new NewUserEvent(user)) // event to create patient profile
         return user.save();
     }
 

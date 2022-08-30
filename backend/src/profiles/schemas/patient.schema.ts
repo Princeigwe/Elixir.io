@@ -4,6 +4,7 @@ import {MaritalStatus} from '../../enums/marital.status.enum'
 import * as mongoose from 'mongoose'
 import {User} from '../../users/users.schema'
 
+
 export type PatientDocument = Patient & Document
 
 @Schema()
