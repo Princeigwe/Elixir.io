@@ -23,9 +23,12 @@ export class PatientService {
         return patients
     }
 
-    async getPatientProfile() {}
+    async getPatientProfileById(_id: any) {
+        const patient = await this.patientModel.findOne({'_id': _id}).exec()
+        if (!patient) {throw new NotFoundException("Patient Not Found")}
+        return patient
+    }
 
-    async editPatientProfile() {}
 
     async assignDoctorToPatient() {}
 
