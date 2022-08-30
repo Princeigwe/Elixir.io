@@ -39,7 +39,7 @@ export class Patient {
     maritalStatus: MaritalStatus
 
     @Prop({ type: mongoose.Schema.Types.Array })
-    medications: [
+    prescriptions: [
         // {
         //     drug: string,
         //     dosage: string,
