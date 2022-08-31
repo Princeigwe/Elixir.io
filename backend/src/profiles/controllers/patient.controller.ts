@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Body } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Body, Delete } from '@nestjs/common';
 import {PatientService} from '../services/patient.service'
 import {EditPatientDto} from '../dtos/edit.pateint.dto'
 
@@ -19,5 +19,11 @@ export class PatientController {
     @Patch(':_id')
     async editBasicPatientProfileById(@Param('_id') _id: string, @Body() body: EditPatientDto) {
         return await this.patientService.editBasicPatientProfileById(_id, body)
+    }
+
+    @Delete()
+    async deletePatientsProfiles() {
+        await this.patientService.deletePatientsProfiles()
+        return {message: 'Patients profiles deleted'}
     }
 }

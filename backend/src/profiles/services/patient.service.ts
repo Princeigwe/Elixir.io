@@ -36,13 +36,19 @@ export class PatientService {
         return patient.save()
     }
 
+    // this method will only be executed by a medical provider
     async addToPatientPrescriptionById(id: string) {}
+
+    // this method will only be executed by a medical provider
+
+    async editPatientPrescriptionById() {}
 
     async assignDoctorToPatient() {}
 
     async editAssignedDoctorToPatient() {}
 
-    async addToPatientMedication() {}
+    async deletePatientsProfiles() {
+        await this.patientModel.deleteMany().exec()
+    }
 
-    async editPatientMedication() {}
 }
