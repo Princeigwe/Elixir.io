@@ -5,16 +5,17 @@ import {MongooseModule} from '@nestjs/mongoose'
 import { PatientService } from './services/patient.service';
 import { PatientController } from './controllers/patient.controller';
 import { DoctorService } from './services/doctor.service';
+import { DoctorController } from './controllers/doctor.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Patient.name, schema: PatientSchema},
-      {name: Doctor.name, schema: DoctorSchema}
+      { name: Patient.name, schema: PatientSchema },
+      { name: Doctor.name, schema: DoctorSchema }
     ])
   ],
   providers: [PatientService, DoctorService],
-  controllers: [PatientController],
-  exports: [PatientService]
+  controllers: [PatientController, DoctorController],
+  exports: [PatientService, DoctorService]
 })
 export class ProfilesModule {}
