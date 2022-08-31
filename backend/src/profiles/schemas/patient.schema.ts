@@ -38,7 +38,7 @@ export class Patient {
     @Prop({default: MaritalStatus.Single})
     maritalStatus: MaritalStatus
 
-    @Prop({type: mongoose.Schema.Types.Array})
+    @Prop([String])
     medicalIssues: string[]
 
     @Prop({ type: mongoose.Schema.Types.Array })
