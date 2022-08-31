@@ -12,7 +12,7 @@ export class Patient {
     
     // todo: this will be the url string of profile image
     // @Prop()
-    // image: string
+    // imageUrl: string
     
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     user: User
@@ -37,6 +37,9 @@ export class Patient {
 
     @Prop({default: MaritalStatus.Single})
     maritalStatus: MaritalStatus
+
+    @Prop({type: mongoose.Schema.Types.Array})
+    medicalIssues: string[]
 
     @Prop({ type: mongoose.Schema.Types.Array })
     prescriptions: [
