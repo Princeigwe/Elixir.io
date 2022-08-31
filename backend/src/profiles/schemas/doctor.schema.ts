@@ -33,9 +33,6 @@ export class Doctor {
     @Prop()
     telephone: string
 
-    @Prop()
-    occupation: string
-
     @Prop({default: MaritalStatus.Single})
     maritalStatus: MaritalStatus
 

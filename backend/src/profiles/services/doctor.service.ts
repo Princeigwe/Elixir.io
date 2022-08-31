@@ -21,4 +21,18 @@ export class DoctorService {
         if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
         return doctors
     }
+
+    async getDoctorProfileById(_id:string) {
+        const doctor = await this.doctorModel.findOne({'_id':_id}).exec()
+        if (!doctor) {throw new NotFoundException("Doctor Not Found")}
+        return doctor
+    }
+
+    async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone'>) {
+
+    }
+
+    async deleteDoctorsProfiles() {
+        await this.doctorModel.deleteMany().exec()
+    }
 }
