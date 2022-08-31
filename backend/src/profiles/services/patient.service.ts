@@ -30,7 +30,7 @@ export class PatientService {
     }
 
     // this method will help patient fill up or edit profile without touching medical details and user object id
-    async editBasicPatientProfileById(_id: string, attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation'>) {
+    async editBasicPatientProfileById(_id: string, attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>) {
         const patient = await this.getPatientProfileById(_id)
         Object.assign(patient, attrs)
         return patient.save()

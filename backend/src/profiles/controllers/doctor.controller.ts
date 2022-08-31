@@ -1,5 +1,6 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Patch, Body } from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
+import {EditDoctorDto} from '../dtos/edit.doctor.dto'
 
 @Controller('doctors')
 export class DoctorController {
@@ -13,6 +14,11 @@ export class DoctorController {
     @Get()
     async getDoctorProfiles() {
         return await this.doctorService.getDoctorProfiles()
+    }
+
+    @Patch(':_id')
+    async editBasicDoctorProfileById(@Param('_id') _id: string, @Body() body: EditDoctorDto) {
+        return await this.doctorService.editBasicDoctorProfileById(_id, body)
     }
 
     @Delete()

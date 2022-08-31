@@ -28,8 +28,11 @@ export class DoctorService {
         return doctor
     }
 
-    async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone'>) {
-
+    // this method will help doctor fill up or edit profile without touching organizational data and user object id
+    async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >) {
+        const doctor = await this.getDoctorProfileById(_id)
+        Object.assign(doctor, attrs)
+        return doctor.save()
     }
 
     async deleteDoctorsProfiles() {

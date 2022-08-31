@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Patch, Body, Delete } from '@nestjs/common';
 import {PatientService} from '../services/patient.service'
-import {EditPatientDto} from '../dtos/edit.pateint.dto'
+import {EditPatientDto} from '../dtos/edit.patient.dto'
 
 @Controller('patients')
 export class PatientController {
