@@ -24,7 +24,36 @@ describe('DoctorController', () => {
       }
     }),
 
-    getDoctorProfiles: jest.fn(),
+    getDoctorProfiles: jest.fn( () => {
+      return [
+        {
+          _id: "1234567",
+          user: "6311006facc97637eed89307",
+          maritalStatus: "Single",
+          specialties: [],
+          certificates: [],
+          hierarchy: "Medical Student",
+          languages: [],
+          subordinateDoctors: [],
+          assignedPatients: [],
+          __v: 0
+        },
+
+        {
+          _id: "12345678",
+          user: "6311006facc97637eed89307",
+          maritalStatus: "Single",
+          specialties: [],
+          certificates: [],
+          hierarchy: "Medical Student",
+          languages: [],
+          subordinateDoctors: [],
+          assignedPatients: [],
+          __v: 0
+        },
+
+      ]
+    } ),
 
     editBasicDoctorProfileById: jest.fn(),
 
@@ -64,5 +93,35 @@ describe('DoctorController', () => {
     }
 
     expect(await controller.getDoctorProfileById('6311006facc97637eed89309')).toEqual(response)
+  })
+
+  it('should return array of doctors', async () => {
+    let response = [
+      {
+        "_id": "1234567",
+        "user": "6311006facc97637eed89307",
+        "maritalStatus": "Single",
+        "specialties": [],
+        "certificates": [],
+        "hierarchy": "Medical Student",
+        "languages": [],
+        "subordinateDoctors": [],
+        "assignedPatients": [],
+        "__v": 0
+      },
+      {
+        "_id": "12345678",
+        "user": "6311006facc97637eed89307",
+        "maritalStatus": "Single",
+        "specialties": [],
+        "certificates": [],
+        "hierarchy": "Medical Student",
+        "languages": [],
+        "subordinateDoctors": [],
+        "assignedPatients": [],
+        "__v": 0
+      }
+    ]
+    expect(await controller.getDoctorProfiles()).toMatchObject(response)
   })
 });
