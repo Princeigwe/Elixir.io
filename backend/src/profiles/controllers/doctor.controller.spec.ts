@@ -55,9 +55,11 @@ describe('DoctorController', () => {
       ]
     } ),
 
-    editBasicDoctorProfileById: jest.fn(),
-
-    deleteDoctorsProfiles: jest.fn(),
+    deleteDoctorsProfiles: jest.fn( () => { 
+      return {
+        message: "Doctor profiles deleted"
+      }
+    } ),
   }
 
   beforeEach(async () => {
@@ -124,4 +126,13 @@ describe('DoctorController', () => {
     ]
     expect(await controller.getDoctorProfiles()).toMatchObject(response)
   })
+
+  it('should return a delete message', async () => {
+    let response = {
+      "message": "Doctor profiles deleted"
+    }
+
+    expect(await controller.deleteDoctorsProfiles()).toEqual(response)
+  })
+
 });
