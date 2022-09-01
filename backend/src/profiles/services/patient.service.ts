@@ -49,6 +49,7 @@ export class PatientService {
 
     async deletePatientsProfiles() {
         await this.patientModel.deleteMany().exec()
+        return {message: 'Patients profiles deleted'}
     }
 
 }

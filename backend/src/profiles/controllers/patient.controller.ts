@@ -23,7 +23,6 @@ export class PatientController {
 
     @Delete()
     async deletePatientsProfiles() {
-        await this.patientService.deletePatientsProfiles()
-        return {message: 'Patients profiles deleted'}
+        return await this.patientService.deletePatientsProfiles()
     }
 }
