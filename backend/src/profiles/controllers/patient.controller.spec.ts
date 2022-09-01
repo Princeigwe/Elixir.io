@@ -19,6 +19,28 @@ describe('PatientController', () => {
       }
     }),
 
+    getPatientProfiles: jest.fn( () => {
+      return [
+        {
+          "_id": "1234567",
+          "user": "630f9ec1ccfea4acf8eb4986",
+          "maritalStatus": "Single",
+          "medicalIssues": [],
+          "prescriptions": [],
+          "__v": 0
+        },
+
+        {
+          "_id": "12345678",
+          "user": "630f9ec1ccfea4acf8eb4986",
+          "maritalStatus": "Single",
+          "medicalIssues": [],
+          "prescriptions": [],
+          "__v": 0
+        }
+      ]
+    } ),
+
 
   }
 
@@ -50,5 +72,28 @@ describe('PatientController', () => {
         "__v": 0
     }
     expect(await controller.getPatientProfileById('1234567')).toEqual(patient)
+  })
+
+  it('should return an array of patients', async () => {
+    let patients = [
+      {
+        "_id": "1234567",
+        "user": "630f9ec1ccfea4acf8eb4986",
+        "maritalStatus": "Single",
+        "medicalIssues": [],
+        "prescriptions": [],
+        "__v": 0
+      },
+
+      {
+        "_id": "12345678",
+        "user": "630f9ec1ccfea4acf8eb4986",
+        "maritalStatus": "Single",
+        "medicalIssues": [],
+        "prescriptions": [],
+        "__v": 0
+      }
+    ]
+    expect(await controller.getPatientProfiles()).toEqual(patients)
   })
 });
