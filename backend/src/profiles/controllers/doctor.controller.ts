@@ -1,6 +1,8 @@
 import { Controller, Get, Param, Delete, Patch, Body } from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
 import {EditDoctorDto} from '../dtos/edit.doctor.dto'
+import {Role} from '../../enums/role.enum'
+import {Roles} from '../../roles.decorator'
 
 @Controller('doctors')
 export class DoctorController {

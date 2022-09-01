@@ -6,6 +6,7 @@ import {NewUserEvent} from '../../events/createProfileByUser.event'
 import {OnEvent} from '@nestjs/event-emitter'
 
 
+
 @Injectable()
 export class DoctorService {
     constructor(@InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>) {}
@@ -34,6 +35,9 @@ export class DoctorService {
         Object.assign(doctor, attrs)
         return doctor.save()
     }
+
+    // this action will be executed by the admin
+    async assignADirectingDoctorToDoctor() {}
 
     async deleteDoctorsProfiles() {
         await this.doctorModel.deleteMany().exec()
