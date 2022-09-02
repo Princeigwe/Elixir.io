@@ -21,3 +21,10 @@ jobs:
           name: push Docker image
           command: docker push princeigwe/elixir.io:latest
 
+
+workflows:
+  elixir:
+    jobs:
+      - build:
+          context: 
+            - DOCKER_AUTH
