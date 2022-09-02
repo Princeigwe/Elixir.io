@@ -68,7 +68,7 @@ COPY . .
 
 
 #  copy the compiled javascript code to out production image
-COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /usr/src/app/backend/dist ./dist
 
 # EXPOSE 3000
 
