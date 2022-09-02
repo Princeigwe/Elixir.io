@@ -23,7 +23,7 @@ jobs:
       - run: 
           name: push Docker image
           command: |
-            docker login
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD docker.io
             docker push princeigwe/elixir.io:latest
 
 
