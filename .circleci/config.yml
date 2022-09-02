@@ -22,7 +22,9 @@ jobs:
           command: docker build -t princeigwe/elixir.io:latest .
       - run: 
           name: push Docker image
-          command: docker push princeigwe/elixir.io:latest
+          command: |
+            docker login
+            docker push princeigwe/elixir.io:latest
 
 
 workflows:
