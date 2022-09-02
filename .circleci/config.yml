@@ -1,8 +1,11 @@
 version: 2.1
 jobs:
-  build:
+  job1:
     docker:
       - image: cimg/node:18.7.0
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
     working_directory: ~/elixir.io/backend # setting working directory
     steps:
       - checkout:
@@ -25,6 +28,6 @@ jobs:
 workflows:
   elixir:
     jobs:
-      - build:
+      - job1:
           context: 
             - DOCKER_AUTH
