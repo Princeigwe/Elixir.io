@@ -102,5 +102,15 @@
         - certificates: The certificates of the practicing doctor.
         - yearsOfExperience
         - languages
+    
+    8. The departments available to doctors to be assigned to:
+        - Cardiology
+        - Dermatology 
+        - Urology
+        - IntensiveCareMedicine
+        - Neurology
+        - Surgery
+        - Radiology
+        - Pharmacy
 
 
