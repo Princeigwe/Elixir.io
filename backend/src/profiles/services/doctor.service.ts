@@ -29,14 +29,22 @@ export class DoctorService {
         return doctor
     }
 
-    // this method will help doctor fill up or edit profile without touching organizational data and user object id
+    
+    // todo: this method will help doctor fill up or edit profile without touching organizational data and user object id
     async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >) {
         const doctor = await this.getDoctorProfileById(_id)
         Object.assign(doctor, attrs)
         return doctor.save()
     }
 
-    // this action will be executed by the admin
+    //todo:  this action can only be executed by the admin. The admin is responsible for assign a doctor to a department
+    async assignDoctorToADepartment(_id: string, attrs: Pick<Doctor, 'department'>) {
+        const doctor = await this.getDoctorProfileById(_id)
+        Object.assign(doctor, attrs)
+        return doctor.save()
+    }
+
+    //todo: this action will be executed by the admin or the Consultant of the departmental unit
     async assignADirectingDoctorToDoctor() {}
 
     async deleteDoctorsProfiles() {

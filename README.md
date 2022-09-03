@@ -86,6 +86,7 @@
         - hierarchy: This is just the professional rank of the practicing doctor.
         - yearsOfExperience
         - languages
+        - department
         - directingDoctor: The doctor monitoring the activities of the practicing doctor.
         - subordinateDoctors: The doctors under the responsibility of the practicing doctor.
         - assignedPatients: The patients under the care of the practicing doctor.

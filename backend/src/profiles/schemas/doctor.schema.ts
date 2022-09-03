@@ -4,6 +4,7 @@ import {MaritalStatus} from '../../enums/marital.status.enum'
 import * as mongoose from 'mongoose'
 import {User} from '../../users/users.schema'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
+import {HospitalDepartments} from '../../enums/department.enum'
 
 
 export type DoctorDocument = Doctor & Document
@@ -50,6 +51,9 @@ export class Doctor {
 
     @Prop([String])
     languages: string[]
+
+    @Prop()
+    department: HospitalDepartments 
 
     @Prop(raw({
         firstName: {type: String},

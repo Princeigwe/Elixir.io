@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Delete, Patch, Body } from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
 import {EditDoctorDto} from '../dtos/edit.doctor.dto'
+import {AssignDoctorToDepartmentDto} from '../dtos/assign.doctor.department.dto'
 import {Role} from '../../enums/role.enum'
 import {Roles} from '../../roles.decorator'
 
@@ -21,6 +22,11 @@ export class DoctorController {
     @Patch(':_id')
     async editBasicDoctorProfileById(@Param('_id') _id: string, @Body() body: EditDoctorDto) {
         return await this.doctorService.editBasicDoctorProfileById(_id, body)
+    }
+
+    @Patch('assign-doctor-to-department/:_id')
+    async assignDoctorToDepartment(@Param('_id') _id: string, @Body() body: AssignDoctorToDepartmentDto) {
+        return await this.doctorService.assignDoctorToADepartment(_id, body)
     }
 
     @Delete()
