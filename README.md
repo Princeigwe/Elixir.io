@@ -112,5 +112,6 @@
         - Surgery
         - Radiology
         - Pharmacy
-
-
+    
+    9. These departments have various registration links to register a doctor with:
+        - Doctors are registered into the departments as consultants or non-consultants.

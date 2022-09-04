@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Body, Get, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, Delete, Param,Query } from '@nestjs/common';
 import {MedicalDepartmentsService} from './medical-departments.service'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import {RolesGuard} from '../roles.guard'
@@ -19,7 +19,20 @@ export class MedicalDepartmentsController {
     }
 
     @Get()
-    async getMedicalDepartments() {
+    async getMedicalDepartments(@Query('name') name: string) {
+        if(name) {
+            return this.medicalDepartmentsService.searchMedicalDepartmentByName(name)
+        }
         return this.medicalDepartmentsService.getMedicalDepartments()
     }
+
+    // @Get()
+    // async searchMedicalDepartmentByName() {}
+
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Delete(':name')
+    // @Roles(Role.Admin)
+    // async deleteMedicalDepartmentByName(@Param('name') name: string) {
+    //     return this.medicalDepartmentsService.deleteMedicalDepartmentByName(name)
+    // }
 }
