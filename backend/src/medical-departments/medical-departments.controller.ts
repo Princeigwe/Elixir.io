@@ -26,13 +26,11 @@ export class MedicalDepartmentsController {
         return this.medicalDepartmentsService.getMedicalDepartments()
     }
 
-    // @Get()
-    // async searchMedicalDepartmentByName() {}
-
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Delete(':name')
-    // @Roles(Role.Admin)
-    // async deleteMedicalDepartmentByName(@Param('name') name: string) {
-    //     return this.medicalDepartmentsService.deleteMedicalDepartmentByName(name)
-    // }
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete()
+    @Roles(Role.Admin)
+    async deleteMedicalDepartmentByName(@Query('name') name: string) {
+        if (name) { return this.medicalDepartmentsService.searchAndDeleteMedicalDepartmentByName(name) }
+        return this.medicalDepartmentsService.deleteMedicalDepartments()
+    }
 }

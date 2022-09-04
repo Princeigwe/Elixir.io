@@ -53,9 +53,16 @@ export class MedicalDepartmentsService {
     async removeFromMembersOfMedicalDepartment() {}
 
     // this action will only be executed by the admin
-    // async deleteMedicalDepartmentByName(name: string) {
-    //     const department = await this.medicalDepartmentModel.fin
-    //     await this.medicalDepartmentModel.deleteOne({'name': name})
-    //     return {message: 'Medical department deleted successfully'}
-    // }
+    async deleteMedicalDepartments() {
+        await this.medicalDepartmentModel.deleteMany()
+        return {message: 'Medical departments deleted successfully'}
+    }
+
+    // this action will only be executed by the admin
+    async searchAndDeleteMedicalDepartmentByName(name: string) {
+        const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': name}).exec()
+        if (!medicalDepartment) {throw new NotFoundException('This department cannot be deleted because it does not exist')}
+        await this.medicalDepartmentModel.deleteOne({'name': name})
+        return {message: 'Medical department deleted successfully'}
+    }
 }
