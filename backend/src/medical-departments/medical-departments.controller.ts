@@ -17,5 +17,9 @@ export class MedicalDepartmentsController {
     async createMedicalDepartment(@Body() body: CreateMedicalDepartmentDto) {
         return this.medicalDepartmentsService.createMedicalDepartment(body.name)
     }
-    
+
+    @Get()
+    async getMedicalDepartments() {
+        return this.medicalDepartmentsService.getMedicalDepartments()
+    }
 }

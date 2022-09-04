@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MedicalDepartmentsModule } from './medical-departments/medical-departments.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UsersModule,
     AuthModule,
     ProfilesModule,
-    EventEmitterModule.forRoot()
+    EventEmitterModule.forRoot(),
+    MedicalDepartmentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

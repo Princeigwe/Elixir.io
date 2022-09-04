@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import {Model} from 'mongoose'
 import {InjectModel} from '@nestjs/mongoose'
 import {MedicalDepartment, MedicalDepartmentDocument} from './medical-departments.schema'
@@ -26,7 +26,11 @@ export class MedicalDepartmentsService {
         return medicalDepartment.save()
     }
 
-    async getMedicalDepartments() {}
+    async getMedicalDepartments() {
+        const medicalDepartments = await this.medicalDepartmentModel.find().exec()
+        if (!medicalDepartments.length) {throw new NotFoundException('There are no medical departments found')}
+        return medicalDepartments
+    }
 
     async getMedicalDepartmentByName() {}
 
