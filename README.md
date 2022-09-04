@@ -115,3 +115,6 @@
     
     9. These departments have various registration links to register a doctor with:
         - Doctors are registered into the departments as consultants or non-consultants.
+
+
+**Note**: If a new medical department is created, the code for doctors' registration into that department should also be created in the auth controller, and vice versa.
