@@ -14,7 +14,7 @@ export class DoctorService {
 
     @OnEvent('new.user.medic')
     async createDoctorProfile(payload: NewMedicalProviderEvent) {
-        const doctor = new this.doctorModel({user: payload.user, firstName: payload.firstName, lastName: payload.lastName})
+        const doctor = new this.doctorModel({user: payload.user, firstName: payload.firstName, lastName: payload.lastName, hierarchy: payload.hierarchy})
         return doctor.save()
     }
 

@@ -3,6 +3,8 @@ import {UsersService} from '../users/users.service'
 import {JwtService} from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt';
 
+import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
+
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -37,16 +39,17 @@ export class AuthService {
     }
 
     // this method registers a user as a medical provider
-    async registerUserMedicalProvider(email: string, firstName: string, lastName: string, password: string) { 
+    async registerUserMedicalProvider(email: string, firstName: string, lastName: string, password: string, hierarchy: DoctorHierarchy) { 
         const salt = await bcrypt.genSalt(10) // generate salt
         const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
-        return this.userService.createUserMedicalProvider(email, firstName, lastName, hashedPassword)
+        return this.userService.createUserMedicalProvider(email, firstName, lastName, hashedPassword, hierarchy)
     }
 
     //  ** METHODS TO REGISTER CONSULTANTS TO VARIOUS DEPARTMENTS **
     // Cardiology
     async registerConsultantToCardiologyDepartment(email: string, firstName: string, lastName: string, password: string) {
-        await this.registerUserMedicalProvider(email, firstName, lastName, password)
+        const hierarchy = DoctorHierarchy.Consultant
+        await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy)
     }
 
 

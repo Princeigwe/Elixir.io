@@ -24,11 +24,11 @@ export class AuthController {
         return this.authService.registerUserPatient(body.email, body.password)
     }
 
-    @Post('register-user-medic')
-    async registerUserMedicalProvider(@Body() body: RegisterUserMedicDto) {
-        return this.authService.registerUserMedicalProvider(body.email, body.firstName, body.lastName, body.password)
+    // @Post('register-user-medic')
+    // async registerUserMedicalProvider(@Body() body: RegisterUserMedicDto) {
+    //     return this.authService.registerUserMedicalProvider(body.email, body.firstName, body.lastName, body.password)
 
-    }
+    // }
 
     //  ** REGISTRATION LINKS TO VARIOUS DEPARTMENTS FOR CONSULTANTS **
 
