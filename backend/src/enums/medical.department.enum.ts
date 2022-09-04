@@ -1,4 +1,4 @@
-export enum HospitalDepartments {
+export enum MedicalDepartments {
     Cardiology = 'Cardiology',
     Dermatology = 'Dermatology', 
     Urology = 'Urology',

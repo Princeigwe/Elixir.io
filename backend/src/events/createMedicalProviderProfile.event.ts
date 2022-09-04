@@ -1,5 +1,6 @@
 import {User} from '../users/users.schema'
 import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
+import {MedicalDepartments} from '../enums/medical.department.enum'
 
 
 export class NewMedicalProviderEvent {
@@ -7,6 +8,7 @@ export class NewMedicalProviderEvent {
         public user: User, 
         public firstName: string, 
         public lastName: string,
-        public hierarchy: DoctorHierarchy
+        public hierarchy: DoctorHierarchy,
+        public department: MedicalDepartments
     ) {}
 }

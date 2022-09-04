@@ -1,8 +1,8 @@
 import {IsEnum, IsNotEmpty} from 'class-validator'
-import {HospitalDepartments} from '../../enums/department.enum'
+import {MedicalDepartments} from '../../enums/medical.department.enum'
 
 export class AssignDoctorToDepartmentDto { 
-    @IsEnum(HospitalDepartments)
+    @IsEnum(MedicalDepartments)
     @IsNotEmpty()
-    department: HospitalDepartments
+    department: MedicalDepartments
 }
