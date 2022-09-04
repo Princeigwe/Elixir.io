@@ -4,6 +4,7 @@ import {Model} from 'mongoose'
 import {Doctor, DoctorDocument} from '../schemas/doctor.schema'
 import {NewUserEvent} from '../../events/createProfileByUser.event'
 import {OnEvent} from '@nestjs/event-emitter'
+import {NewMedicalProviderEvent} from '../../events/createMedicalProviderProfile.event'
 
 
 
@@ -11,9 +12,9 @@ import {OnEvent} from '@nestjs/event-emitter'
 export class DoctorService {
     constructor(@InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>) {}
 
-    @OnEvent('new.user')
-    async createPatientProfile(payload: NewUserEvent) {
-        const doctor = new this.doctorModel({user: payload.user})
+    @OnEvent('new.user.medic')
+    async createDoctorProfile(payload: NewMedicalProviderEvent) {
+        const doctor = new this.doctorModel({user: payload.user, firstName: payload.firstName, lastName: payload.lastName})
         return doctor.save()
     }
 

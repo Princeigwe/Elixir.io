@@ -3,6 +3,17 @@ import {UsersService} from '../users/users.service'
 import {JwtService} from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt';
 
+
+// AVAILABLE DEPARTMENTS = 
+// - Cardiology
+// - Dermatology 
+// - Urology
+// - IntensiveCareMedicine
+// - Neurology
+// - Surgery
+// - Radiology
+// - Pharmacy
+
 @Injectable()
 export class AuthService {
     constructor(
@@ -26,10 +37,16 @@ export class AuthService {
     }
 
     // this method registers a user as a medical provider
-    async registerUserMedicalProvider(email: string, password: string) { 
+    async registerUserMedicalProvider(email: string, firstName: string, lastName: string, password: string) { 
         const salt = await bcrypt.genSalt(10) // generate salt
         const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
-        return this.userService.createUserMedicalProvider(email, hashedPassword)
+        return this.userService.createUserMedicalProvider(email, firstName, lastName, hashedPassword)
+    }
+
+    //  ** METHODS TO REGISTER CONSULTANTS TO VARIOUS DEPARTMENTS **
+    // Cardiology
+    async registerConsultantToCardiologyDepartment(email: string, firstName: string, lastName: string, password: string) {
+        await this.registerUserMedicalProvider(email, firstName, lastName, password)
     }
 
 
@@ -67,6 +84,6 @@ export class AuthService {
     async putJwtInCookieOnLogin(userId: any) {
         const payload = { userId: userId }
         const token = this.jwtService.sign(payload)
-        return `Authentication=${token}; HttpOnly; Path=/; Max-Age=120`;
+        return `Authentication=${token}; HttpOnly; Path=/; Max-Age=86400`;
     }
 }

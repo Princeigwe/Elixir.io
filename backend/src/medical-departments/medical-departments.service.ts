@@ -3,7 +3,8 @@ import {Model} from 'mongoose'
 import {InjectModel} from '@nestjs/mongoose'
 import {MedicalDepartment, MedicalDepartmentDocument} from './medical-departments.schema'
 
-// AVAILABLE DEPARTMENTS = - Cardiology
+// AVAILABLE DEPARTMENTS = 
+// - Cardiology
 // - Dermatology 
 // - Urology
 // - IntensiveCareMedicine

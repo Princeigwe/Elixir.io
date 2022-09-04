@@ -6,6 +6,7 @@ import {Role} from '../enums/role.enum'
 import {UserCategory} from '../enums/user.category.enum'
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {NewUserEvent} from '../events/createProfileByUser.event'
+import {NewMedicalProviderEvent} from '../events/createMedicalProviderProfile.event'
 
 
 @Injectable()
@@ -61,14 +62,14 @@ export class UsersService {
 
 
     // this method create a user as a MedicalProvider
-    async createUserMedicalProvider(email: string, password: string) {
+    async createUserMedicalProvider(email: string, firstName: string, lastName: string, password: string) {
         const existingUser = await this.userModel.findOne({email: email}).exec();
         if (existingUser) { 
             throw new HttpException('A user with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const category = UserCategory.MedicalProvider
         const user = new this.userModel({email: email, password: password, category: category})
-        this.eventEmitter.emit('new.user', new NewUserEvent(user)) // event to create medical provider profile
+        this.eventEmitter.emit('new.user.medic', new NewMedicalProviderEvent(user, firstName, lastName)) // event to create medical provider profile
         return user.save()
     }
 

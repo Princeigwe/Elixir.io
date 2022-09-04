@@ -2,6 +2,7 @@ import { Controller, Get, Body, Post, UseGuards, Request, Response } from '@nest
 import { AuthService } from './auth.service';
 import {RegisterUserAdminDto} from './dtos/registerUser.dto'
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import {RegisterUserMedicDto} from './dtos/registerMedic.dto'
 
 
 @Controller('auth')
@@ -24,10 +25,18 @@ export class AuthController {
     }
 
     @Post('register-user-medic')
-    async registerUserMedicalProvider(@Body() body: RegisterUserAdminDto) {
-        return this.authService.registerUserMedicalProvider(body.email, body.password)
+    async registerUserMedicalProvider(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerUserMedicalProvider(body.email, body.firstName, body.lastName, body.password)
 
     }
+
+    //  ** REGISTRATION LINKS TO VARIOUS DEPARTMENTS FOR CONSULTANTS **
+
+    // Cardiology
+    @Post('register-consultant-to-cardiology')
+    async registerConsultantToCardiologyDepartment(@Body() body: RegisterUserMedicDto) { 
+        return this.authService.registerConsultantToCardiologyDepartment(body.email, body.firstName, body.lastName, body.password)
+    } 
 
 
     @UseGuards(LocalAuthGuard)
