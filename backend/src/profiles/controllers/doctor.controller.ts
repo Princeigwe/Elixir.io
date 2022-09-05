@@ -29,12 +29,12 @@ export class DoctorController {
         return await this.doctorService.editBasicDoctorProfileById(_id, body)
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.Admin)
-    @Patch('assign-doctor-to-department/:_id')
-    async assignDoctorToDepartment(@Param('_id') _id: string, @Body() body: AssignDoctorToDepartmentDto) {
-        return await this.doctorService.assignDoctorToADepartment(_id, body)
-    }
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles(Role.Admin)
+    // @Patch('assign-doctor-to-department/:_id')
+    // async assignDoctorToDepartment(@Param('_id') _id: string, @Body() body: AssignDoctorToDepartmentDto) {
+    //     return await this.doctorService.assignDoctorToADepartment(_id, body)
+    // }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()

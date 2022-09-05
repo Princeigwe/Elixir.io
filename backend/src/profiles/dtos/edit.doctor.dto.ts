@@ -3,14 +3,6 @@ import {MaritalStatus} from '../../enums/marital.status.enum'
 
 export class EditDoctorDto {
 
-    @IsString()
-    @IsOptional()
-    firstName: string;
-
-    @IsString()
-    @IsOptional()
-    lastName: string;
-
     @IsNumber()
     @IsOptional()
     age: number;
