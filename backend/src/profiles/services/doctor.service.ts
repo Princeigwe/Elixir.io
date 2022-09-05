@@ -49,7 +49,7 @@ export class DoctorService {
         }
 
         else if (firstName && lastName) {
-            let doctors = await this.doctorModel.find({'firstName.$': { "$regex": firstName, "$options": 'i' }, 'lastName.$': { "$regex": lastName, "$options": 'i' } }).exec() 
+            let doctors = await this.doctorModel.find({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' } }).exec() 
             if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
             return doctors
         }
