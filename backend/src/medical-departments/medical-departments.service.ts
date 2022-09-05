@@ -4,6 +4,7 @@ import {InjectModel} from '@nestjs/mongoose'
 import {MedicalDepartment, MedicalDepartmentDocument} from './medical-departments.schema'
 import {OnEvent} from '@nestjs/event-emitter'
 import {NewDepartmentConsultantEvent} from '../events/createNewDepartmentGroup.event'
+import {MedicalDepartments} from '../enums/medical.department.enum'
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -41,9 +42,13 @@ export class MedicalDepartmentsService {
         return medicalDepartment
     }
 
+    // this method finds a department and adds a new doctor to its memebers
+    async addToMembersOfDepartment(department: MedicalDepartments, member: string) {
+        await this.medicalDepartmentModel.updateOne( {'name': department}, { $push: { members: member } } )
+    }
+
     /*
         this will be executed by an event when a new consultant is registered
-
         This searches a department by name provided, and creates a new group with the consultant first and last name data
      */
     @OnEvent('new.consultant')
@@ -52,24 +57,24 @@ export class MedicalDepartmentsService {
         const consultantLastName = payload.lastName
         const department = payload.department
 
+        const consultant = `${consultantFirstName} ${consultantLastName}`
+
         let newGroup = { 
-            consultant: ` ${consultantFirstName} ${consultantLastName} `,
+            consultant: consultant,
             associateSpecialists: [], // maximum number of 2
             juniorStudents: [], // maximum number of 4
             medicalStudents: [] // maximum number of 8
         }
 
+        // fetch the a department by the event payload department, and add a group object to the groups array
         await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
-
+        await this.addToMembersOfDepartment(department, consultant)
     }
 
     // this will be executed by an event, the doctor's full name will be added to the list of members in the department
     async addToMembersOfGroup() {}
 
     async editMemberOfGroupByName() {}
-
-    // this action will only be executed by an event, when a doctor registers into a department
-    async addToMembersOfDepartment() {}
 
     // this action will only be executed by the admin, when a doctor is fired, or profile is deleted
     async removeFromMembersOfMedicalDepartment() {}
