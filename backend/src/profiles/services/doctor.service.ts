@@ -36,19 +36,20 @@ export class DoctorService {
         return doctor
     }
 
+    // this function searches names with regular expressions
     async searchDoctorsByFirstAndLastNames(firstName?:string, lastName?:string) {
         if (firstName) { 
-            let doctors = await this.doctorModel.find({'firstName': firstName }).exec() 
+            let doctors = await this.doctorModel.find({'firstName': { "$regex": firstName, "$options": 'i' } }).exec() 
             if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
             return doctors
         }else if (lastName) {
-            let doctors = await this.doctorModel.find({'lastName': lastName }).exec() 
+            let doctors = await this.doctorModel.find({'lastName': { "$regex": lastName, "$options": 'i' } }).exec() 
             if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
             return doctors
         }
 
         else if (firstName && lastName) {
-            let doctors = await this.doctorModel.find({ 'lastName': lastName,  'firstName': firstName }).exec() 
+            let doctors = await this.doctorModel.find({'firstName.$': { "$regex": firstName, "$options": 'i' }, 'lastName.$': { "$regex": lastName, "$options": 'i' } }).exec() 
             if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
             return doctors
         }
