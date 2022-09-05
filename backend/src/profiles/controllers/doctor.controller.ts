@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, Patch, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query } from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
 import {EditDoctorDto} from '../dtos/edit.doctor.dto'
 import {AssignDoctorToDepartmentDto} from '../dtos/assign.doctor.department.dto'
@@ -19,7 +19,10 @@ export class DoctorController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    async getDoctorProfiles() {
+    async getDoctorProfiles(@Query('firstName') firstName?: string, @Query('lastName') lastName?: string) {
+        if(firstName || lastName || firstName && lastName) { 
+            return await this.doctorService.searchDoctorsByFirstAndLastNames(firstName, lastName)
+        }
         return await this.doctorService.getDoctorProfiles()
     }
 
@@ -28,13 +31,6 @@ export class DoctorController {
     async editBasicDoctorProfileById(@Param('_id') _id: string, @Body() body: EditDoctorDto) {
         return await this.doctorService.editBasicDoctorProfileById(_id, body)
     }
-
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Roles(Role.Admin)
-    // @Patch('assign-doctor-to-department/:_id')
-    // async assignDoctorToDepartment(@Param('_id') _id: string, @Body() body: AssignDoctorToDepartmentDto) {
-    //     return await this.doctorService.assignDoctorToADepartment(_id, body)
-    // }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()

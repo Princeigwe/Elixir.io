@@ -36,6 +36,25 @@ export class DoctorService {
         return doctor
     }
 
+    async searchDoctorsByFirstAndLastNames(firstName?:string, lastName?:string) {
+        if (firstName) { 
+            let doctors = await this.doctorModel.find({'firstName': firstName }).exec() 
+            if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
+            return doctors
+        }else if (lastName) {
+            let doctors = await this.doctorModel.find({'lastName': lastName }).exec() 
+            if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
+            return doctors
+        }
+
+        else if (firstName && lastName) {
+            let doctors = await this.doctorModel.find({ 'lastName': lastName,  'firstName': firstName }).exec() 
+            if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
+            return doctors
+        }
+
+    }
+
     
     /* 
         this method will help doctor fill up or edit profile without touching organizational data and user object id 
@@ -46,16 +65,7 @@ export class DoctorService {
         return doctor.save()
     }
 
-    // this method is already implemented in the auth service
-    // async assignDoctorToADepartment(_id: string, attrs: Pick<Doctor, 'department'>) {
-    //     const doctor = await this.getDoctorProfileById(_id)
-    //     Object.assign(doctor, attrs)
-    //     return doctor.save()
-    // }
-
-    //todo: this action will be executed by the admin or the Consultant of the departmental unit
-    async assignADirectingDoctorToDoctor() {}
-
+    
     async deleteDoctorsProfiles() {
         await this.doctorModel.deleteMany().exec()
     }
