@@ -2,6 +2,8 @@ import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestj
 import {Model} from 'mongoose'
 import {InjectModel} from '@nestjs/mongoose'
 import {MedicalDepartment, MedicalDepartmentDocument} from './medical-departments.schema'
+import {OnEvent} from '@nestjs/event-emitter'
+import {NewDepartmentConsultantEvent} from '../events/createNewDepartmentGroup.event'
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -39,8 +41,27 @@ export class MedicalDepartmentsService {
         return medicalDepartment
     }
 
-    // this will be executed by an event when a new consultant is registered
-    async createGroupInDepartment() {}
+    /*
+        this will be executed by an event when a new consultant is registered
+
+        This searches a department by name provided, and creates a new group with the consultant first and last name data
+     */
+    @OnEvent('new.consultant')
+    async createGroupWithNewConsultantInDepartment(payload: NewDepartmentConsultantEvent) {
+        const consultantFirstName = payload.firstName
+        const consultantLastName = payload.lastName
+        const department = payload.department
+
+        let newGroup = { 
+            consultant: ` ${consultantFirstName} ${consultantLastName} `,
+            associateSpecialists: [], // maximum number of 2
+            juniorStudents: [], // maximum number of 4
+            medicalStudents: [] // maximum number of 8
+        }
+
+        await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
+
+    }
 
     // this will be executed by an event, the doctor's full name will be added to the list of members in the department
     async addToMembersOfGroup() {}

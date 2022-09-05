@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 
 import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
 import {MedicalDepartments} from '../enums/medical.department.enum'
+import { NewDepartmentConsultantEvent } from '../events/createNewDepartmentGroup.event';
+import {EventEmitter2} from '@nestjs/event-emitter'
 
 
 // AVAILABLE DEPARTMENTS = 
@@ -21,7 +23,8 @@ import {MedicalDepartments} from '../enums/medical.department.enum'
 export class AuthService {
     constructor(
         private userService: UsersService,
-        private jwtService: JwtService // service that will sign a token to the authenticated user payload
+        private jwtService: JwtService, // service that will sign a token to the authenticated user payload
+        private eventEmitter: EventEmitter2
     ) {}
 
 
@@ -52,6 +55,8 @@ export class AuthService {
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Cardiology
         await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the cardiology department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
     }
 
 
