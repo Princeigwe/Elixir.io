@@ -43,7 +43,9 @@
 
     3. Registration as a patient or a medical doctor, creates a profile for the party.
 
-    4. Attributes of the patient profile:
+    4. Registering as a doctor is done in different departments, as a consultant or non-consultant
+
+    5. Attributes of the patient profile:
         - imageUrl: This attribute is not yet implemented, but it will be working with AWS S3.
         - user: This is a reference to the created user account.
         - firstName
@@ -61,7 +63,7 @@
         - doctorAddress
         - pharmacyTelephone: The telephone number of the pharmacist of which the patient got the drugs from. (I'm not sure if this feature is necessary).
 
-    5. The patient is only able to edit certain attributes such as:
+    6. The patient is only able to edit certain attributes such as:
         - imageUrl: This attribute is not yet implemented, but it will be working with AWS S3.
         - firstName
         - lastName
@@ -72,7 +74,7 @@
         - maritalStatus
         - occupation
 
-    6. Attributes of the doctor profile:
+    7. Attributes of the doctor profile:
         - imageUrl: This attribute is not yet implemented, but it will be working with AWS S3
         - user: This is a reference to the created user account.
         - firstName
@@ -91,7 +93,7 @@
         - subordinateDoctors: The doctors under the responsibility of the practicing doctor.
         - assignedPatients: The patients under the care of the practicing doctor.
 
-    7. The doctor is only able to update certain features of his or her profile, such as:
+    8. The doctor is only able to update certain features of his or her profile, such as:
         - imageUrl: This attribute is not yet implemented, but it will be working with AWS S3.
         - firstName
         - lastName
@@ -103,7 +105,7 @@
         - yearsOfExperience
         - languages
     
-    8. The departments available to doctors to be assigned to:
+    9. The departments available to doctors to be assigned to:
         - Cardiology
         - Dermatology 
         - Urology
@@ -113,8 +115,8 @@
         - Radiology
         - Pharmacy
     
-    9. These departments have various registration links to register a doctor with:
+    10. These departments have various registration links to register a doctor with:
         - Doctors are registered into the departments as consultants or non-consultants.
 
 
-**Note**: If a new medical department is created, the code for doctors' registration into that department should also be created in the auth controller, and vice versa.
+**Note**: If a new medical department is created, the code for doctors' registration into that department should also be created in the auth controller, and vice versa... The medical-department enum class should also be update
