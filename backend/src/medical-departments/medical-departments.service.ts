@@ -42,7 +42,7 @@ export class MedicalDepartmentsService {
         return medicalDepartment
     }
 
-    // this method finds a department and adds a new doctor to its memebers
+    // this method finds a department and adds a new doctor to its members
     async addToMembersOfDepartment(department: MedicalDepartments, member: string) {
         await this.medicalDepartmentModel.updateOne( {'name': department}, { $push: { members: member } } )
     }

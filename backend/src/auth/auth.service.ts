@@ -54,9 +54,10 @@ export class AuthService {
     async registerConsultantToCardiologyDepartment(email: string, firstName: string, lastName: string, password: string) {
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Cardiology
-        await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
         // emitting an event to create a new group in the cardiology department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
     }
 
 
