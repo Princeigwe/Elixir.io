@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {User, UserDocument} from '../users/users.schema'
@@ -25,6 +25,7 @@ export class UsersService {
      * @param {string} password - string - the password that the user will use to login
      * @returns The user object is being returned.
      */
+    // @UseInterceptors(ClassSerializerInterceptor)
     async createUser(email: string, password: string) {
         const existingUser = await this.userModel.findOne({ email: email}).exec()
         if (existingUser) { 

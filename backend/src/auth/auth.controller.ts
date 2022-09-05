@@ -33,10 +33,52 @@ export class AuthController {
     //  ** REGISTRATION LINKS TO VARIOUS DEPARTMENTS FOR CONSULTANTS **
 
     // Cardiology
-    @Post('register-consultant-to-cardiology')
+    @Post('registration-consultant-cardiology')
     async registerConsultantToCardiologyDepartment(@Body() body: RegisterUserMedicDto) { 
         return this.authService.registerConsultantToCardiologyDepartment(body.email, body.firstName, body.lastName, body.password)
-    } 
+    }
+
+    // Dermatology
+    @Post('registration-consultant-dermatology')
+    async registerConsultantToDermatologyDepartment(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerConsultantToDermatologyDepartment(body.email, body.firstName, body.lastName, body.password)
+    }
+
+    // - Urology
+    @Post('registration-consultant-urology')
+    async registerConsultantToUrologyDepartment(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerConsultantToUrologyDepartment(body.email, body.firstName, body.lastName, body.password)
+    }
+
+    // - IntensiveCareMedicine
+    @Post('registration-consultant-intensive-care-medicine')
+    async registerConsultantToIntensiveCareMedicineDepartment(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerConsultantToIntensiveCareMedicineDepartment(body.email, body.firstName, body.lastName, body.password)
+    }
+
+    // - Neurology
+    @Post('registration-consultant-neurology')
+    async registerConsultantToNeurologyDepartment(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerConsultantToNeurologyDepartment(body.email, body.firstName, body.lastName, body.password)
+    }
+
+    // - Surgery
+    @Post('registration-consultant-surgery')
+    async registerConsultantToSurgeryDepartment(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerConsultantToSurgeryDepartment(body.email, body.firstName, body.lastName, body.password)
+    }
+
+    // - Radiology
+    @Post('registration-consultant-radiology')
+    async registerConsultantToRadiologyDepartment(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerConsultantToRadiologyDepartment(body.email, body.firstName, body.lastName, body.password)
+    }
+
+    // - Pharmacy
+    @Post('registration-consultant-pharmacy')
+    async registerConsultantToPharmacyDepartment(@Body() body: RegisterUserMedicDto) {
+        return this.authService.registerConsultantToPharmacyDepartment(body.email, body.firstName, body.lastName, body.password)
+    }
 
 
     @UseGuards(LocalAuthGuard)

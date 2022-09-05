@@ -50,7 +50,8 @@ export class AuthService {
     }
 
     //  ** METHODS TO REGISTER CONSULTANTS TO VARIOUS DEPARTMENTS **
-    // Cardiology
+
+    // - Cardiology
     async registerConsultantToCardiologyDepartment(email: string, firstName: string, lastName: string, password: string) {
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Cardiology
@@ -59,6 +60,78 @@ export class AuthService {
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
+
+    // - Dermatology 
+    async registerConsultantToDermatologyDepartment(email: string, firstName: string, lastName: string, password: string) {
+        const hierarchy = DoctorHierarchy.Consultant
+        const department = MedicalDepartments.Dermatology
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the dermatology department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
+    }
+
+    // - Urology
+    async registerConsultantToUrologyDepartment(email: string, firstName: string, lastName: string, password: string) { 
+        const hierarchy = DoctorHierarchy.Consultant
+        const department = MedicalDepartments.Urology
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the urology department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
+    }
+
+    // - IntensiveCareMedicine
+    async registerConsultantToIntensiveCareMedicineDepartment(email: string, firstName: string, lastName: string, password: string) { 
+        const hierarchy = DoctorHierarchy.Consultant
+        const department = MedicalDepartments.IntensiveCareMedicine
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the intensive care medicine department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
+    }
+
+    // - Neurology
+    async registerConsultantToNeurologyDepartment(email: string, firstName: string, lastName: string, password: string) { 
+        const hierarchy = DoctorHierarchy.Consultant
+        const department = MedicalDepartments.Neurology
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the neurology department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
+    }
+
+    // - Surgery
+    async registerConsultantToSurgeryDepartment(email: string, firstName: string, lastName: string, password: string) { 
+        const hierarchy = DoctorHierarchy.Consultant
+        const department = MedicalDepartments.Surgery
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the surgery department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
+    }
+
+    // - Radiology
+    async registerConsultantToRadiologyDepartment(email: string, firstName: string, lastName: string, password: string) {
+        const hierarchy = DoctorHierarchy.Consultant
+        const department = MedicalDepartments.Radiology
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the radiology department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
+    }
+
+    // - Pharmacy
+    async registerConsultantToPharmacyDepartment(email: string, firstName: string, lastName: string, password: string) {
+        const hierarchy = DoctorHierarchy.Consultant
+        const department = MedicalDepartments.Pharmacy
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        // emitting an event to create a new group in the pharmacy department
+        this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
+        return consultant
+    }
+
+
 
 
     /**
