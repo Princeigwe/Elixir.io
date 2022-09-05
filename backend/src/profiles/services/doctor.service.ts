@@ -37,7 +37,10 @@ export class DoctorService {
     }
 
     
-    // todo: this method will help doctor fill up or edit profile without touching organizational data and user object id
+    /* 
+        this method will help doctor fill up or edit profile without touching organizational data and user object id 
+        todo: when the doctor name is edited, the admin should me notified by email in order to apply changes where necessary. Examples: [change name of doctor in medical department, change name of doctor assigned to patient]
+    */
     async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >) {
         const doctor = await this.getDoctorProfileById(_id)
         Object.assign(doctor, attrs)
