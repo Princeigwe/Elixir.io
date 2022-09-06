@@ -110,6 +110,11 @@ export class UsersService {
         return user
     }
 
+    async getUserByIDForJwt(_id: any){
+        const user = await this.userModel.findOne({"_id": _id}).exec()
+        if(!user) { throw new HttpException('UnAuthorized User', HttpStatus.UNAUTHORIZED) }
+        return user
+    }
     /**
      * It deletes all users from the database
      */

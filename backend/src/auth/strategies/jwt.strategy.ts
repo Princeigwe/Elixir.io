@@ -1,8 +1,9 @@
-import {Injectable} from '@nestjs/common'
+import {Injectable, NotFoundException} from '@nestjs/common'
 import {ExtractJwt, Strategy} from 'passport-jwt'
 import {PassportStrategy} from '@nestjs/passport'
 import { jwtConstants } from '../constants'
 import { UsersService } from '../../users/users.service'
+
 
 
 
@@ -19,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) { // not really sure what this method does
-        return this.usersService.getUserByID(payload.userId)
+        const user = this.usersService.getUserByIDForJwt(payload.userId)
+        return user
     }
 }
