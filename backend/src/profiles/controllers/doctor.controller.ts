@@ -12,18 +12,18 @@ export class DoctorController {
     constructor(private doctorService: DoctorService) {}
 
     @UseGuards(JwtAuthGuard)
-    @Get(':_id')
-    async getDoctorProfileById(@Param('_id') _id: string) {
-        return await this.doctorService.getDoctorProfileById(_id)
-    }
-
-    @UseGuards(JwtAuthGuard)
     @Get()
-    async getDoctorProfiles(@Query('firstName') firstName?: string, @Query('lastName') lastName?: string) {
+    async getDoctorProfiles(@Query('firstName') firstName: string, @Query('lastName') lastName: string) {
         if(firstName || lastName || firstName && lastName) { 
             return await this.doctorService.searchDoctorsByFirstAndLastNames(firstName, lastName)
         }
         return await this.doctorService.getDoctorProfiles()
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':_id')
+    async getDoctorProfileById(@Param('_id') _id: string) {
+        return await this.doctorService.getDoctorProfileById(_id)
     }
 
     @UseGuards(JwtAuthGuard)

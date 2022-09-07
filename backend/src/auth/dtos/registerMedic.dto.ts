@@ -1,7 +1,9 @@
-import {IsNotEmpty, IsString} from 'class-validator'
+import {IsEnum, IsNotEmpty, IsOptional, IsString} from 'class-validator'
+import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
+import {MedicalDepartments} from '../../enums/medical.department.enum'
 
 // dto for user and admin registration
-export class RegisterUserMedicDto {
+export class RegisterUserConsultantDto {
 
     @IsString()
     @IsNotEmpty()
@@ -18,5 +20,34 @@ export class RegisterUserMedicDto {
     @IsNotEmpty()
     @IsString()
     password: string;
+
+}
+
+
+export class RegisterUserDoctorDto {
+
+    @IsString()
+    @IsNotEmpty()
+    email: string;
+
+    @IsString()
+    @IsNotEmpty()
+    firstName: string;
+
+    @IsNotEmpty()
+    @IsString()
+    lastName: string;
+
+    @IsNotEmpty()
+    @IsString()
+    password: string;
+
+    @IsEnum(MedicalDepartments)
+    @IsNotEmpty()
+    department: MedicalDepartments
+
+    @IsOptional()
+    @IsEnum(DoctorHierarchy)
+    hierarchy: DoctorHierarchy
 
 }

@@ -7,6 +7,7 @@ import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
 import {MedicalDepartments} from '../enums/medical.department.enum'
 import { NewDepartmentConsultantEvent } from '../events/createNewDepartmentGroup.event';
 import {EventEmitter2} from '@nestjs/event-emitter'
+import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGroup.event'
 
 
 // AVAILABLE DEPARTMENTS = 
@@ -131,6 +132,17 @@ export class AuthService {
         return consultant
     }
 
+
+    /** 
+       ** METHOD TO REGISTER NON-CONSULTANTS TO VARIOUS DEPARTMENTS WITH ASSOCIATE SPECIALIST HIERARCHY AS DEFAULT **
+        REGISTRATION HERE REQUIRES THE PARTY TO SPECIFY THE HIERARCHY, OR THE DEFAULT ASSOCIATE SPECIALIST HIERARCHY WILL BE USED
+        THE DEPARTMENT DATA IS ALSO REQUIRED
+    */
+    async registerDoctorToADepartment(email: string, firstName: string, lastName: string, password: string, department: MedicalDepartments, hierarchy?: DoctorHierarchy) {
+        const doctor = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        this.eventEmitter.emit('new.doctor', new NewMedicalDepartmentDoctorEvent(firstName, lastName, department, hierarchy))
+        return doctor
+    }
 
 
 

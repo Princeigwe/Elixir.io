@@ -5,6 +5,8 @@ import {MedicalDepartment, MedicalDepartmentDocument} from './medical-department
 import {OnEvent} from '@nestjs/event-emitter'
 import {NewDepartmentConsultantEvent} from '../events/createNewDepartmentGroup.event'
 import {MedicalDepartments} from '../enums/medical.department.enum'
+import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
+import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGroup.event'
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -36,6 +38,7 @@ export class MedicalDepartmentsService {
         return medicalDepartments
     }
 
+    // todo: add regex search function to this
     async searchMedicalDepartmentByName(name: string) {
         const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': name}).exec()
         if (!medicalDepartment) {throw new NotFoundException('Medical department with this name does not exist')}
@@ -71,8 +74,52 @@ export class MedicalDepartmentsService {
         await this.addToMembersOfDepartment(department, consultant)
     }
 
-    // this will be executed by an event, the doctor's full name will be added to the list of members in the department
-    async addToMembersOfGroup() {}
+
+    // this will be executed by an event, the doctor's full name will be added to the list of members in the department, and assigned to a hierarchy
+    @OnEvent('new.doctor')
+    async addToHierarchyOfGroupsAndMembersOfDepartment( payload: NewMedicalDepartmentDoctorEvent) {
+        const firstName = payload.firstName
+        const lastName = payload.lastName
+        const department = payload.department
+        let hierarchy = payload.hierarchy // ** hierarchy may be undefined if not specified according to 'registerDoctorToADepartment()' of auth.controller.ts **
+
+        if (hierarchy == undefined) {
+            hierarchy = DoctorHierarchy.AssociateSpecialist
+        }
+
+        // return object with only groups key value
+        let departmentGroups = await this.medicalDepartmentModel.findOne({'department': department}, {'groups': 1})
+
+        let doctorNames = `${firstName} ${lastName}`
+
+        console.log(`New doctor added with ${doctorNames}, ${department}, ${hierarchy}`)
+        console.log(departmentGroups)
+
+
+        if(hierarchy != DoctorHierarchy.Consultant){ 
+            console.log(departmentGroups)
+            if(departmentGroups["groups"].length == 0) {
+                const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+                await sleep(120000) // sleep for 2 minutes before notifying the related parties
+
+                //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
+                console.log('An associate specialist can no longer be accepted as of this time.')
+            }
+            else {
+                
+            }
+        }
+
+        // if(hierarchy == DoctorHierarchy.AssociateSpecialist) { 
+        //     if( departmentGroups["associateSpecialists"].length < 2 ){
+        //         await this.medicalDepartmentModel.updateOne({ 'name': department }, { $push: { 'groups.$.associateSpecialists': doctorNames } })
+        //     }
+            
+        //     else {
+        //         throw new HttpException('An associate specialist can no longer be accepted as of this time.', HttpStatus.BAD_REQUEST)
+        //     }
+        // }
+    }
 
     async editMemberOfGroupByName() {}
 

@@ -43,7 +43,7 @@ export class Doctor {
     @Prop([String])
     certificates: string[]
 
-    @Prop({default: DoctorHierarchy.MedicalStudent})
+    @Prop({default: DoctorHierarchy.AssociateSpecialist})
     hierarchy: DoctorHierarchy
 
     @Prop()
