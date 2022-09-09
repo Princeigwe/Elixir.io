@@ -102,6 +102,9 @@ export class MedicalDepartmentsService {
                     break
                 }
             }
+
+            // add to members array of department
+            await this.addToMembersOfDepartment(department, doctorNames)
         }
     }
 
