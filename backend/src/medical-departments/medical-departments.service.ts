@@ -80,22 +80,29 @@ export class MedicalDepartmentsService {
     async addAssociateSpecialistToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         /**
          * this function gets the department the doctor specified during registration.
-         * it checks if there is a group avaliable in that department.
-         * if there is a group in the department, the name of the doctor will be added to the hierarchy of that department
+         * it checks if there is a group available in that department.
+         * if there is a group in the department, the name of the doctor will be added to the associate specialist hierarchy of that department
          */
 
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
 
-        let doctorNames = `${firstName} ${lastName}`        
-
-        for (let group of doctorDepartment['groups']) {
-            if( _.size(group['associateSpecialists']) < 2 ){
-                let groupIndex = doctorDepartment['groups'].indexOf(group)
-                await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.associateSpecialists'] : doctorNames }  })
-                break
+        let doctorNames = `${firstName} ${lastName}`    
+        let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
+        let lengthOfLastAssociateSpecialistsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['associateSpecialists'])  // getting the length of the last associateSpecialists array in the last group with lodash
+        
+        if(lengthOfLastAssociateSpecialistsArrayInLastGroup == 2) {
+            console.log("No available space to add a new associate specialist")
+        }
+        
+        else{
+            for (let group of doctorDepartment['groups']) {
+                if( _.size(group['associateSpecialists']) < 2 ){ // only 2 associate specialists are allowed per group
+                    let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
+                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.associateSpecialists'] : doctorNames }  })
+                    break
+                }
             }
         }
-
     }
 
     // this will be executed by an event, the doctor's full name will be added to the list of members in the department, and assigned to a hierarchy
