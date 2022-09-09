@@ -84,39 +84,17 @@ export class MedicalDepartmentsService {
          * if there is a group in the department, the name of the doctor will be added to the hierarchy of that department
          */
 
-        console.log('department')
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
-        console.log(doctorDepartment.groups.length)
 
-        let doctorNames = `${firstName} ${lastName}`
+        let doctorNames = `${firstName} ${lastName}`        
 
-        // !! don't delete this code !!
-        for(let group of doctorDepartment['groups']){
-            
-            console.log('added')
-            console.log( await this.medicalDepartmentModel.findOne({'name': department}).exec() )
-            // await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { 'groups.$[].associateSpecialists': doctorNames } })
-
-            const groupToUpdate = 0
-            console.log('groups.' + groupToUpdate +'.associateSpecialists')
-
-            // !! Don't delete this code !!
-            // if( _.size(group['associateSpecialists']) < 2 ) { 
-            //     await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { 'groups.$[].associateSpecialists': doctorNames } })
-            //     break
-            // }
-
-
-            if( _.size(group['associateSpecialists']) < 20 ) { 
-                await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { ['groups.' + groupToUpdate +'.associateSpecialists'] : doctorNames } })
+        for (let group of doctorDepartment['groups']) {
+            if( _.size(group['associateSpecialists']) < 2 ){
+                let groupIndex = doctorDepartment['groups'].indexOf(group)
+                await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.associateSpecialists'] : doctorNames }  })
                 break
             }
-
-
-
         }
-
-
 
     }
 
