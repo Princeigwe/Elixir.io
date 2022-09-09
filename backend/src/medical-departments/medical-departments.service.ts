@@ -7,6 +7,7 @@ import {NewDepartmentConsultantEvent} from '../events/createNewDepartmentGroup.e
 import {MedicalDepartments} from '../enums/medical.department.enum'
 import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
 import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGroup.event'
+import * as _ from 'lodash'
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -75,6 +76,34 @@ export class MedicalDepartmentsService {
     }
 
 
+    // function to add an associate specialist to a group in a specified department
+    async addAssociateSpecialistToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+        /**
+         * this function gets the department the doctor specified during registration.
+         * it checks if there is a group avaliable in that department.
+         * if there is a group in the department, the name of the doctor will be added to the hierarchy of that department
+         */
+
+        console.log('department')
+        let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
+        console.log(doctorDepartment.groups.length)
+
+        let doctorNames = `${firstName} ${lastName}`
+
+        for(let group of doctorDepartment['groups']){
+            
+            console.log('added')
+            console.log( await this.medicalDepartmentModel.findOne({'name': department}).exec() )
+            // await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { 'groups.$[].associateSpecialists': doctorNames } })
+
+
+            if( _.size(group['associateSpecialists']) < 2 ) { 
+                await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { 'groups.$[].associateSpecialists': doctorNames } })
+                break
+            }
+        }
+    }
+
     // this will be executed by an event, the doctor's full name will be added to the list of members in the department, and assigned to a hierarchy
     @OnEvent('new.doctor')
     async addToHierarchyOfGroupsAndMembersOfDepartment( payload: NewMedicalDepartmentDoctorEvent) {
@@ -93,22 +122,36 @@ export class MedicalDepartmentsService {
         let doctorNames = `${firstName} ${lastName}`
 
         console.log(`New doctor added with ${doctorNames}, ${department}, ${hierarchy}`)
-        console.log(departmentGroups)
+        // console.log(departmentGroups)
 
+        if(departmentGroups["groups"].length == 0) {
+            const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+            await sleep(120000) // sleep for 2 minutes before notifying the related parties
 
-        if(hierarchy != DoctorHierarchy.Consultant){ 
-            console.log(departmentGroups)
-            if(departmentGroups["groups"].length == 0) {
-                const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
-                await sleep(120000) // sleep for 2 minutes before notifying the related parties
-
-                //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
-                console.log('An associate specialist can no longer be accepted as of this time.')
-            }
-            else {
-                
-            }
+            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
+            console.log(`A(n) ${hierarchy} can no longer be accepted as of this time.`)
         }
+
+        if(hierarchy == DoctorHierarchy.AssociateSpecialist) {
+            await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
+        }
+
+
+
+        
+
+        // if(hierarchy != DoctorHierarchy.Consultant){ 
+        //     console.log(departmentGroups)
+        //     if(departmentGroups["groups"].length == 0) {
+        //         const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+        //         await sleep(120000) // sleep for 2 minutes before notifying the related parties
+
+        //         //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
+        //         console.log('An associate specialist can no longer be accepted as of this time.')
+        //     }
+            
+        // }
+
 
         // if(hierarchy == DoctorHierarchy.AssociateSpecialist) { 
         //     if( departmentGroups["associateSpecialists"].length < 2 ){
