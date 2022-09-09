@@ -140,32 +140,6 @@ export class MedicalDepartmentsService {
             await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
         }
 
-
-
-        
-
-        // if(hierarchy != DoctorHierarchy.Consultant){ 
-        //     console.log(departmentGroups)
-        //     if(departmentGroups["groups"].length == 0) {
-        //         const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
-        //         await sleep(120000) // sleep for 2 minutes before notifying the related parties
-
-        //         //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
-        //         console.log('An associate specialist can no longer be accepted as of this time.')
-        //     }
-            
-        // }
-
-
-        // if(hierarchy == DoctorHierarchy.AssociateSpecialist) { 
-        //     if( departmentGroups["associateSpecialists"].length < 2 ){
-        //         await this.medicalDepartmentModel.updateOne({ 'name': department }, { $push: { 'groups.$.associateSpecialists': doctorNames } })
-        //     }
-            
-        //     else {
-        //         throw new HttpException('An associate specialist can no longer be accepted as of this time.', HttpStatus.BAD_REQUEST)
-        //     }
-        // }
     }
 
     async editMemberOfGroupByName() {}
