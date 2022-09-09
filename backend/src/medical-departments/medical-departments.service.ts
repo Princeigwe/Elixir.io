@@ -90,18 +90,34 @@ export class MedicalDepartmentsService {
 
         let doctorNames = `${firstName} ${lastName}`
 
+        // !! don't delete this code !!
         for(let group of doctorDepartment['groups']){
             
             console.log('added')
             console.log( await this.medicalDepartmentModel.findOne({'name': department}).exec() )
             // await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { 'groups.$[].associateSpecialists': doctorNames } })
 
+            const groupToUpdate = 0
+            console.log('groups.' + groupToUpdate +'.associateSpecialists')
 
-            if( _.size(group['associateSpecialists']) < 2 ) { 
-                await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { 'groups.$[].associateSpecialists': doctorNames } })
+            // !! Don't delete this code !!
+            // if( _.size(group['associateSpecialists']) < 2 ) { 
+            //     await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { 'groups.$[].associateSpecialists': doctorNames } })
+            //     break
+            // }
+
+
+            if( _.size(group['associateSpecialists']) < 20 ) { 
+                await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { ['groups.' + groupToUpdate +'.associateSpecialists'] : doctorNames } })
                 break
             }
+
+
+
         }
+
+
+
     }
 
     // this will be executed by an event, the doctor's full name will be added to the list of members in the department, and assigned to a hierarchy
