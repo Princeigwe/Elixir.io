@@ -63,6 +63,7 @@ export class MedicalDepartmentsService {
 
         const consultant = `${consultantFirstName} ${consultantLastName}`
 
+        // todo: change 'juniorStudents' to 'juniorDoctors'
         let newGroup = { 
             consultant: consultant,
             associateSpecialists: [], // maximum number of 2
@@ -98,7 +99,7 @@ export class MedicalDepartmentsService {
             for (let group of doctorDepartment['groups']) {
                 if( _.size(group['associateSpecialists']) < 2 ){ // only 2 associate specialists are allowed per group
                     let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
-                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.associateSpecialists'] : doctorNames }  })
+                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.associateSpecialists'] : doctorNames }  }) // updating nested array of associate specialist per group item with doctor's names
                     break
                 }
             }
@@ -109,7 +110,14 @@ export class MedicalDepartmentsService {
     }
 
 
-    async addJuniorStudentToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+    // function to add a junior doctor to a group in a specified department
+        // todo: change 'juniorStudents' to 'juniorDoctors'
+    async addJuniorDoctorToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+        /**
+         * this function gets the department the doctor specified during registration.
+         * it checks if there is a group available in that department.
+         * if there is a group in the department, the name of the doctor will be added to the junior doctor hierarchy of that department
+         */
 
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
         let doctorNames = `${firstName} ${lastName}`    
@@ -117,14 +125,45 @@ export class MedicalDepartmentsService {
         let lengthOfLastJuniorStudentsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['juniorStudents'])  // getting the length of the last juniorStudents array in the last group with lodash
         
         if(lengthOfLastJuniorStudentsArrayInLastGroup == 4) {
-            console.log("No available space to add a new junior specialist")
+            console.log("No available space to add a new junior doctor")
         }
 
         else{
             for (let group of doctorDepartment['groups']) {
                 if( _.size(group['juniorStudents']) < 4 ){ // only 4 junior students are allowed per group
                     let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
-                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.juniorStudents'] : doctorNames }  })
+                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.juniorStudents'] : doctorNames }  }) // updating nested array of junior doctor per group item with doctor's names
+                    break
+                }
+            }
+
+            // add to members array of department
+            await this.addToMembersOfDepartment(department, doctorNames)
+        }
+    }
+
+
+    async addMedicalStudentToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+        /**
+         * this function gets the department the doctor specified during registration.
+         * it checks if there is a group available in that department.
+         * if there is a group in the department, the name of the doctor will be added to the medical student hierarchy of that department
+         */
+
+        let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
+        let doctorNames = `${firstName} ${lastName}`    
+        let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
+        let lengthOfLastMedicalStudentsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['medicalStudents'])  // getting the length of the last medical Students array in the last group with lodash
+
+        if(lengthOfLastMedicalStudentsArrayInLastGroup == 8) {
+            console.log("No available space to add a new medical student")
+        }
+
+        else { 
+            for (let group of doctorDepartment['groups']) {
+                if( _.size(group['medicalStudents']) < 8 ){ // only 8 medical students are allowed per group
+                    let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
+                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.medicalStudents'] : doctorNames }  }) // updating nested array of junior doctor per group item with doctor's names
                     break
                 }
             }
@@ -167,7 +206,11 @@ export class MedicalDepartmentsService {
             await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
         }
         else if(hierarchy == DoctorHierarchy.JuniorDoctor) {
-            await this.addJuniorStudentToADepartmentGroup(firstName, lastName, department)
+            await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
+        }
+
+        else if(hierarchy == DoctorHierarchy.MedicalStudent) { 
+            await this.addMedicalStudentToADepartmentGroup(firstName, lastName, department)
         }
 
     }
