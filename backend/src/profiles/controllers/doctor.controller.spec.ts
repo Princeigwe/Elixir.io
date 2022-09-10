@@ -18,7 +18,7 @@ describe('DoctorController', () => {
         certificates: [],
         hierarchy: "Medical Student",
         languages: [],
-        subordinateDoctors: [],
+        department: 'Surgery',
         assignedPatients: [],
         __v: 0
       }
@@ -34,7 +34,7 @@ describe('DoctorController', () => {
           certificates: [],
           hierarchy: "Medical Student",
           languages: [],
-          subordinateDoctors: [],
+          department: 'Cardiology',
           assignedPatients: [],
           __v: 0
         },
@@ -47,7 +47,7 @@ describe('DoctorController', () => {
           certificates: [],
           hierarchy: "Medical Student",
           languages: [],
-          subordinateDoctors: [],
+          department: 'Cardiology',
           assignedPatients: [],
           __v: 0
         },
@@ -89,7 +89,7 @@ describe('DoctorController', () => {
       "certificates": [],
       "hierarchy": "Medical Student",
       "languages": [],
-      "subordinateDoctors": [],
+      "department": "Surgery",
       "assignedPatients": [],
       "__v": 0
     }
@@ -107,7 +107,7 @@ describe('DoctorController', () => {
         "certificates": [],
         "hierarchy": "Medical Student",
         "languages": [],
-        "subordinateDoctors": [],
+        "department": "Cardiology",
         "assignedPatients": [],
         "__v": 0
       },
@@ -119,7 +119,7 @@ describe('DoctorController', () => {
         "certificates": [],
         "hierarchy": "Medical Student",
         "languages": [],
-        "subordinateDoctors": [],
+        "department": "Cardiology",
         "assignedPatients": [],
         "__v": 0
       }

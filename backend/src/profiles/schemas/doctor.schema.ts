@@ -55,14 +55,6 @@ export class Doctor {
     @Prop()
     department: MedicalDepartments 
 
-    @Prop(raw({
-        firstName: {type: String},
-        lastName: {type: String},
-    }))
-    directingDoctor: Record<string, any>
-
-    @Prop([])
-    subordinateDoctors: []
 
     @Prop([])
     assignedPatients: [

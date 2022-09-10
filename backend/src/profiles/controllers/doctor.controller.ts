@@ -13,7 +13,7 @@ export class DoctorController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    async getDoctorProfiles(@Query('firstName') firstName: string, @Query('lastName') lastName: string) {
+    async getDoctorProfiles(@Query('firstName') firstName?: string, @Query('lastName') lastName?: string) { // to pass test
         if(firstName || lastName || firstName && lastName) { 
             return await this.doctorService.searchDoctorsByFirstAndLastNames(firstName, lastName)
         }
