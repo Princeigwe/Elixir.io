@@ -1,9 +1,9 @@
-import {IsString, IsNotEmpty, MaxLength} from 'class-validator'
+import {IsEnum, IsNotEmpty, MaxLength} from 'class-validator'
+import {MedicalDepartments} from '../../enums/medical.department.enum'
 
 export class CreateMedicalDepartmentDto {
 
-    @IsString()
-    @MaxLength(30, { message: 'Name of department is too long'})
+    @IsEnum(MedicalDepartments)
     @IsNotEmpty()
-    name: string;
+    name: MedicalDepartments;
 }

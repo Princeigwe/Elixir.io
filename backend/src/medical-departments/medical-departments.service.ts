@@ -8,6 +8,7 @@ import {MedicalDepartments} from '../enums/medical.department.enum'
 import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
 import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGroup.event'
 import * as _ from 'lodash'
+import {DoctorService} from '../profiles/services/doctor.service'
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -21,7 +22,10 @@ import * as _ from 'lodash'
 
 @Injectable()
 export class MedicalDepartmentsService {
-    constructor( @InjectModel(MedicalDepartment.name) private medicalDepartmentModel: Model<MedicalDepartmentDocument> ) {}
+    constructor( 
+        @InjectModel(MedicalDepartment.name) private medicalDepartmentModel: Model<MedicalDepartmentDocument>,
+        private doctorService: DoctorService
+    ) {}
 
     // this action will only be executed by the admin
     async createMedicalDepartment(name: string) {
@@ -63,11 +67,10 @@ export class MedicalDepartmentsService {
 
         const consultant = `${consultantFirstName} ${consultantLastName}`
 
-        // todo: change 'juniorStudents' to 'juniorDoctors'
         let newGroup = { 
             consultant: consultant,
             associateSpecialists: [], // maximum number of 2
-            juniorStudents: [], // maximum number of 4
+            juniorDoctors: [], // maximum number of 4
             medicalStudents: [] // maximum number of 8
         }
 
@@ -91,7 +94,15 @@ export class MedicalDepartmentsService {
         let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
         let lengthOfLastAssociateSpecialistsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['associateSpecialists'])  // getting the length of the last associateSpecialists array in the last group with lodash
         
-        if(lengthOfLastAssociateSpecialistsArrayInLastGroup == 2) {
+        /*
+            if the roles for associate specialists in a department are filled up,
+            fetch the newly created doctor profile with the firstName and lastName, with the specified department and hierarchy,
+            and delete it.
+        */
+        if(lengthOfLastAssociateSpecialistsArrayInLastGroup == 2) { // 2 here is the maximum number of items the associateSpecialists array can take
+            let hierarchy = DoctorHierarchy.AssociateSpecialist
+            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
+            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new associate specialist")
         }
         
@@ -111,7 +122,6 @@ export class MedicalDepartmentsService {
 
 
     // function to add a junior doctor to a group in a specified department
-        // todo: change 'juniorStudents' to 'juniorDoctors'
     async addJuniorDoctorToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         /**
          * this function gets the department the doctor specified during registration.
@@ -122,17 +132,25 @@ export class MedicalDepartmentsService {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
         let doctorNames = `${firstName} ${lastName}`    
         let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
-        let lengthOfLastJuniorStudentsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['juniorStudents'])  // getting the length of the last juniorStudents array in the last group with lodash
+        let lengthOfLastJuniorDoctorsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['juniorDoctors'])  // getting the length of the last juniorDoctors array in the last group with lodash
         
-        if(lengthOfLastJuniorStudentsArrayInLastGroup == 4) {
+        /*
+            if the roles for junior doctors in a department are filled up,
+            fetch the newly created doctor profile with the firstName and lastName, with the specified department and hierarchy,
+            and delete it.
+        */
+        if(lengthOfLastJuniorDoctorsArrayInLastGroup == 4) { // 4 here is the maximum number of items the juniorDoctors array can take
+            let hierarchy = DoctorHierarchy.JuniorDoctor
+            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
+            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new junior doctor")
         }
 
         else{
             for (let group of doctorDepartment['groups']) {
-                if( _.size(group['juniorStudents']) < 4 ){ // only 4 junior students are allowed per group
+                if( _.size(group['juniorDoctors']) < 4 ){ // only 4 junior students are allowed per group
                     let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
-                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.juniorStudents'] : doctorNames }  }) // updating nested array of junior doctor per group item with doctor's names
+                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.juniorDoctors'] : doctorNames }  }) // updating nested array of junior doctor per group item with doctor's names
                     break
                 }
             }
@@ -155,7 +173,15 @@ export class MedicalDepartmentsService {
         let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
         let lengthOfLastMedicalStudentsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['medicalStudents'])  // getting the length of the last medical Students array in the last group with lodash
 
-        if(lengthOfLastMedicalStudentsArrayInLastGroup == 8) {
+        /*
+            if the roles for medical students in a department are filled up,
+            fetch the newly created doctor profile with the firstName and lastName, with the specified department and hierarchy,
+            and delete it.
+        */
+        if(lengthOfLastMedicalStudentsArrayInLastGroup == 8) { // 8 here is the maximum number of items the medicalStudents array can take
+            let hierarchy = DoctorHierarchy.MedicalStudent
+            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
+            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new medical student")
         }
 

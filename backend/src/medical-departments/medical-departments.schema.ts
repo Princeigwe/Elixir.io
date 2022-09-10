@@ -14,7 +14,7 @@ export class MedicalDepartment {
         // {
         //     consultant: string,
         //     associateSpecialist: string[]
-        //     juniorStudent: string[]
+        //     juniorDoctors: string[]
         //     medicalStudents: string[]
         // }
     ]

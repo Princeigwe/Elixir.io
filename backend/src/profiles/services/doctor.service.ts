@@ -5,6 +5,9 @@ import {Doctor, DoctorDocument} from '../schemas/doctor.schema'
 import {NewUserEvent} from '../../events/createProfileByUser.event'
 import {OnEvent} from '@nestjs/event-emitter'
 import {NewMedicalProviderEvent} from '../../events/createMedicalProviderProfile.event'
+import {MedicalDepartments} from '../../enums/medical.department.enum'
+import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
+
 
 
 
@@ -69,5 +72,11 @@ export class DoctorService {
     
     async deleteDoctorsProfiles() {
         await this.doctorModel.deleteMany().exec()
+    }
+
+
+    // this will be used in the medical department service when a doctor cannot be added to a department
+    async deleteDoctorByNamesDepartmentAndHierarchy(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
+        await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
     }
 }
