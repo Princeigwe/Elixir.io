@@ -97,10 +97,11 @@ export class MedicalDepartmentsService {
         /*
             if the roles for associate specialists in a department are filled up,
             fetch the newly created doctor profile with the firstName and lastName, with the specified department and hierarchy,
-            and delete it.
+            and delete it, along with the user associated to the profile.
         */
         if(lengthOfLastAssociateSpecialistsArrayInLastGroup == 2) { // 2 here is the maximum number of items the associateSpecialists array can take
             let hierarchy = DoctorHierarchy.AssociateSpecialist
+            await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
             await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new associate specialist")
@@ -137,10 +138,11 @@ export class MedicalDepartmentsService {
         /*
             if the roles for junior doctors in a department are filled up,
             fetch the newly created doctor profile with the firstName and lastName, with the specified department and hierarchy,
-            and delete it.
+            and delete it, along with the user associated to the profile.
         */
         if(lengthOfLastJuniorDoctorsArrayInLastGroup == 4) { // 4 here is the maximum number of items the juniorDoctors array can take
             let hierarchy = DoctorHierarchy.JuniorDoctor
+            await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
             await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new junior doctor")
@@ -176,10 +178,11 @@ export class MedicalDepartmentsService {
         /*
             if the roles for medical students in a department are filled up,
             fetch the newly created doctor profile with the firstName and lastName, with the specified department and hierarchy,
-            and delete it.
+            and delete it, along with the user associated to the profile.
         */
         if(lengthOfLastMedicalStudentsArrayInLastGroup == 8) { // 8 here is the maximum number of items the medicalStudents array can take
             let hierarchy = DoctorHierarchy.MedicalStudent
+            await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
             await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new medical student")

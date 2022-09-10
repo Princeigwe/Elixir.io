@@ -7,13 +7,18 @@ import {OnEvent} from '@nestjs/event-emitter'
 import {NewMedicalProviderEvent} from '../../events/createMedicalProviderProfile.event'
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
+import {UsersService} from '../../users/users.service'
+import { doc } from 'prettier';
 
 
 
 
 @Injectable()
 export class DoctorService {
-    constructor(@InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>) {}
+    constructor(
+        @InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>,
+        private usersService: UsersService
+    ) {}
 
     @OnEvent('new.user.medic')
     async createDoctorProfile(payload: NewMedicalProviderEvent) {
@@ -75,8 +80,18 @@ export class DoctorService {
     }
 
 
+    // this deletes the user model tied to the doctor profile
+    // this should be executed first before 'this.deleteDoctorByNamesDepartmentAndHierarchy()' method
+    async deleteUserLinkedToDoctorProfile(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
+        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+        const doctorUserObjectID = doctor['user']
+        await this.usersService.deleteUserByID(doctorUserObjectID)
+    }
+
+
     // this will be used in the medical department service when a doctor cannot be added to a department
     async deleteDoctorByNamesDepartmentAndHierarchy(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
         await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
     }
+
 }
