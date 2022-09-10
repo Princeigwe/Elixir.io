@@ -108,6 +108,33 @@ export class MedicalDepartmentsService {
         }
     }
 
+
+    async addJuniorStudentToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+
+        let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
+        let doctorNames = `${firstName} ${lastName}`    
+        let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
+        let lengthOfLastJuniorStudentsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['juniorStudents'])  // getting the length of the last juniorStudents array in the last group with lodash
+        
+        if(lengthOfLastJuniorStudentsArrayInLastGroup == 4) {
+            console.log("No available space to add a new junior specialist")
+        }
+
+        else{
+            for (let group of doctorDepartment['groups']) {
+                if( _.size(group['juniorStudents']) < 4 ){ // only 4 junior students are allowed per group
+                    let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
+                    await this.medicalDepartmentModel.updateOne({'name': department}, { $push:  { ['groups.' + groupIndex +'.juniorStudents'] : doctorNames }  })
+                    break
+                }
+            }
+
+            // add to members array of department
+            await this.addToMembersOfDepartment(department, doctorNames)
+        }
+    }
+
+
     // this will be executed by an event, the doctor's full name will be added to the list of members in the department, and assigned to a hierarchy
     @OnEvent('new.doctor')
     async addToHierarchyOfGroupsAndMembersOfDepartment( payload: NewMedicalDepartmentDoctorEvent) {
@@ -138,6 +165,9 @@ export class MedicalDepartmentsService {
 
         if(hierarchy == DoctorHierarchy.AssociateSpecialist) {
             await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
+        }
+        else if(hierarchy == DoctorHierarchy.JuniorDoctor) {
+            await this.addJuniorStudentToADepartmentGroup(firstName, lastName, department)
         }
 
     }
