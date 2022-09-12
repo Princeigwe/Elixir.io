@@ -43,9 +43,9 @@ export class MedicalDepartmentsService {
         return medicalDepartments
     }
 
-    // todo: add regex search function to this
+    // this function searches name with regular expressions
     async searchMedicalDepartmentByName(name: string) {
-        const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': name}).exec()
+        const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': {"$regex": name, "$options": 'i'}}).exec()
         if (!medicalDepartment) {throw new NotFoundException('Medical department with this name does not exist')}
         return medicalDepartment
     }
