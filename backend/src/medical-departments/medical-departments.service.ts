@@ -252,7 +252,7 @@ export class MedicalDepartmentsService {
     // this action will only be executed by the admin
     async deleteMedicalDepartments() {
         await this.medicalDepartmentModel.deleteMany()
-        return {message: 'Medical departments deleted successfully'}
+        return {message: 'Medical departments Http successfully'}
     }
 
     // this action will only be executed by the admin

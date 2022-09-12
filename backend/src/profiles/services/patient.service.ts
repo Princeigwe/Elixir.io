@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {Patient, PatientDocument} from '../schemas/patient.schema'
@@ -49,7 +49,8 @@ export class PatientService {
 
     async deletePatientsProfiles() {
         await this.patientModel.deleteMany().exec()
-        return {message: 'Patients profiles deleted'}
+        // return {message: 'Patients profiles deleted'}
+        throw new HttpException('Patients profiles Deleted', HttpStatus.NO_CONTENT) 
     }
 
 }

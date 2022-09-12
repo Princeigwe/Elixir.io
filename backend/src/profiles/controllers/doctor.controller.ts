@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query, HttpException, HttpStatus } from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
 import {EditDoctorDto} from '../dtos/edit.doctor.dto'
 import {AssignDoctorToDepartmentDto} from '../dtos/assign.doctor.department.dto'
@@ -37,7 +37,9 @@ export class DoctorController {
     @Roles(Role.Admin)
     async deleteDoctorsProfiles() {
         await this.doctorService.deleteDoctorsProfiles()
-        return {message: 'Doctor profiles deleted'}
+        // return {message: 'Doctor profiles deleted'}
+        throw new HttpException('Doctor Profiles Deleted', HttpStatus.NO_CONTENT) 
+
     }
 
 }

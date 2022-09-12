@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Body, Query, Param } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus } from '@nestjs/common';
 import {UsersService} from './users.service'
 import {CreateUserDto} from './dtos/createUser.dto'
 
@@ -32,7 +32,7 @@ export class UsersController {
     async deleteUsers(@Query('email') email: string) {
         if (email) {
             await this.usersService.deleteUserByEmail(email)
-            return {message: 'User Deleted'}
+            throw new HttpException('User Deleted', HttpStatus.NO_CONTENT) 
         }
         await this.usersService.deleteUsers()
         return {message: 'Users Deleted'}

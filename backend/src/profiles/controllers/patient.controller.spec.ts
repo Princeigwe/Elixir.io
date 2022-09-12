@@ -59,9 +59,9 @@ describe('PatientController', () => {
       }
     } ),
 
-    deletePatientsProfiles: jest.fn( () => {
-      return { message: 'Patients profiles deleted'}
-    } ),
+    // deletePatientsProfiles: jest.fn( () => {
+    //   return { message: 'Patients profiles deleted'}
+    // } ),
 
   }
 
@@ -137,9 +137,9 @@ describe('PatientController', () => {
     expect(await controller.editBasicPatientProfileById( '12345678' , {firstName: "John", lastName: "Smith", age: 24, address: "London", telephone: "53950954", occupation: "Lawyer", maritalStatus: MaritalStatus.Single} )).toEqual(patient)
   })
 
-  it('should return a delete message', async () => {
-    let response = { message: 'Patients profiles deleted'}
-    expect(await controller.deletePatientsProfiles()).toEqual(response)
-  })
+  // it('should return a delete message', async () => {
+  //   let response = { message: 'Patients profiles deleted'}
+  //   expect(await controller.deletePatientsProfiles()).toEqual(response)
+  // })
 
 });
