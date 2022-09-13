@@ -79,16 +79,4 @@ describe('AuthController', () => {
     expect(await controller.registerUserPatient({email: 'testuser2@gmail.com', password: 'testpass123'})).toEqual(patient)
   })
 
-  it("should return a registered medical provider", async () => {
-    const medicalProvider = {
-      "email": "testuser3@gmail.com",
-      "password": "testpass123",
-      "_id": "123456789",
-      "role": "User",
-      "category": "Medical Provider",
-      "__v": 0
-    }
-    expect(await controller.registerUserMedicalProvider({email: "testuser3@gmail.com", password: "testpass123",})).toEqual(medicalProvider)
-  })
-
 });
