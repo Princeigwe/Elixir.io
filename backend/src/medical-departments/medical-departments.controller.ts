@@ -19,7 +19,7 @@ export class MedicalDepartmentsController {
     }
 
     @Get()
-    async getMedicalDepartments(@Query('name') name: string) {
+    async getOrSearchMedicalDepartments(@Query('name') name?: string) { // name is optional in order to pass test
         if(name) {
             return this.medicalDepartmentsService.searchMedicalDepartmentByName(name)
         }
