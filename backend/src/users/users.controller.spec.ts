@@ -61,16 +61,16 @@ describe('UsersController', () => {
   });
 
 
-  it('should create a User', async () => {
-    expect(await controller.createUser({email: "testuser@gmail.com", password: "testpass123"})).toEqual(
-      {
-        email: "testuser@gmail.com",
-	      password: "testpass123",
-	      _id: "1234567",
-	      __v: 0
-      }
-    )
-  })
+  // it('should create a User', async () => {
+  //   expect(await controller.createUser({email: "testuser@gmail.com", password: "testpass123"})).toEqual(
+  //     {
+  //       email: "testuser@gmail.com",
+	//       password: "testpass123",
+	//       _id: "1234567",
+	//       __v: 0
+  //     }
+  //   )
+  // })
 
 
   it("should return array of users", async () => {

@@ -6,10 +6,10 @@ import {CreateUserDto} from './dtos/createUser.dto'
 export class UsersController {
     constructor(private usersService: UsersService) {}
 
-    @Post()
-    async createUser(@Body() body: CreateUserDto) {
-        return await this.usersService.createUser(body.email, body.password)
-    }
+    // @Post()
+    // async createUser(@Body() body: CreateUserDto) {
+    //     return await this.usersService.createUser(body.email, body.password)
+    // }
 
     @Get(':_id')
     async getUserByID(@Param('_id') _id:any ) {
