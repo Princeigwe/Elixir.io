@@ -1,10 +1,12 @@
-import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus, UseInterceptors } from '@nestjs/common';
 import {UsersService} from './users.service'
 import {CreateUserDto} from './dtos/createUser.dto'
 import {ApiTags, ApiParam, ApiResponse, ApiQuery} from '@nestjs/swagger'
+import {SanitizeMongooseModelInterceptor} from 'nestjs-mongoose-exclude'
 
 @ApiTags('Users') // grouping the users endpoints for Swagger
 
+@UseInterceptors(new SanitizeMongooseModelInterceptor) // hides user password
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) {}
