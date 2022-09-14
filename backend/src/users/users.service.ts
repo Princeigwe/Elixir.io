@@ -10,6 +10,7 @@ import {NewMedicalProviderEvent} from '../events/createMedicalProviderProfile.ev
 import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
 
 import {MedicalDepartments} from '../enums/medical.department.enum'
+import { SanitizeMongooseModelInterceptor } from 'nestjs-mongoose-exclude';
 
 
 @Injectable()
@@ -25,7 +26,7 @@ export class UsersService {
      * @param {string} password - string - the password that the user will use to login
      * @returns The user object is being returned.
      */
-    // @UseInterceptors(ClassSerializerInterceptor)
+    // @UseInterceptors(new SanitizeMongooseModelInterceptor)
     async createUser(email: string, password: string) {
         const existingUser = await this.userModel.findOne({ email: email}).exec()
         if (existingUser) { 
