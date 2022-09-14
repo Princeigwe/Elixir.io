@@ -13,6 +13,7 @@ import {ProfilesModule} from '../profiles/profiles.module'
     ProfilesModule,
   ],
   providers: [MedicalDepartmentsService],
+  exports: [MedicalDepartmentsService],
   controllers: [MedicalDepartmentsController]
 })
 export class MedicalDepartmentsModule {}
