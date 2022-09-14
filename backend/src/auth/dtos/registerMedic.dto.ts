@@ -50,7 +50,9 @@ export class RegisterUserDoctorDto {
     @IsString()
     password: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: "  Array of defined departments to register a doctor/consultant [ Cardiology, Dermatology, Urology, IntensiveCareMedicine, Neurology, Surgery, Radiology, Pharmacy ] "
+    })
     @IsEnum(MedicalDepartments)
     @IsNotEmpty()
     department: MedicalDepartments

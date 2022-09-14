@@ -106,6 +106,7 @@ export class AuthController {
 
     // ** REGISTRATION LINK TO REGISTER NON-CONSULTANTS TO VARIOUS DEPARTMENTS WITH ASSOCIATE SPECIALIST HIERARCHY AS DEFAULT **
     
+    @ApiOperation({description: "Registers a doctor that is not a consultant into the defined department"})
     @Redirect('http://localhost:3000/auth/doctor-form-submitted')
     @Post('registration-doctor')
     async registerDoctorToADepartment(@Body() body: RegisterUserDoctorDto) { 
@@ -113,6 +114,7 @@ export class AuthController {
     }
 
 
+    @ApiOperation({description: "Logs in a user with a (email, password) request body, returns a jwt in return within a cookie"})
     @UseGuards(LocalAuthGuard)
     @Post('login')
     async login(@Request() request, @Response() response) {
