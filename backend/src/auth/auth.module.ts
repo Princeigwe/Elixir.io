@@ -7,9 +7,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import {JwtStrategy} from './strategies/jwt.strategy'
+import { ProfilesModule } from 'src/profiles/profiles.module';
+import {MedicalDepartmentsModule} from '../medical-departments/medical-departments.module'
 
 @Module({
   imports: [
+    MedicalDepartmentsModule,
+    ProfilesModule,
     UsersModule,
     PassportModule,
     JwtModule.register({ 
