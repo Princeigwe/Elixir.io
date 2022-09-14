@@ -198,6 +198,13 @@ export class AuthService {
         THE DEPARTMENT DATA IS ALSO REQUIRED
     */
     async registerDoctorToADepartment(email: string, firstName: string, lastName: string, password: string, department: MedicalDepartments, hierarchy?: DoctorHierarchy) {
+
+        // this block checks if a department exists, if it doesn't, the doctor cannot be registered into the department
+        let existingDepartment = await this.medicalDepartmentsService.getMedicalDepartmentByName(department)
+        if(!existingDepartment) {
+            throw new NotFoundException(`${hierarchy} cannot be registered to ${department} department, because it does not exist`)
+        }
+
         const doctor = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
         this.eventEmitter.emit('new.doctor', new NewMedicalDepartmentDoctorEvent(firstName, lastName, department, hierarchy))
         return doctor
