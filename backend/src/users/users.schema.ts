@@ -3,6 +3,7 @@ import {Exclude} from 'class-transformer'
 import { Document } from 'mongoose'
 import {Role} from '../enums/role.enum'
 import { UserCategory } from '../enums/user.category.enum'
+// import { ExcludeProperty } from 'nestjs-mongoose-exclude'
 
 export type UserDocument = User & Document
 
@@ -12,7 +13,7 @@ export class User {
     @Prop()
     email: string
 
-    // @Exclude()
+    // @ExcludeProperty()
     @Prop()
     password: string
 

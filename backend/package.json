@@ -34,6 +34,7 @@
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",
     "mongoose": "^6.5.2",
+    "nestjs-mongoose-exclude": "^1.0.5",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
