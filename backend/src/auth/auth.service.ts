@@ -203,6 +203,8 @@ export class AuthService {
         let existingDepartment = await this.medicalDepartmentsService.getMedicalDepartmentByName(department)
         if(!existingDepartment) {
             throw new NotFoundException(`${hierarchy} cannot be registered to ${department} department, because it does not exist`)
+        }else if(hierarchy == DoctorHierarchy.Consultant) {
+            throw new HttpException(`Please register consultant into ${department} department with the appropriate url`, HttpStatus.BAD_REQUEST) 
         }
 
         const doctor = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
