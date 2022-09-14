@@ -1,7 +1,7 @@
 import {MongooseModule} from '@nestjs/mongoose'
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+// import { AppController } from './app.controller';
+// import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ProfilesModule } from './profiles/profiles.module';
@@ -17,7 +17,7 @@ import { MedicalDepartmentsModule } from './medical-departments/medical-departme
     EventEmitterModule.forRoot(),
     MedicalDepartmentsModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  // controllers: [AppController],
+  // providers: [AppService],
 })
 export class AppModule {}
