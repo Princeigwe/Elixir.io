@@ -1,6 +1,9 @@
 import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus } from '@nestjs/common';
 import {UsersService} from './users.service'
 import {CreateUserDto} from './dtos/createUser.dto'
+import {ApiTags, ApiParam, ApiResponse, ApiQuery} from '@nestjs/swagger'
+
+@ApiTags('Users') // grouping the users endpoints for Swagger
 
 @Controller('users')
 export class UsersController {
@@ -11,23 +14,69 @@ export class UsersController {
     //     return await this.usersService.createUser(body.email, body.password)
     // }
 
+    // details on user ObjectID parameter for Swagger
+    @ApiParam({ 
+        name: '_id',
+        required: false,
+        description: "This is the ObjectId of the user in the database",
+    })
+
+    // details on GET user response for Swagger
+    @ApiResponse({
+        status: 404,
+        description: "Returns a  'User Not Found' error "
+    })
+    @ApiResponse({ 
+        status: 200,
+        description: " Returns a user object from the database "
+    })
     @Get(':_id')
     async getUserByID(@Param('_id') _id:any ) {
         return await this.usersService.getUserByID(_id)
     }
 
+
+    @ApiQuery({ 
+        name: 'email',
+        required: false,
+        description: 'queries a user by email address'
+    })
+    @ApiResponse({ 
+        status: 200,
+        description: " Returns all users in the database"
+    })
     @Get()
     async getUsers(@Query('email') email?: string) {
         if (email) {return await this.usersService.getUserByEmail(email)}
         return await this.usersService.getUsers()
     }
 
+
+    @ApiParam({ 
+        name: '_id',
+        required: false,
+        description: "Deletes user by ObjectId",
+    })
+    @ApiResponse({ 
+        status: 204,
+        description: " No Content"
+    })
     @Delete(':_id')
     async deleteUserByID(@Param('_id') _id:any) {
         await this.usersService.deleteUserByID(_id)
-        return {message: 'User Deleted'}
+        throw new HttpException('Users Deleted', HttpStatus.NO_CONTENT) 
     }
 
+
+    @ApiQuery({ 
+        name: 'email',
+        required: false,
+        description: "Deletes a user by email address"
+    })
+    @ApiResponse({ 
+        status: 204,
+        description: " No Content"
+    })
     @Delete()
     async deleteUsers(@Query('email') email: string) {
         if (email) {
@@ -35,7 +84,7 @@ export class UsersController {
             throw new HttpException('User Deleted', HttpStatus.NO_CONTENT) 
         }
         await this.usersService.deleteUsers()
-        return {message: 'Users Deleted'}
+        throw new HttpException('Users Deleted', HttpStatus.NO_CONTENT) 
     }
 
     // @Delete()
