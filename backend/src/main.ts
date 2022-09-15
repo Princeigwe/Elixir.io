@@ -19,7 +19,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle("Elixir.io")
-    .setDescription("A health tech API for Elixir.io")
+    .setDescription("A health-tech API for Elixir.io")
     .setVersion('1.0')
     .build()
   
