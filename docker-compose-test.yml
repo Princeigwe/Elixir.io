@@ -10,7 +10,9 @@ services:
     ports:
       - 9229:9229
       - 3000:3000
-    command: npm run test:watch
+    # command: npm run test:watch
+    command: npm run test
+
     volumes:
       - .:/usr/src/app/ # mounting the directory inside the container
       - /usr/src/app/backend/node_modules # mounting node_modules inside the backend container
