@@ -19,4 +19,8 @@ describe('AppController', () => {
   //     expect(appController.getHello()).toBe('Hello World!');
   //   });
   // });
+
+  it('should return 2', () => {
+    expect(1+1).toBe(2) // Did this because i don't want to delete this test file. LOL
+  })
 });
