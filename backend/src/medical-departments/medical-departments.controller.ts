@@ -5,7 +5,7 @@ import {RolesGuard} from '../roles.guard'
 import {Roles} from '../roles.decorator'
 import { Role } from '../enums/role.enum';
 import {CreateMedicalDepartmentDto} from './dtos/create.medical.department.dto'
-import {ApiTags, ApiResponse, ApiOperation, ApiParam, ApiQuery} from '@nestjs/swagger'
+import {ApiTags, ApiResponse, ApiOperation, ApiParam, ApiQuery, ApiBody} from '@nestjs/swagger'
 
 
 @ApiTags('Medical Departments')
@@ -13,7 +13,7 @@ import {ApiTags, ApiResponse, ApiOperation, ApiParam, ApiQuery} from '@nestjs/sw
 export class MedicalDepartmentsController {
     constructor(private medicalDepartmentsService: MedicalDepartmentsService) {}
 
-    @ApiOperation({description: "Creates a new department with one of [ Cardiology, Dermatology, Urology, IntensiveCareMedicine, Neurology, Surgery, Radiology, Pharmacy] as name data, only by an admin"})
+    @ApiOperation({description: "Creates a new department with one of [ Cardiology, Dermatology, Urology, IntensiveCareMedicine, Neurology, Surgery, Radiology, Pharmacy] as name data, only by an admin. Reference: CreateMedicalDepartmentDto"})
     @ApiResponse({ 
         status: 201,
         description: "Returns the object of a Medical Department."
@@ -26,6 +26,7 @@ export class MedicalDepartmentsController {
         status: 400,
         description: "Medical department already exists, create with a different name"
     })
+    @ApiBody({type: CreateMedicalDepartmentDto})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Post()
     @Roles(Role.Admin)

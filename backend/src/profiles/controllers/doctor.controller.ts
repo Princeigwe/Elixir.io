@@ -63,7 +63,7 @@ export class DoctorController {
     }
 
 
-    @ApiOperation({description: "Edit any of the doctor attributes. JWT authentication required'"})
+    @ApiOperation({description: "Edit any of the doctor attributes. JWT authentication required. Reference: EditDoctorDto"})
     @ApiParam({ 
         name: '_id',
         required: true,

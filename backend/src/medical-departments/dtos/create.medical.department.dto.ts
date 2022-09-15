@@ -4,7 +4,7 @@ import {ApiProperty} from '@nestjs/swagger'
 
 export class CreateMedicalDepartmentDto {
 
-    @ApiProperty({ description: " [ Cardiology, Dermatology, Urology, IntensiveCareMedicine, Neurology, Surgery, Radiology, Pharmacy] "})
+    @ApiProperty({ description: " [ Cardiology, Dermatology, Urology, IntensiveCareMedicine, Neurology, Surgery, Radiology, Pharmacy] ", example: "Cardiology"})
     @IsEnum(MedicalDepartments)
     @IsNotEmpty()
     name: MedicalDepartments;

@@ -27,7 +27,7 @@ export class PatientController {
         return await this.patientService.getPatientProfiles()
     }
 
-    @ApiOperation({description: "Edit any of the patient attributes"})
+    @ApiOperation({description: "Edit any of the patient attributes. Reference: EditPatientDto"})
     @ApiParam({ 
         name: '_id',
         required: true,
