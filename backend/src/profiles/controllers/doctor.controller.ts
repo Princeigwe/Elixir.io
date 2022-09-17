@@ -7,6 +7,8 @@ import {Roles} from '../../roles.decorator'
 import {JwtAuthGuard} from '../../auth/guards/jwt-auth.guard'
 import {RolesGuard} from '../../roles.guard'
 import {ApiOperation, ApiParam, ApiQuery, ApiTags, ApiResponse} from '@nestjs/swagger'
+import {MedicalDepartments} from '../../enums/medical.department.enum'
+import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 
 
 @ApiTags('Doctors')
@@ -84,6 +86,19 @@ export class DoctorController {
         // return {message: 'Doctor profiles deleted'}
         throw new HttpException('Doctor Profiles Deleted', HttpStatus.NO_CONTENT) 
 
+    }
+
+    @ApiOperation({description: "DELETE a doctor profile by names, department, and hierarchy, by an admin. JWT authentication required"})
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete(':firstName/:lastName/:department/:hierarchy')
+    @Roles(Role.Admin)
+    async deleteDoctorByNamesDepartmentAndHierarchy(
+        @Param('firstName') firstName: string, 
+        @Param('lastName') lastName: string, 
+        @Param('department') department: MedicalDepartments, 
+        @Param('hierarchy') hierarchy: DoctorHierarchy) {
+
+            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy);
     }
 
 }

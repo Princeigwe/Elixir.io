@@ -83,16 +83,23 @@ export class DoctorService {
 
     // this deletes the user model tied to the doctor profile
     // this should be executed first before 'this.deleteDoctorByNamesDepartmentAndHierarchy()' method
-    async deleteUserLinkedToDoctorProfile(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
-        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
-        const doctorUserObjectID = doctor['user']
-        await this.usersService.deleteUserByID(doctorUserObjectID)
-    }
+    // async deleteUserLinkedToDoctorProfile(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
+    //     const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+    //     const doctorUserObjectID = doctor['user']
+    //     await this.usersService.deleteUserByID(doctorUserObjectID)
+    // }
 
 
     // this will be used in the medical department service when a doctor cannot be added to a department
     async deleteDoctorByNamesDepartmentAndHierarchy(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
-        await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+
+        // this deletes the user model tied to the doctor profile
+        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+        const doctorUserObjectID = doctor['user']
+        // await this.usersService.deleteUserByID(doctorUserObjectID)
+        console.log(doctorUserObjectID)
+
+        // await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
     }
 
 }

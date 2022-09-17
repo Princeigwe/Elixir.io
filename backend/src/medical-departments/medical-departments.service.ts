@@ -107,7 +107,7 @@ export class MedicalDepartmentsService {
         */
         if(lengthOfLastAssociateSpecialistsArrayInLastGroup == 2) { // 2 here is the maximum number of items the associateSpecialists array can take
             let hierarchy = DoctorHierarchy.AssociateSpecialist
-            await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
+            // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
             await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new associate specialist")
@@ -148,7 +148,7 @@ export class MedicalDepartmentsService {
         */
         if(lengthOfLastJuniorDoctorsArrayInLastGroup == 4) { // 4 here is the maximum number of items the juniorDoctors array can take
             let hierarchy = DoctorHierarchy.JuniorDoctor
-            await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
+            // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
             await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new junior doctor")
@@ -188,7 +188,7 @@ export class MedicalDepartmentsService {
         */
         if(lengthOfLastMedicalStudentsArrayInLastGroup == 8) { // 8 here is the maximum number of items the medicalStudents array can take
             let hierarchy = DoctorHierarchy.MedicalStudent
-            await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
+            // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
             await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new medical student")
@@ -268,4 +268,14 @@ export class MedicalDepartmentsService {
         await this.medicalDepartmentModel.deleteOne({'name': name})
         return {message: 'Medical department deleted successfully'}
     }
+
+
+    async removeDoctorOrConsultantFromMembersOfDepartment(
+        firstName: string, 
+        lastName: string, 
+        department: MedicalDepartments) {
+
+            let doctorNames = `${firstName} ${lastName}`
+            await this.medicalDepartmentModel.updateOne({'name': department}, {$pull: { 'members': doctorNames }})
+        }
 }
