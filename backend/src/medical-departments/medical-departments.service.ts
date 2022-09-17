@@ -9,6 +9,8 @@ import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
 import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGroup.event'
 import * as _ from 'lodash'
 import {DoctorService} from '../profiles/services/doctor.service'
+import { RemoveDoctorEvent } from '../events/removeDoctorFromDepartment.event';
+
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -270,12 +272,13 @@ export class MedicalDepartmentsService {
     }
 
 
-    async removeDoctorOrConsultantFromMembersOfDepartment(
-        firstName: string, 
-        lastName: string, 
-        department: MedicalDepartments) {
+    @OnEvent('remove.doctor')
+    async removeDoctorOrConsultantFromMembersOfDepartment( payload: RemoveDoctorEvent ) {
+        let firstName = payload.firstName
+        let lastName = payload.lastName
+        let department = payload.department
+        let doctorNames = `${firstName} ${lastName}`
 
-            let doctorNames = `${firstName} ${lastName}`
-            await this.medicalDepartmentModel.updateOne({'name': department}, {$pull: { 'members': doctorNames }})
-        }
+        await this.medicalDepartmentModel.updateOne({'name': department}, {$pull: { 'members': doctorNames }})
+    }
 }

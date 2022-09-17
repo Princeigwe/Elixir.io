@@ -8,8 +8,8 @@ import {NewMedicalProviderEvent} from '../../events/createMedicalProviderProfile
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 import {UsersService} from '../../users/users.service'
-import { doc } from 'prettier';
-
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
 
 
 
@@ -17,7 +17,8 @@ import { doc } from 'prettier';
 export class DoctorService {
     constructor(
         @InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>,
-        private usersService: UsersService
+        private usersService: UsersService,
+        private eventEmitter: EventEmitter2
     ) {}
 
     @OnEvent('new.user.medic')
@@ -96,10 +97,14 @@ export class DoctorService {
         // this deletes the user model tied to the doctor profile
         const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
         const doctorUserObjectID = doctor['user']
-        // await this.usersService.deleteUserByID(doctorUserObjectID)
         console.log(doctorUserObjectID)
+        await this.usersService.deleteUserByID(doctorUserObjectID)
 
-        // await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+        // emitting the data that will be used to delete a member from a department
+        this.eventEmitter.emit('remove.doctor', new RemoveDoctorEvent(firstName, lastName, department, hierarchy))
+
+        // deletes doctor profile
+        await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
     }
 
 }
