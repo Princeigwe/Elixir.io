@@ -98,7 +98,8 @@ export class DoctorController {
         @Param('department') department: MedicalDepartments, 
         @Param('hierarchy') hierarchy: DoctorHierarchy) {
 
-            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy);
+        await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy);
+        throw new HttpException("Doctor Profile Deleted", HttpStatus.NO_CONTENT) 
     }
 
 }
