@@ -76,7 +76,7 @@ export class DoctorService {
         return doctor.save()
     }
 
-    
+
     async deleteDoctorsProfiles() {
         await this.doctorModel.deleteMany().exec()
     }

@@ -254,14 +254,13 @@ export class MedicalDepartmentsService {
 
     async editMemberOfGroupByName() {}
 
-    // this action will only be executed by the admin, when a doctor is fired, or profile is deleted
-    async removeFromMembersOfMedicalDepartment() {}
 
     // this action will only be executed by the admin
     async deleteMedicalDepartments() {
         await this.medicalDepartmentModel.deleteMany()
         return {message: 'Medical departments Http successfully'}
     }
+
 
     // this action will only be executed by the admin
     async searchAndDeleteMedicalDepartmentByName(name: string) {
@@ -272,13 +271,64 @@ export class MedicalDepartmentsService {
     }
 
 
-    @OnEvent('remove.doctor')
-    async removeDoctorOrConsultantFromMembersOfDepartment( payload: RemoveDoctorEvent ) {
-        let firstName = payload.firstName
-        let lastName = payload.lastName
-        let department = payload.department
+    // @OnEvent('remove.doctor')
+    // async removeExistingDoctorOrConsultantFromMembersOfDepartment( payload: RemoveDoctorEvent ) {
+    //     let firstName = payload.firstName
+    //     let lastName = payload.lastName
+    //     let department = payload.department
+    //     let doctorNames = `${firstName} ${lastName}`
+
+    //     await this.medicalDepartmentModel.updateOne({'name': department}, {$pull: { 'members': doctorNames }})
+    // }
+
+
+    async removeExistingDoctorOrConsultantFromMembersOfDepartment( firstName: string, lastName: string, department: MedicalDepartments) {
+        // let firstName = payload.firstName
+        // let lastName = payload.lastName
+        // let department = payload.department
         let doctorNames = `${firstName} ${lastName}`
 
         await this.medicalDepartmentModel.updateOne({'name': department}, {$pull: { 'members': doctorNames }})
+    }
+
+
+    async removeExistingConsultantFromAGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+        let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
+        let doctorNames = `${firstName} ${lastName}`
+
+        for(let group of doctorDepartment['groups']) {
+            let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
+            if(group['consultant'] == doctorNames) {
+                await this.medicalDepartmentModel.updateOne({'name': department}, { $set: { ['groups.' + groupIndex +'.consultant'] : '' }} )
+                break
+            }
+        }
+
+        // await this.medicalDepartmentModel.updateOne({'name': department, ''})
+    }
+
+
+    @OnEvent('remove.doctor')
+    async removeExistingDoctorOrConsultantFromGroupsOfDepartment( payload: RemoveDoctorEvent ) {
+        /* 
+            1. search the department 
+            2.Get the hierarchy of the doctor names provided
+            3. for every group that's in the group array of the department...
+            4. check the hierarchy provided
+            5. if the doctor is seen with the hierarchy, delete the name and break the loop
+        */
+        
+        let firstName = payload.firstName
+        let lastName = payload.lastName
+        let department = payload.department
+        let hierarchy = payload.hierarchy
+
+        // let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
+
+        if(hierarchy == DoctorHierarchy.Consultant) {
+            await this.removeExistingConsultantFromAGroup(firstName, lastName, department)
+        }
+
+        await this.removeExistingDoctorOrConsultantFromMembersOfDepartment(firstName, lastName, department)
     }
 }
