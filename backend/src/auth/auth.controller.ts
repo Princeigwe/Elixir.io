@@ -107,7 +107,7 @@ export class AuthController {
     // ** REGISTRATION LINK TO REGISTER NON-CONSULTANTS TO VARIOUS DEPARTMENTS WITH ASSOCIATE SPECIALIST HIERARCHY AS DEFAULT **
     
     @ApiOperation({description: "Registers a doctor that is not a consultant into the defined department. Reference: RegisterUserDoctorDto"})
-    @Redirect('http://localhost:3000/auth/doctor-form-submitted')
+    @Redirect('http://localhost:3000/api/v1/auth/doctor-form-submitted')
     @Post('registration-doctor')
     async registerDoctorToADepartment(@Body() body: RegisterUserDoctorDto) { 
         return this.authService.registerDoctorToADepartment(body.email, body.firstName, body.lastName, body.password, body.department, body.hierarchy)

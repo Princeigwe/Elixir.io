@@ -323,6 +323,20 @@ export class MedicalDepartmentsService {
     }
 
 
+    async removeExistingMedicalStudentFromAGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+        let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
+        let doctorNames = `${firstName} ${lastName}`
+
+        for(let group of doctorDepartment['groups']) {
+            let groupIndex = doctorDepartment['groups'].indexOf(group) // getting the index value of each iterated group
+            if( _.includes(group['medicalStudents'], doctorNames)) { // checking if array of medicalStudents contains doctor names, with lodash.
+                await this.medicalDepartmentModel.updateOne({'name': department}, { $pull: { ['groups.' + groupIndex +'.medicalStudents'] : doctorNames }})
+                break
+            }
+        }
+    }
+
+
     @OnEvent('remove.doctor')
     async removeExistingDoctorOrConsultantFromGroupsOfDepartment( payload: RemoveDoctorEvent ) {
         /* 
@@ -347,6 +361,10 @@ export class MedicalDepartmentsService {
 
         else if(hierarchy == DoctorHierarchy.JuniorDoctor) {
             await this.removeExistingJuniorDoctorFromAGroup(firstName, lastName, department)
+        }
+
+        else if(hierarchy == DoctorHierarchy.MedicalStudent) { 
+            await this.removeExistingMedicalStudentFromAGroup(firstName, lastName, department)
         }
 
         await this.removeExistingDoctorOrConsultantFromMembersOfDepartment(firstName, lastName, department)
