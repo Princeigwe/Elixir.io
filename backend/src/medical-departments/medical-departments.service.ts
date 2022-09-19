@@ -64,6 +64,21 @@ export class MedicalDepartmentsService {
     }
 
 
+    async createNewConsultantGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+
+        const consultant = `${firstName} ${lastName}`
+
+        let newGroup = { 
+            consultant: consultant,
+            associateSpecialists: [], // maximum number of 2
+            juniorDoctors: [], // maximum number of 4
+            medicalStudents: [] // maximum number of 8
+        }
+        
+        // fetch the a department by the event payload department, and add a group object to the groups array
+        await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
+    }
+
     /**
      *  this method iterates through every group in a department in search of a vacant consultant space.
      *  if a space is found during iteration, the new consultant fills up that space.
@@ -86,15 +101,18 @@ export class MedicalDepartmentsService {
         // checking if all groups have an object with a vacant consultant
         let vacantConsultant = doctorDepartment['groups'].some(group => group['consultant'] == "")
         if(!vacantConsultant) {
-            let newGroup = { 
-                consultant: consultant,
-                associateSpecialists: [], // maximum number of 2
-                juniorDoctors: [], // maximum number of 4
-                medicalStudents: [] // maximum number of 8
-            }
+            await this.createNewConsultantGroup(firstName, lastName, department)
+
+
+            // let newGroup = { 
+            //     consultant: consultant,
+            //     associateSpecialists: [], // maximum number of 2
+            //     juniorDoctors: [], // maximum number of 4
+            //     medicalStudents: [] // maximum number of 8
+            // }
             
-            // fetch the a department by the event payload department, and add a group object to the groups array
-            await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
+            // // fetch the a department by the event payload department, and add a group object to the groups array
+            // await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
         }
 
         await this.addToMembersOfDepartment(department, consultant)
@@ -113,15 +131,18 @@ export class MedicalDepartmentsService {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
 
         if (doctorDepartment['groups'].length == 0) {
-            let newGroup = { 
-                consultant: consultant,
-                associateSpecialists: [], // maximum number of 2
-                juniorDoctors: [], // maximum number of 4
-                medicalStudents: [] // maximum number of 8
-            }
+
+            await this.createNewConsultantGroup(consultantFirstName, consultantLastName, department)
+
+            // let newGroup = { 
+            //     consultant: consultant,
+            //     associateSpecialists: [], // maximum number of 2
+            //     juniorDoctors: [], // maximum number of 4
+            //     medicalStudents: [] // maximum number of 8
+            // }
     
-            // fetch the a department by the event payload department, and add a group object to the groups array
-            await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
+            // // fetch the a department by the event payload department, and add a group object to the groups array
+            // await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
             await this.addToMembersOfDepartment(department, consultant)
         }
 
