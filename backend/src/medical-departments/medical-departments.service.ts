@@ -64,7 +64,7 @@ export class MedicalDepartmentsService {
     }
 
 
-    async replaceVacantConsultantSpace(firstName: string, lastName: string, department: MedicalDepartments) {
+    async replaceVacantConsultantSpaceOrCreateNewGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
 
         const consultant = `${firstName} ${lastName}`
@@ -75,16 +75,24 @@ export class MedicalDepartmentsService {
                 await this.medicalDepartmentModel.updateOne({'name': department}, { $set: { ['groups.' + groupIndex +'.consultant'] : consultant }} )
                 break
             }
+            else {
+                let newGroup = { 
+                    consultant: consultant,
+                    associateSpecialists: [], // maximum number of 2
+                    juniorDoctors: [], // maximum number of 4
+                    medicalStudents: [] // maximum number of 8
+                }
+
+                // fetch the a department by the event payload department, and add a group object to the groups array
+                await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
+                break
+            }
         }
         await this.addToMembersOfDepartment(department, consultant)
     }
 
 
-    /*
-        this method will be executed by an event when a consultant is registered to a department
-        if the department already have a group, it checks for a vacant consultant space and fills it up with the consultant names,
-        else it creates a new group
-    */
+
     @OnEvent('new.consultant')
     async createGroupWithNewConsultantOrReplaceConsultantInDepartment(payload: NewDepartmentConsultantEvent) {
         const consultantFirstName = payload.firstName
@@ -109,7 +117,7 @@ export class MedicalDepartmentsService {
         }
 
         else { 
-            await this.replaceVacantConsultantSpace(consultantFirstName, consultantLastName, department)
+            await this.replaceVacantConsultantSpaceOrCreateNewGroup(consultantFirstName, consultantLastName, department)
         }
 
     }
