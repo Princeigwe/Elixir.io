@@ -64,6 +64,12 @@ export class MedicalDepartmentsService {
     }
 
 
+    /**
+     *  this method iterates through every group in a department in search of a vacant consultant space.
+     *  if a space is found during iteration, the new consultant fills up that space.
+     * 
+     * if after iteration and no vacant space was found, a new group with the consultant will be created.
+     */
     async replaceVacantConsultantSpaceOrCreateNewGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
 
@@ -75,19 +81,22 @@ export class MedicalDepartmentsService {
                 await this.medicalDepartmentModel.updateOne({'name': department}, { $set: { ['groups.' + groupIndex +'.consultant'] : consultant }} )
                 break
             }
-            else {
-                let newGroup = { 
-                    consultant: consultant,
-                    associateSpecialists: [], // maximum number of 2
-                    juniorDoctors: [], // maximum number of 4
-                    medicalStudents: [] // maximum number of 8
-                }
-
-                // fetch the a department by the event payload department, and add a group object to the groups array
-                await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
-                break
-            }
         }
+
+        // checking if all groups have an object with a vacant consultant
+        let vacantConsultant = doctorDepartment['groups'].some(group => group['consultant'] == "")
+        if(!vacantConsultant) {
+            let newGroup = { 
+                consultant: consultant,
+                associateSpecialists: [], // maximum number of 2
+                juniorDoctors: [], // maximum number of 4
+                medicalStudents: [] // maximum number of 8
+            }
+            
+            // fetch the a department by the event payload department, and add a group object to the groups array
+            await this.medicalDepartmentModel.updateOne({'name': department}, { $push: { groups:  newGroup } })
+        }
+
         await this.addToMembersOfDepartment(department, consultant)
     }
 
@@ -293,7 +302,7 @@ export class MedicalDepartmentsService {
     // this action will only be executed by the admin
     async deleteMedicalDepartments() {
         await this.medicalDepartmentModel.deleteMany()
-        return {message: 'Medical departments Http successfully'}
+        return {message: 'Medical departments Deleted successfully'}
     }
 
 
