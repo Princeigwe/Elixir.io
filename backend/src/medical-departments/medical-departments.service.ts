@@ -64,6 +64,7 @@ export class MedicalDepartmentsService {
     }
 
 
+    // this method creates a new consultant group
     async createNewConsultantGroup(firstName: string, lastName: string, department: MedicalDepartments) {
 
         const consultant = `${firstName} ${lastName}`
