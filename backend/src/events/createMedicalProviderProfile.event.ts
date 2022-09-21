@@ -8,6 +8,7 @@ export class NewMedicalProviderEvent {
         public user: User, 
         public firstName: string, 
         public lastName: string,
+        public email: string,
         public hierarchy: DoctorHierarchy,
         public department: MedicalDepartments
     ) {}

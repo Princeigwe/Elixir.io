@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query, HttpException, HttpStatus, Request } from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
 import {EditDoctorDto} from '../dtos/edit.doctor.dto'
 import {AssignDoctorToDepartmentDto} from '../dtos/assign.doctor.department.dto'
@@ -72,8 +72,9 @@ export class DoctorController {
     })
     @UseGuards(JwtAuthGuard)
     @Patch(':_id')
-    async editBasicDoctorProfileById(@Param('_id') _id: string, @Body() body: EditDoctorDto) {
-        return await this.doctorService.editBasicDoctorProfileById(_id, body)
+    async editBasicDoctorProfileById(@Param('_id') _id: string, @Body() body: EditDoctorDto, @Request() request) {
+        const user = request.user
+        return await this.doctorService.editBasicDoctorProfileById(_id, body, user)
     }
 
 

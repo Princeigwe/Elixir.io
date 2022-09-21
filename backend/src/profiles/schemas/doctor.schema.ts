@@ -26,6 +26,9 @@ export class Doctor {
     lastName: string
 
     @Prop()
+    email: string
+
+    @Prop()
     age: number
 
     @Prop()

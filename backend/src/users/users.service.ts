@@ -74,7 +74,7 @@ export class UsersService {
         }
         const category = UserCategory.MedicalProvider
         const user = new this.userModel({email: email, password: password, category: category})
-        this.eventEmitter.emit('new.user.medic', new NewMedicalProviderEvent(user, firstName, lastName, hierarchy, department)) // event to create medical provider profile
+        this.eventEmitter.emit('new.user.medic', new NewMedicalProviderEvent(user, firstName, lastName, email, hierarchy, department)) // event to create medical provider profile
         return user.save()
     }
 

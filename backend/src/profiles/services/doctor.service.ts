@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose'
 import {Model} from 'mongoose'
 import {Doctor, DoctorDocument} from '../schemas/doctor.schema'
@@ -11,6 +11,10 @@ import {UsersService} from '../../users/users.service'
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
 
+import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
+import {User} from '../../users/users.schema'
+import {Action} from '../../enums/action.enum'
+
 
 
 @Injectable()
@@ -18,7 +22,8 @@ export class DoctorService {
     constructor(
         @InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>,
         private usersService: UsersService,
-        private eventEmitter: EventEmitter2
+        private eventEmitter: EventEmitter2,
+        private caslAbilityFactory: CaslAbilityFactory
     ) {}
 
     @OnEvent('new.user.medic')
@@ -27,6 +32,7 @@ export class DoctorService {
             user: payload.user, 
             firstName: payload.firstName, 
             lastName: payload.lastName, 
+            email: payload.email,
             hierarchy: payload.hierarchy, 
             department: payload.department
         })
@@ -70,10 +76,25 @@ export class DoctorService {
         this method will help doctor fill up or edit profile without touching organizational data and user object id
         todo: add CASL authorization to this
     */
-    async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >) {
+    // async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >) {
+    //     const doctor = await this.getDoctorProfileById(_id)
+    //     Object.assign(doctor, attrs)
+    //     return doctor.save()
+    // }
+
+    async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >, user: User) {
+        const ability = this.caslAbilityFactory.createForUser(user)
+
         const doctor = await this.getDoctorProfileById(_id)
-        Object.assign(doctor, attrs)
-        return doctor.save()
+        // const doctor = await this.doctorModel.findOne({'_id': _id})
+
+        if( ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all') ) {
+            Object.assign(doctor, attrs)
+            return doctor.save()
+        }
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.BAD_REQUEST)
+        }
     }
 
 
