@@ -71,17 +71,8 @@ export class DoctorService {
 
     }
 
-    
-    /* 
-        this method will help doctor fill up or edit profile without touching organizational data and user object id
-        todo: add CASL authorization to this
-    */
-    // async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >) {
-    //     const doctor = await this.getDoctorProfileById(_id)
-    //     Object.assign(doctor, attrs)
-    //     return doctor.save()
-    // }
 
+    // doctor profile update with authorization with CASL
     async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >, user: User) {
         const ability = this.caslAbilityFactory.createForUser(user)
 
