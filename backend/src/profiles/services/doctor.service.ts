@@ -88,6 +88,8 @@ export class DoctorService {
         const doctor = await this.getDoctorProfileById(_id)
         // const doctor = await this.doctorModel.findOne({'_id': _id})
 
+        console.log(ability.can(Action.Update, doctor))
+
         if( ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all') ) {
             Object.assign(doctor, attrs)
             return doctor.save()
