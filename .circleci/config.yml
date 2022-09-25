@@ -1,26 +1,39 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  job1:
     docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+      - image: cimg/node:18.7.0
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
+    working_directory: ~/elixir.io/backend # setting working directory
     steps:
-      - checkout
+      - checkout:
+          path: ~/elixir.io # circleci should work on the subdirectories of elixir.io
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: npm update
+          command: sudo npm install -g npm@latest
+      - run:
+          name: test
+          command: |
+            npm install @nestjs/swagger --force
+            npm install rimraf 
+            npm test
+      - run:
+          name: build Docker image
+          command: docker build -t princeigwe/elixir.io:latest .
+      - run: 
+          name: push Docker image
+          command: |
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD docker.io
+            docker push princeigwe/elixir.io:latest
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+
 workflows:
-  say-hello-workflow:
+  elixir:
     jobs:
-      - say-hello
+      - job1:
+          context: 
+            - DOCKER_AUTH
