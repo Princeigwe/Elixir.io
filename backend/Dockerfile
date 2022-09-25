@@ -11,6 +11,7 @@ COPY package*.json ./
 # install development dependencies
 RUN npm install --only=development --force
 
+
 # copy the application code to the working directory of image
 COPY . .
 
