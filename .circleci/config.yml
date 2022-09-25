@@ -18,7 +18,6 @@ jobs:
       - run:
           name: test
           command: |
-            npm install @nestjs/swagger --force
             npm install rimraf 
             npm test
       - run:
