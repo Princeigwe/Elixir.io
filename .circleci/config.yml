@@ -13,10 +13,12 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
+          name: npm update
+          command: npm install -g npm@latest
+      - run:
           name: test
           command: |
             npm install rimraf 
-            npm install @nestjs/swagger --legacy-peer-deps
             npm test
       - run:
           name: build Docker image
