@@ -16,6 +16,7 @@ jobs:
           name: test
           command: |
             npm install rimraf 
+            npm install @nestjs/swagger --force
             npm test
       - run:
           name: build Docker image
