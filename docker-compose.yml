@@ -18,6 +18,9 @@ services:
     command: npm run start:dev
     environment:
       JWT_CONSTANT_SECRET: ${JWT_CONSTANT_SECRET}
+      S3_ADMINISTRATOR_ACCESS_KEY_ID: ${S3_ADMINISTRATOR_ACCESS_KEY_ID}
+      S3_ADMINISTRATOR_SECRET_ACCESS_KEY: ${S3_ADMINISTRATOR_SECRET_ACCESS_KEY}
+      S3_BUCKET: ${S3_BUCKET}
     volumes:
       - .:/usr/src/app/ # mounting the directory inside the container
       - /usr/src/app/backend/node_modules # mounting node_modules inside the backend container

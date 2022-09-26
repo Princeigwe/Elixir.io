@@ -12,9 +12,8 @@ export type DoctorDocument = Doctor & Document
 @Schema()
 export class Doctor {
 
-    // todo: this will be the url string of profile image
-    // @Prop()
-    // imageUrl: string
+    @Prop()
+    imageUrl: string
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     user: User

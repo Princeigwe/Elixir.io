@@ -4,6 +4,8 @@ import {ValidationPipe} from '@nestjs/common'
 import * as cookieParser from 'cookie-parser';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 
+import {config as AWS_CONFIG} from 'aws-sdk'
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser())
@@ -16,6 +18,11 @@ async function bootstrap() {
     })
   )
   app.setGlobalPrefix('/api/v1/')
+
+  AWS_CONFIG.update({
+    accessKeyId: process.env.S3_ADMINISTRATOR_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_ADMINISTRATOR_SECRET_ACCESS_KEY
+  })
 
   const config = new DocumentBuilder()
     .setTitle("Elixir.io")

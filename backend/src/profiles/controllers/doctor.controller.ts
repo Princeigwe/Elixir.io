@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query, HttpException, HttpStatus, Request } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query, HttpException, HttpStatus, Request, Post, UseInterceptors, UploadedFile} from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
 import {EditDoctorDto} from '../dtos/edit.doctor.dto'
 import {AssignDoctorToDepartmentDto} from '../dtos/assign.doctor.department.dto'
@@ -9,6 +9,8 @@ import {RolesGuard} from '../../roles.guard'
 import {ApiOperation, ApiParam, ApiQuery, ApiTags, ApiResponse} from '@nestjs/swagger'
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
+
+import {FileInterceptor} from '@nestjs/platform-express'
 
 
 @ApiTags('Doctors')
@@ -64,6 +66,12 @@ export class DoctorController {
         return await this.doctorService.getDoctorProfileById(_id)
     }
 
+
+    @Post('avatar/upload/:email')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadDoctorProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('email') email: string) {
+        return await this.doctorService.uploadDoctorProfileAvatar(email, file.buffer, file.originalname)
+    }
 
     @ApiOperation({description: "Edit any of the doctor attributes. JWT authentication required. Reference: EditDoctorDto"})
     @ApiParam({ 

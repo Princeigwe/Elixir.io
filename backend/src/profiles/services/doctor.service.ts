@@ -14,6 +14,7 @@ import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event
 import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
 import {User} from '../../users/users.schema'
 import {Action} from '../../enums/action.enum'
+import {S3} from 'aws-sdk'
 
 
 
@@ -71,6 +72,24 @@ export class DoctorService {
 
     }
 
+
+    // this method uploads a file to the Elixir.io bucket
+    async uploadProfileAvatar(body: Buffer, fileName: string) {
+        const bucket = process.env.S3_BUCKET
+
+        const s3 = new S3()
+        const params = {Bucket: bucket, Key: fileName, Body: body}
+        return s3.upload(params).promise()
+
+    }
+
+
+    async uploadDoctorProfileAvatar(email: string, body: Buffer, fileName: string) {
+
+        const imageLocation = await (await this.uploadProfileAvatar(body, fileName)).Location
+        await this.doctorModel.updateOne({email: email}, {'imageUrl': imageLocation})
+
+    }
 
     // doctor profile update with authorization with CASL
     async editBasicDoctorProfileById(_id:string, attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >, user: User) {
