@@ -70,6 +70,12 @@ export class DoctorController {
     @Post('avatar/upload/:email')
     @UseInterceptors(FileInterceptor('file'))
     async uploadDoctorProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('email') email: string) {
+        if( !file.originalname.match(/\.(jpg|png|jpeg)$/) ) {
+            throw new HttpException("File must be of mimetype jpeg/jpg or png", HttpStatus.BAD_REQUEST)
+        }
+        else if (file.size > 5000000){
+            throw new HttpException("File size must not be more than 5MB", HttpStatus.BAD_REQUEST)
+        }
         return await this.doctorService.uploadDoctorProfileAvatar(email, file.buffer, file.originalname)
     }
 
