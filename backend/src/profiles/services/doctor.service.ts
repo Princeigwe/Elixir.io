@@ -80,7 +80,31 @@ export class DoctorService {
         const s3 = new S3()
         const params = {Bucket: bucket, Key: fileName, Body: body}
         return s3.upload(params).promise()
+    }
 
+    async deleteProfileAvatar(fileName: string) {
+        const bucket = process.env.S3_BUCKET
+
+        const s3 = new S3()
+        const params = {Bucket: bucket, Delete: {Objects: [ {Key: fileName} ]}}
+        s3.deleteObjects(params)
+    }
+
+    // async getFileNameOfDoctorUploadedAvatar(email: string) {
+    //     const doctor = await this.doctorModel.findOne({'email': email})
+    //     const doctorImageFileName = doctor.imageUrl.split('elixir.io/')[1]
+    // }
+
+    async editDoctorProfileAvatar(email: string, body: Buffer, fileName: string) {
+        const doctor = await this.doctorModel.findOne({'email': email})
+        // getting the filename from the image url of doctor profile
+        const doctorImageFileName = doctor.imageUrl.split('elixir.io/')[1]
+
+        // deleting the image from s3
+        await this.deleteProfileAvatar(doctorImageFileName)
+
+        // uploading a new file
+        await this.uploadDoctorProfileAvatar(email, body, fileName)
     }
 
 

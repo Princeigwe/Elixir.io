@@ -79,6 +79,19 @@ export class DoctorController {
         return await this.doctorService.uploadDoctorProfileAvatar(email, file.buffer, file.originalname)
     }
 
+
+    @Patch('avatar/upload/:email')
+    @UseInterceptors(FileInterceptor('file'))
+    async editDoctorProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('email') email: string) {
+        if( !file.originalname.match(/\.(jpg|png|jpeg)$/) ) {
+            throw new HttpException("File must be of mimetype jpeg/jpg or png", HttpStatus.BAD_REQUEST)
+        }
+        else if (file.size > 5000000){
+            throw new HttpException("File size must not be more than 5MB", HttpStatus.BAD_REQUEST)
+        }
+        return await this.doctorService.editDoctorProfileAvatar(email, file.buffer, file.originalname)
+    }
+
     @ApiOperation({description: "Edit any of the doctor attributes. JWT authentication required. Reference: EditDoctorDto"})
     @ApiParam({ 
         name: '_id',
