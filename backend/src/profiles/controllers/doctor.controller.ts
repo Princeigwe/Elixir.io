@@ -6,7 +6,7 @@ import {Role} from '../../enums/role.enum'
 import {Roles} from '../../roles.decorator'
 import {JwtAuthGuard} from '../../auth/guards/jwt-auth.guard'
 import {RolesGuard} from '../../roles.guard'
-import {ApiOperation, ApiParam, ApiQuery, ApiTags, ApiResponse} from '@nestjs/swagger'
+import {ApiOperation, ApiParam, ApiQuery, ApiTags, ApiResponse, ApiConsumes} from '@nestjs/swagger'
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 
@@ -67,29 +67,35 @@ export class DoctorController {
     }
 
 
-    @Post('avatar/upload/:email')
+    @ApiConsumes('multipart/form-data')
+    @UseGuards(JwtAuthGuard)
+    @Post('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
-    async uploadDoctorProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('email') email: string) {
+    async uploadDoctorProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('_id') _id: string, @Request() request) {
+        const user = request.user
         if( !file.originalname.match(/\.(jpg|png|jpeg)$/) ) {
             throw new HttpException("File must be of mimetype jpeg/jpg or png", HttpStatus.BAD_REQUEST)
         }
         else if (file.size > 5000000){
             throw new HttpException("File size must not be more than 5MB", HttpStatus.BAD_REQUEST)
         }
-        return await this.doctorService.uploadDoctorProfileAvatar(email, file.buffer, file.originalname)
+        return await this.doctorService.uploadDoctorProfileAvatar(_id, file.buffer, file.originalname, user)
     }
 
 
-    @Patch('avatar/upload/:email')
+    @ApiConsumes('multipart/form-data')
+    @UseGuards(JwtAuthGuard)
+    @Patch('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
-    async editDoctorProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('email') email: string) {
+    async editDoctorProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('_id') _id: string, @Request() request) {
+        const user = request.user
         if( !file.originalname.match(/\.(jpg|png|jpeg)$/) ) {
             throw new HttpException("File must be of mimetype jpeg/jpg or png", HttpStatus.BAD_REQUEST)
         }
         else if (file.size > 5000000){
             throw new HttpException("File size must not be more than 5MB", HttpStatus.BAD_REQUEST)
         }
-        return await this.doctorService.editDoctorProfileAvatar(email, file.buffer, file.originalname)
+        return await this.doctorService.editDoctorProfileAvatar(_id, file.buffer, file.originalname, user)
     }
 
     @ApiOperation({description: "Edit any of the doctor attributes. JWT authentication required. Reference: EditDoctorDto"})

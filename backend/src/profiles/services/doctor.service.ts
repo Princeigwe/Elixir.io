@@ -128,8 +128,9 @@ export class DoctorService {
  * @param {string} fileName - the name of the file that will be uploaded to s3
  */
 
-    async editDoctorProfileAvatar(email: string, body: Buffer, fileName: string) {
-        const doctor = await this.doctorModel.findOne({'email': email})
+    async editDoctorProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
+        const doctor = await this.getDoctorProfileById(_id)
+        
         // getting the filename from the image url of doctor profile
         const doctorImageFileName = doctor.imageUrl.split('elixir.io/')[1]
 
@@ -137,14 +138,23 @@ export class DoctorService {
         await this.deleteProfileAvatar(doctorImageFileName)
 
         // uploading a new file
-        await this.uploadDoctorProfileAvatar(email, body, fileName)
+        await this.uploadDoctorProfileAvatar(_id, body, fileName, user)
     }
 
 
-    async uploadDoctorProfileAvatar(email: string, body: Buffer, fileName: string) {
+    async uploadDoctorProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
 
+        const ability = this.caslAbilityFactory.createForUser(user)
+
+        const doctor = await this.getDoctorProfileById(_id)
         const imageLocation = await (await this.uploadProfileAvatar(body, fileName)).Location
-        await this.doctorModel.updateOne({email: email}, {'imageUrl': imageLocation})
+
+        if (ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all')) {
+            await this.doctorModel.updateOne({'_id': _id}, {'imageUrl': imageLocation})
+        }
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.BAD_REQUEST)
+        }
 
     }
 
