@@ -6,11 +6,12 @@ import {Role} from '../../enums/role.enum'
 import {Roles} from '../../roles.decorator'
 import {JwtAuthGuard} from '../../auth/guards/jwt-auth.guard'
 import {RolesGuard} from '../../roles.guard'
-import {ApiOperation, ApiParam, ApiQuery, ApiTags, ApiResponse, ApiConsumes} from '@nestjs/swagger'
+import {ApiOperation, ApiParam, ApiQuery, ApiTags, ApiResponse, ApiConsumes, ApiBody} from '@nestjs/swagger'
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 
 import {FileInterceptor} from '@nestjs/platform-express'
+import { UploadDoctorAvatarDto } from '../dtos/upload.doctor.avatar.dto';
 
 
 @ApiTags('Doctors')
@@ -67,7 +68,16 @@ export class DoctorController {
     }
 
 
+    @ApiOperation({description: 'Uploads doctor profile avatar. JWT authentication required. Reference: UploadDoctorAvatarDto'})
+    @ApiParam({
+        name: '_id',
+        required: true,
+    })
+    @ApiResponse({
+        status: 200,
+    })
     @ApiConsumes('multipart/form-data')
+    @ApiBody({type: UploadDoctorAvatarDto})
     @UseGuards(JwtAuthGuard)
     @Post('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
@@ -83,7 +93,16 @@ export class DoctorController {
     }
 
 
+    @ApiOperation({description: 'Edits doctor profile avatar. JWT authentication required. Reference: UploadDoctorAvatarDto'})
+    @ApiParam({
+        name: '_id',
+        required: true,
+    })
+    @ApiResponse({
+        status: 200,
+    })
     @ApiConsumes('multipart/form-data')
+    @ApiBody({type: UploadDoctorAvatarDto})
     @UseGuards(JwtAuthGuard)
     @Patch('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
