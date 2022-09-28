@@ -27,6 +27,11 @@ export class DoctorService {
         private caslAbilityFactory: CaslAbilityFactory
     ) {}
 
+    /**
+     * It creates a new doctor profile and saves it to the database
+     * @param {NewMedicalProviderEvent} payload - NewMedicalProviderEvent
+     * @returns The doctor object is being returned.
+     */
     @OnEvent('new.user.medic')
     async createDoctorProfile(payload: NewMedicalProviderEvent) {
         const doctor = new this.doctorModel({
@@ -40,12 +45,21 @@ export class DoctorService {
         return doctor.save()
     }
 
+    /**
+     * It returns a list of all doctors in the database
+     * @returns An array of all the doctors in the database
+     */
     async getDoctorProfiles() {
         const doctors  = await this.doctorModel.find().exec()
         if(!doctors.length) {throw new NotFoundException("Doctors Not Found")}
         return doctors
     }
 
+    /**
+     * It returns a doctor profile by id
+     * @param {string} _id - The id of the doctor you want to get.
+     * @returns The doctor object
+     */
     async getDoctorProfileById(_id:string) {
         const doctor = await this.doctorModel.findOne({'_id':_id}).exec()
         if (!doctor) {throw new NotFoundException("Doctor Not Found")}
@@ -53,6 +67,11 @@ export class DoctorService {
     }
 
     // this function searches names with regular expressions
+    /**
+     * It searches for doctors by first name, last name, or both
+     * @param {string} [firstName] - The first name of the doctor.
+     * @param {string} [lastName] - The last name of the doctor.
+     */
     async searchDoctorsByFirstAndLastNames(firstName?:string, lastName?:string) {
         if (firstName) { 
             let doctors = await this.doctorModel.find({'firstName': { "$regex": firstName, "$options": 'i' } }).exec() 
@@ -74,6 +93,12 @@ export class DoctorService {
 
 
     // this method uploads a file to the Elixir.io bucket
+    /**
+     * It uploads a file to an S3 bucket
+     * @param {Buffer} body - The image file that we want to upload.
+     * @param {string} fileName - The name of the file that will be saved in S3.
+     * @returns A promise
+     */
     async uploadProfileAvatar(body: Buffer, fileName: string) {
         const bucket = process.env.S3_BUCKET
 
@@ -82,18 +107,26 @@ export class DoctorService {
         return s3.upload(params).promise()
     }
 
+
+
+    /**
+     * It deletes a profile avatar from S3
+     * @param {string} fileName - The name of the file to be deleted.
+     */
     async deleteProfileAvatar(fileName: string) {
         const bucket = process.env.S3_BUCKET
 
         const s3 = new S3()
-        const params = {Bucket: bucket, Delete: {Objects: [ {Key: fileName} ]}}
-        s3.deleteObjects(params)
+        const params = {Bucket: bucket, Key: fileName}
+        s3.deleteObject(params).promise()
     }
 
-    // async getFileNameOfDoctorUploadedAvatar(email: string) {
-    //     const doctor = await this.doctorModel.findOne({'email': email})
-    //     const doctorImageFileName = doctor.imageUrl.split('elixir.io/')[1]
-    // }
+/**
+ * It deletes the old image from s3 and uploads a new one
+ * @param {string} email - email of the doctor
+ * @param {Buffer} body - Buffer - the image file
+ * @param {string} fileName - the name of the file that will be uploaded to s3
+ */
 
     async editDoctorProfileAvatar(email: string, body: Buffer, fileName: string) {
         const doctor = await this.doctorModel.findOne({'email': email})
@@ -137,15 +170,6 @@ export class DoctorService {
     async deleteDoctorsProfiles() {
         await this.doctorModel.deleteMany().exec()
     }
-
-
-    // this deletes the user model tied to the doctor profile
-    // this should be executed first before 'this.deleteDoctorByNamesDepartmentAndHierarchy()' method
-    // async deleteUserLinkedToDoctorProfile(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
-    //     const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
-    //     const doctorUserObjectID = doctor['user']
-    //     await this.usersService.deleteUserByID(doctorUserObjectID)
-    // }
 
 
     // this will be used in the medical department service when a doctor cannot be added to a department
