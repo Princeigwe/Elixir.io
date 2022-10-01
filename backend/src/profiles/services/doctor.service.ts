@@ -194,6 +194,11 @@ export class DoctorService {
         // emitting the data that will be used to delete a member from a department
         this.eventEmitter.emit('remove.doctor', new RemoveDoctorEvent(firstName, lastName, department, hierarchy))
 
+
+        // deleting the doctor's profile avatar from elixir.io s3 bucket
+        const doctorImageFileName = doctor.imageUrl.split('elixir.io/')[1]
+        await this.deleteProfileAvatar(doctorImageFileName)
+
         // deletes doctor profile
         await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
     }
