@@ -156,7 +156,22 @@ export class DoctorController {
     }
 
 
+    @ApiResponse({
+        status: 200,
+        description: "Returns the doctor's profile with update hierarchy"
+    })
+    @ApiResponse({
+        status: 404,
+        description: "Doctor not found"
+    })
+    @ApiResponse({
+        status: 400,
+        description: "Consultant cannot be promoted"
+    })
+    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required"})
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Patch('promote-doctor-hierarchy/:firstName/:lastName/:department')
+    @Roles(Role.Admin) 
     async promoteDoctorHierarchy(
         @Param('firstName') firstName: string, 
         @Param('lastName') lastName: string, 
