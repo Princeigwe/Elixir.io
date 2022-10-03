@@ -207,25 +207,25 @@ export class DoctorService {
 
     // this action will only be executed by an admin
     async promoteDoctorHierarchy(firstName: string, lastName: string, department: MedicalDepartments) {
-        const doctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec() 
+        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department }).exec() 
         if(!doctor) {throw new NotFoundException("Doctor Not Found")}
 
         else if(doctor.hierarchy == DoctorHierarchy.MedicalStudent) {
-            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
+            await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
             await this.medicalDepartmentsService.promoteMedicalStudentToJuniorDoctorInDepartment(firstName, lastName, department)
             let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
         else if(doctor.hierarchy == DoctorHierarchy.JuniorDoctor) {
-            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
+            await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
             await this.medicalDepartmentsService.promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName, lastName, department)
             let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
         else if(doctor.hierarchy == DoctorHierarchy.AssociateSpecialist) {
-            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.Consultant}})
+            await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.Consultant}})
             await this.medicalDepartmentsService.promoteAssociateSpecialistToConsultantInDepartment(firstName, lastName, department)
             let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
@@ -243,21 +243,21 @@ export class DoctorService {
         if(!doctor) {throw new NotFoundException("Doctor Not Found")}
 
         else if(doctor.hierarchy == DoctorHierarchy.Consultant) {
-            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
+            await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
             await this.medicalDepartmentsService.demoteConsultantToAssociateSpecialistInDepartment(firstName, lastName, department)
             let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
         else if(doctor.hierarchy == DoctorHierarchy.AssociateSpecialist) {
-            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
+            await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department}, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
             await this.medicalDepartmentsService.demoteAssociateSpecialistToJuniorDoctorInDepartment(firstName, lastName, department)
             let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
         else if(doctor.hierarchy == DoctorHierarchy.JuniorDoctor) {
-            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.MedicalStudent}})
+            await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.MedicalStudent}})
             await this.medicalDepartmentsService.demoteJuniorDoctorToMedicalStudentInDepartment(firstName, lastName, department)
             let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
