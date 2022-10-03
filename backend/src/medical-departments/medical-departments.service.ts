@@ -296,8 +296,6 @@ export class MedicalDepartmentsService {
 
     }
 
-    async editMemberOfGroupByName() {}
-
 
     // this action will only be executed by the admin
     async deleteMedicalDepartments() {
@@ -322,8 +320,8 @@ export class MedicalDepartmentsService {
 
 
     /* 
-        this method removes an existing consultant from a department, it will be called by the removeExistingDoctorOrConsultantFromGroupsOfDepartment() method
-        on a 'remove.doctor' event, when a doctor profile gets deleted by the admin.
+        this method removes an existing consultant from a department
+        on a 'remove.doctor' event, when a doctor profile gets deleted, or demoted by the admin.
      */
     async removeExistingConsultantFromAGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
@@ -339,6 +337,10 @@ export class MedicalDepartmentsService {
     }
 
 
+    /* 
+        this method removes an existing associate specialist from a department
+        on a 'remove.doctor' event, when a doctor profile gets deleted, or demoted by the admin.
+     */
     async removeExistingAssociateSpecialistFromAGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
         let doctorNames = `${firstName} ${lastName}`
@@ -353,6 +355,10 @@ export class MedicalDepartmentsService {
     }
 
 
+    /* 
+        this method removes an existing  from a department
+        on a 'remove.doctor' event, when a doctor profile gets deleted, or demoted by the admin.
+     */
     async removeExistingJuniorDoctorFromAGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
         let doctorNames = `${firstName} ${lastName}`
@@ -367,6 +373,10 @@ export class MedicalDepartmentsService {
     }
 
 
+    /* 
+        this method removes an existing  from a department
+        on a 'remove.doctor' event, when a doctor profile gets deleted by the admin.
+     */
     async removeExistingMedicalStudentFromAGroup(firstName: string, lastName: string, department: MedicalDepartments) {
         let doctorDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
         let doctorNames = `${firstName} ${lastName}`
@@ -415,6 +425,8 @@ export class MedicalDepartmentsService {
     }
 
 
+    //** medical department hierarchy promotion methods, they move doctor names up to higher ranks in the department */
+
     async promoteMedicalStudentToJuniorDoctorInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
         await this.removeExistingMedicalStudentFromAGroup(firstName, lastName, department)
         await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
@@ -431,4 +443,25 @@ export class MedicalDepartmentsService {
         await this.removeExistingAssociateSpecialistFromAGroup(firstName, lastName, department)
         await this.replaceVacantConsultantSpaceOrCreateNewGroup(firstName, lastName, department)
     }
+
+
+    //** medical department hierarchy demotion methods, they move doctor names down to lower ranks in the department */
+
+    async demoteConsultantToAssociateSpecialistInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+        await this.removeExistingConsultantFromAGroup(firstName, lastName, department)
+        await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
+    }
+
+
+    async demoteAssociateSpecialistToJuniorDoctorInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+        await this.removeExistingAssociateSpecialistFromAGroup(firstName, lastName, department)
+        await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
+    }
+
+
+    async demoteJuniorDoctorToMedicalStudentInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+        await this.removeExistingJuniorDoctorFromAGroup(firstName, lastName, department)
+        await this.addMedicalStudentToADepartmentGroup(firstName, lastName, department)
+    }
+
 }

@@ -232,7 +232,39 @@ export class DoctorService {
         }
 
         else {
-            throw new HttpException('Consultant cannot be promoted', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Consultant hierarchy cannot be promoted any further', HttpStatus.BAD_REQUEST)
+        }
+    }
+
+
+    // this action will be executed by the admin, in case of an error in promotion
+    async demoteDoctorHierarchy(firstName: string, lastName: string, department: MedicalDepartments) {
+        const doctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec() 
+        if(!doctor) {throw new NotFoundException("Doctor Not Found")}
+
+        else if(doctor.hierarchy == DoctorHierarchy.Consultant) {
+            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
+            await this.medicalDepartmentsService.demoteConsultantToAssociateSpecialistInDepartment(firstName, lastName, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            return updatedDoctor
+        }
+
+        else if(doctor.hierarchy == DoctorHierarchy.AssociateSpecialist) {
+            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
+            await this.medicalDepartmentsService.demoteAssociateSpecialistToJuniorDoctorInDepartment(firstName, lastName, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            return updatedDoctor
+        }
+
+        else if(doctor.hierarchy == DoctorHierarchy.JuniorDoctor) {
+            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.MedicalStudent}})
+            await this.medicalDepartmentsService.demoteJuniorDoctorToMedicalStudentInDepartment(firstName, lastName, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            return updatedDoctor
+        }
+
+        else {
+            throw new HttpException('Medical Student hierarchy cannot be demoted any further', HttpStatus.BAD_REQUEST)
         }
     }
 
