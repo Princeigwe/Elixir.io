@@ -155,4 +155,14 @@ export class DoctorController {
         throw new HttpException("Doctor Profile Deleted", HttpStatus.NO_CONTENT) 
     }
 
+
+    @Patch('promote-doctor-hierarchy/:firstName/:lastName/:department')
+    async promoteDoctorHierarchy(
+        @Param('firstName') firstName: string, 
+        @Param('lastName') lastName: string, 
+        @Param('department') department: MedicalDepartments,) {
+
+        return this.doctorService.promoteDoctorHierarchy(firstName, lastName, department)
+    }
+
 }

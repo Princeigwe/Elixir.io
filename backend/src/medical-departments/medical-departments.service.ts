@@ -60,7 +60,7 @@ export class MedicalDepartmentsService {
 
     // this method finds a department and adds a new doctor to its members
     async addToMembersOfDepartment(department: MedicalDepartments, member: string) {
-        await this.medicalDepartmentModel.updateOne( {'name': department}, { $push: { members: member } } )
+        await this.medicalDepartmentModel.updateOne( {'name': department}, { $addToSet: { members: member } } )
     }
 
 
@@ -412,5 +412,23 @@ export class MedicalDepartmentsService {
         }
 
         await this.removeExistingDoctorOrConsultantFromMembersOfDepartment(firstName, lastName, department)
+    }
+
+
+    async promoteMedicalStudentToJuniorDoctorInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+        await this.removeExistingMedicalStudentFromAGroup(firstName, lastName, department)
+        await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
+    }
+
+    
+    async promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+        await this.removeExistingJuniorDoctorFromAGroup(firstName, lastName, department)
+        await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
+    }
+
+
+    async promoteAssociateSpecialistToConsultantInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+        await this.removeExistingAssociateSpecialistFromAGroup(firstName, lastName, department)
+        await this.replaceVacantConsultantSpaceOrCreateNewGroup(firstName, lastName, department)
     }
 }

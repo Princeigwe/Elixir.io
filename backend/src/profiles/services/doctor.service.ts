@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, Inject, forwardRef } from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose'
 import {Model} from 'mongoose'
 import {Doctor, DoctorDocument} from '../schemas/doctor.schema'
@@ -8,6 +8,7 @@ import {NewMedicalProviderEvent} from '../../events/createMedicalProviderProfile
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 import {UsersService} from '../../users/users.service'
+import {MedicalDepartmentsService} from '../../medical-departments/medical-departments.service'
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
 
@@ -17,14 +18,14 @@ import {Action} from '../../enums/action.enum'
 import {S3} from 'aws-sdk'
 
 
-
 @Injectable()
 export class DoctorService {
     constructor(
         @InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>,
         private usersService: UsersService,
         private eventEmitter: EventEmitter2,
-        private caslAbilityFactory: CaslAbilityFactory
+        @Inject(forwardRef(() => MedicalDepartmentsService)) private medicalDepartmentsService: MedicalDepartmentsService,
+        private caslAbilityFactory: CaslAbilityFactory,
     ) {}
 
     /**
@@ -201,6 +202,38 @@ export class DoctorService {
 
         // deletes doctor profile
         await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+    }
+
+
+    // this action will only be executed by an admin
+    async promoteDoctorHierarchy(firstName: string, lastName: string, department: MedicalDepartments) {
+        const doctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec() 
+        if(!doctor) {throw new NotFoundException("Doctor Not Found")}
+
+        else if(doctor.hierarchy == DoctorHierarchy.MedicalStudent) {
+            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
+            await this.medicalDepartmentsService.promoteMedicalStudentToJuniorDoctorInDepartment(firstName, lastName, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            return updatedDoctor
+        }
+
+        else if(doctor.hierarchy == DoctorHierarchy.JuniorDoctor) {
+            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
+            await this.medicalDepartmentsService.promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName, lastName, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            return updatedDoctor
+        }
+
+        else if(doctor.hierarchy == DoctorHierarchy.AssociateSpecialist) {
+            await this.doctorModel.updateOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }, {$set: {'hierarchy': DoctorHierarchy.Consultant}})
+            await this.medicalDepartmentsService.promoteAssociateSpecialistToConsultantInDepartment(firstName, lastName, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            return updatedDoctor
+        }
+
+        else {
+            throw new HttpException('Consultant cannot be promoted', HttpStatus.BAD_REQUEST)
+        }
     }
 
 }

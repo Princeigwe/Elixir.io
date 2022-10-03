@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MedicalDepartmentsService } from './medical-departments.service';
 import { MedicalDepartmentsController } from './medical-departments.controller';
 import { MedicalDepartment, MedicalDepartmentSchema } from './medical-departments.schema';
@@ -10,7 +10,7 @@ import {ProfilesModule} from '../profiles/profiles.module'
     MongooseModule.forFeature([
       {name: MedicalDepartment.name, schema: MedicalDepartmentSchema},
     ]),
-    ProfilesModule,
+    forwardRef(() => ProfilesModule),
   ],
   providers: [MedicalDepartmentsService],
   exports: [MedicalDepartmentsService],

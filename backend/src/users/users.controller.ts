@@ -6,7 +6,7 @@ import {SanitizeMongooseModelInterceptor} from 'nestjs-mongoose-exclude'
 
 @ApiTags('Users') // grouping the users endpoints for Swagger
 
-// @UseInterceptors(new SanitizeMongooseModelInterceptor) // hides user password
+@UseInterceptors(new SanitizeMongooseModelInterceptor) // hides user password
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) {}

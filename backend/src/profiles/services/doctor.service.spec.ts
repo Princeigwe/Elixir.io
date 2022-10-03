@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DoctorService } from './doctor.service';
 import {getModelToken} from '@nestjs/mongoose'
 import {UsersService} from '../../users/users.service'
+import {MedicalDepartmentsService} from '../../medical-departments/medical-departments.service'
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
 
@@ -15,6 +16,7 @@ describe('DoctorService', () => {
   let mockEventEmitter2 = {}
 
   let mockCaslAbilityFactory = {}
+  let mockMedicalDepartmentsService = {}
 
   function mockDoctorModel (dto:any) {
     this.data = dto
@@ -40,7 +42,11 @@ describe('DoctorService', () => {
         {
           provide: CaslAbilityFactory,
           useValue: mockCaslAbilityFactory
-        }
+        },
+        // {
+        //   provide: MedicalDepartmentsService,
+        //   useValue: mockMedicalDepartmentsService
+        // }
       ],
     }).compile();
 

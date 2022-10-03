@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import {Patient, PatientSchema} from './schemas/patient.schema'
 import {Doctor, DoctorSchema} from './schemas/doctor.schema'
 import {MongooseModule} from '@nestjs/mongoose'
@@ -9,6 +9,8 @@ import { DoctorController } from './controllers/doctor.controller';
 import {UsersModule} from '../users/users.module'
 import {CaslModule} from '../casl/casl.module'
 
+import { MedicalDepartmentsModule } from '../medical-departments/medical-departments.module';
+
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -16,7 +18,9 @@ import {CaslModule} from '../casl/casl.module'
       { name: Doctor.name, schema: DoctorSchema }
     ]),
     UsersModule,
-    CaslModule
+    CaslModule,
+    forwardRef(() => MedicalDepartmentsModule),
+
   ],
   providers: [PatientService, DoctorService],
   controllers: [PatientController, DoctorController],
