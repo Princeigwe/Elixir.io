@@ -40,8 +40,17 @@ export class PatientService {
 
 
     async uploadPatientProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
+        const ability = this.caslAbilityFactory.createForUser(user)
+
+        const patient = await this.getPatientProfileById(_id)
         const imageLocation = await (await s3BucketOperations.uploadProfileAvatar(body, fileName)).Location
-        await this.patientModel.updateOne({'_id': _id}, {'imageUrl': imageLocation})
+
+        if (ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all')) {
+            await this.patientModel.updateOne({'_id': _id}, {'imageUrl': imageLocation})
+        }
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.BAD_REQUEST)
+        }
     } 
 
 

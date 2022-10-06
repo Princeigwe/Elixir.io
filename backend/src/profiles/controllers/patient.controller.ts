@@ -46,6 +46,7 @@ export class PatientController {
     }
 
 
+    @UseGuards(JwtAuthGuard)
     @Post('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
     async uploadPatientProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('_id') _id: string, @Request() request) {
@@ -60,6 +61,7 @@ export class PatientController {
     }
 
 
+    @UseGuards(JwtAuthGuard)
     @Patch('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
     async editPatientProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('_id') _id: string, @Request() request) {
