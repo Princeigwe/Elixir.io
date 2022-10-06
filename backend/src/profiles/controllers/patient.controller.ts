@@ -60,6 +60,20 @@ export class PatientController {
     }
 
 
+    @Patch('avatar/upload/:_id')
+    @UseInterceptors(FileInterceptor('file'))
+    async editPatientProfileAvatar(@UploadedFile() file: Express.Multer.File, @Param('_id') _id: string, @Request() request) {
+        const user = request.user
+        if( !file.originalname.match(/\.(jpg|png|jpeg)$/) ) {
+            throw new HttpException("File must be of mimetype jpeg/jpg or png", HttpStatus.BAD_REQUEST)
+        }
+        else if (file.size > 5000000){
+            throw new HttpException("File size must not be more than 5MB", HttpStatus.BAD_REQUEST)
+        }
+        return await this.patientService.editPatientProfileAvatar(_id, file.buffer, file.originalname, user)
+    }
+
+
     // todo: add admin authorization for this action
     @ApiOperation({description: "DELETE all patients in the database"})
     @UseGuards(JwtAuthGuard, RolesGuard)

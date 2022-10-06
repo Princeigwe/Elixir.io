@@ -45,6 +45,17 @@ export class PatientService {
     } 
 
 
+    async editPatientProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
+        const patient = await this.getPatientProfileById(_id)
+        
+        const patientImageFileName = patient.imageUrl.split('elixir.io/')[1]
+
+        await s3BucketOperations.deleteProfileAvatar(patientImageFileName)
+
+        await this.uploadPatientProfileAvatar(_id, body, fileName, user)
+    }
+
+
 
     // this method will help patient fill up or edit profile without touching medical details and user object id
     async editBasicPatientProfileById(_id: string, attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>,user: User) {
