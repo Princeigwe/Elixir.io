@@ -39,12 +39,10 @@ export class PatientService {
 
 
 
-    // async uploadPatientProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
-        
-    //     const imageLocation = await (await this.s3BucketOperations.uploadProfileAvatar(body, fileName)).Location
-    //     await this.patientModel.updateOne({'_id': _id}, {'imageUrl': imageLocation})
-
-    // } 
+    async uploadPatientProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
+        const imageLocation = await (await s3BucketOperations.uploadProfileAvatar(body, fileName)).Location
+        await this.patientModel.updateOne({'_id': _id}, {'imageUrl': imageLocation})
+    } 
 
 
 
