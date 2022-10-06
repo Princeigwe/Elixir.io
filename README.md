@@ -120,5 +120,7 @@
     
     11. Doctors can be deleted, but only by an admin. To delete a doctor, the doctor's first and last names, department, and hierarchy must be provided as parameters. Deleting a doctor's profile automatically removes the doctor from the department he was initially assigned to, and also deletes the user account linked to the profile.
 
+    12. Patients and Profile avatar upload by authorization.
+
 
 **Note**: If a new medical department is created, the code for doctors' registration into that department should also be created in the auth controller, and vice versa... The medical-department enum class should also be update

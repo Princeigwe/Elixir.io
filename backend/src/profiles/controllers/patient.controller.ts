@@ -2,12 +2,13 @@ import { Controller, Get, Param, Patch, Body, Post, Delete, UseGuards, Request, 
 import {PatientService} from '../services/patient.service'
 import {EditPatientDto} from '../dtos/edit.patient.dto'
 import {JwtAuthGuard} from '../../auth/guards/jwt-auth.guard'
-import {ApiOperation, ApiParam, ApiTags} from '@nestjs/swagger'
+import {ApiOperation, ApiParam, ApiTags, ApiResponse, ApiConsumes, ApiBody} from '@nestjs/swagger'
 
 import {Role} from '../../enums/role.enum'
 import {Roles} from '../../roles.decorator'
 import {RolesGuard} from '../../roles.guard'
 import {FileInterceptor} from '@nestjs/platform-express'
+import { UploadAvatarDto } from '../dtos/upload.avatar.dto';
 
 
 
@@ -46,6 +47,16 @@ export class PatientController {
     }
 
 
+    @ApiOperation({description: 'Uploads patient profile avatar. JWT authentication required. Reference: UploadAvatarDto'})
+    @ApiParam({
+        name: '_id',
+        required: true,
+    })
+    @ApiResponse({
+        status: 200,
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({type: UploadAvatarDto})
     @UseGuards(JwtAuthGuard)
     @Post('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
@@ -61,6 +72,16 @@ export class PatientController {
     }
 
 
+    @ApiOperation({description: 'Edits patient profile avatar. JWT authentication required. Reference: UploadDoctorAvatarDto'})
+    @ApiParam({
+        name: '_id',
+        required: true,
+    })
+    @ApiResponse({
+        status: 200,
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({type: UploadAvatarDto})
     @UseGuards(JwtAuthGuard)
     @Patch('avatar/upload/:_id')
     @UseInterceptors(FileInterceptor('file'))
