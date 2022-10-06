@@ -61,7 +61,7 @@ export class UsersService {
             throw new HttpException('A user with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const user = new this.userModel({email: email, password: password});
-        this.eventEmitter.emit('new.user', new NewUserEvent(user)) // event to create patient profile
+        this.eventEmitter.emit('new.user', new NewUserEvent(user, email)) // event to create patient profile
         return user.save();
     }
 

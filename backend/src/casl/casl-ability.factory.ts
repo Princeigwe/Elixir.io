@@ -1,6 +1,7 @@
 import {Injectable} from '@nestjs/common'
 import {User} from '../users/users.schema'
 import {Doctor} from '../profiles/schemas/doctor.schema'
+import {Patient} from '../profiles/schemas/patient.schema'
 import { InferSubjects, Ability, AbilityBuilder, AbilityClass, ExtractSubjectType} from '@casl/ability'
 import {Action} from '../enums/action.enum'
 
@@ -11,7 +12,7 @@ export class CaslAbilityFactory {
 
     createForUser(user: User) {
         const {can, build} = new AbilityBuilder(
-            Ability as AbilityClass< Ability<[Action, InferSubjects<typeof Doctor | typeof User> | 'all']> >
+            Ability as AbilityClass< Ability<[Action, InferSubjects<typeof Doctor | typeof Patient | typeof User> | 'all']> >
 
         )
 
@@ -24,7 +25,7 @@ export class CaslAbilityFactory {
 
 
         return build({
-            detectSubjectType: (item) => item.constructor as ExtractSubjectType<InferSubjects<typeof Doctor | typeof User> | 'all'>
+            detectSubjectType: (item) => item.constructor as ExtractSubjectType<InferSubjects<typeof Doctor | typeof Patient | typeof User> | 'all'>
         })
     }
 }

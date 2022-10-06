@@ -4,16 +4,24 @@ import { InjectModel } from '@nestjs/mongoose';
 import {Patient, PatientDocument} from '../schemas/patient.schema'
 import {OnEvent} from '@nestjs/event-emitter'
 import {NewUserEvent} from '../../events/createProfileByUser.event'
+import { S3BucketOperations } from '../../aws/s3.bucket.operations';
+import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
+import {User} from '../../users/users.schema'
+import {Action} from '../../enums/action.enum'
+
+const s3BucketOperations = new S3BucketOperations()
+
 
 @Injectable()
 export class PatientService {
     constructor(
         @InjectModel(Patient.name) private patientModel: Model<PatientDocument>,
+        private caslAbilityFactory: CaslAbilityFactory,
     ) {}
 
     @OnEvent('new.user')
     async createPatientProfile(payload: NewUserEvent) {
-        const patient = new this.patientModel({user: payload.user})
+        const patient = new this.patientModel({user: payload.user, email: payload.email})
         return patient.save()
     }
 
@@ -29,11 +37,29 @@ export class PatientService {
         return patient
     }
 
+
+
+    // async uploadPatientProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
+        
+    //     const imageLocation = await (await this.s3BucketOperations.uploadProfileAvatar(body, fileName)).Location
+    //     await this.patientModel.updateOne({'_id': _id}, {'imageUrl': imageLocation})
+
+    // } 
+
+
+
     // this method will help patient fill up or edit profile without touching medical details and user object id
-    async editBasicPatientProfileById(_id: string, attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>) {
+    async editBasicPatientProfileById(_id: string, attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>,user: User) {
+        const ability = this.caslAbilityFactory.createForUser(user)
+
         const patient = await this.getPatientProfileById(_id)
-        Object.assign(patient, attrs)
-        return patient.save()
+        if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
+            Object.assign(patient, attrs)
+            return patient.save()
+        }
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.BAD_REQUEST)
+        }
     }
 
     // this method will only be executed by a medical provider

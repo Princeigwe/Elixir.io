@@ -24,6 +24,9 @@ export class Patient {
     lastName: string
 
     @Prop()
+    email: string
+
+    @Prop()
     age: number
 
     @Prop()
