@@ -9,6 +9,7 @@ import {Roles} from '../../roles.decorator'
 import {RolesGuard} from '../../roles.guard'
 import {FileInterceptor} from '@nestjs/platform-express'
 import { UploadAvatarDto } from '../dtos/upload.avatar.dto';
+import {AssignSubordinateDoctorToPatientDto} from '../dtos/assign.subordinate.doctor.dto'
 
 
 
@@ -94,6 +95,14 @@ export class PatientController {
             throw new HttpException("File size must not be more than 5MB", HttpStatus.BAD_REQUEST)
         }
         return await this.patientService.editPatientProfileAvatar(_id, file.buffer, file.originalname, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':patientId/assign-patient-to-subordinate-doctor')
+    async assignSubordinateDoctorToPatient(@Param('patientId') patientId: string, @Request() request, @Body() body: AssignSubordinateDoctorToPatientDto ) {
+        const user = request.user
+        return await this.patientService.assignSubordinateDoctorToPatient(user, patientId, body.subDoctorFirstName, body.subDoctorLastName)
     }
 
 

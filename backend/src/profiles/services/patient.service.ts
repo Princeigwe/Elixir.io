@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, Inject, forwardRef } from '@nestjs/common';
 import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {Patient, PatientDocument} from '../schemas/patient.schema'
@@ -8,6 +8,12 @@ import { S3BucketOperations } from '../../aws/s3.bucket.operations';
 import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
 import {User} from '../../users/users.schema'
 import {Action} from '../../enums/action.enum'
+import {UserCategory} from '../../enums/user.category.enum'
+import {DoctorService} from './doctor.service'
+import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
+import {MedicalDepartmentsService} from '../../medical-departments/medical-departments.service'
+
+
 
 const s3BucketOperations = new S3BucketOperations()
 
@@ -17,6 +23,8 @@ export class PatientService {
     constructor(
         @InjectModel(Patient.name) private patientModel: Model<PatientDocument>,
         private caslAbilityFactory: CaslAbilityFactory,
+        private doctorService: DoctorService,
+        @Inject(forwardRef(() => MedicalDepartmentsService)) private medicalDepartmentsService: MedicalDepartmentsService,
     ) {}
 
     @OnEvent('new.user')
@@ -86,8 +94,39 @@ export class PatientService {
     // this method will only be executed by a medical provider
     async editPatientPrescriptionById() {}
 
-    // this action will be executed by any doctor in charge
-    async assignSubordinateDoctorToPatient() {}
+    /* 
+        this action will be executed by a consultant after they are referred to a patient after admission.
+        the consultant assigns the patient to a subordinate doctor
+    */
+    async assignSubordinateDoctorToPatient(user: User, patientId: string, subDoctorFirstName: string, subDoctorLastName: string) {
+        if(user.category != UserCategory.MedicalProvider) {
+            throw new HttpException('Forbidden action, as you are not a medical provider', HttpStatus.FORBIDDEN)
+        }
+
+        // getting the profile logged in consultant
+        const doctor = await this.doctorService.getDoctorProfileByEmail(user.email)
+        if(doctor.hierarchy != DoctorHierarchy.Consultant) {
+            throw new HttpException('Forbidden action, as you are not a consultant', HttpStatus.FORBIDDEN)
+        }
+
+        // const patientToBeAssignedADoctor = await this.getPatientProfileById(patientId)
+
+        // getting the department the logged in consultant belongs to
+        const departmentOfConsultant = await this.medicalDepartmentsService.searchMedicalDepartmentByName(doctor.department)
+        
+        const subDoctorFullNames = `${subDoctorFirstName} ${subDoctorLastName}`
+        if( !departmentOfConsultant['members'].includes(subDoctorFullNames) ) {
+            throw new HttpException( `${subDoctorFullNames} is not a member of ${doctor.department} department`, HttpStatus.BAD_REQUEST )
+        }
+
+        // getting the profile of the subordinate doctor that will be assigned to the patient 
+        const subordinateDoctor = await this.doctorService.getDoctorProfileByNames(subDoctorFirstName, subDoctorLastName)
+
+        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': subDoctorFullNames, 'doctorTelephone': subordinateDoctor.telephone, 'doctorAddress': subordinateDoctor.address}})
+
+        const updatedPatientProfile = await this.getPatientProfileById(patientId)
+        return updatedPatientProfile
+    }
 
     async editAssignedSubordinateDoctorToPatient() {}
 

@@ -96,6 +96,20 @@ export class DoctorService {
     }
 
 
+    async getDoctorProfileByEmail(email: string) {
+        const doctor = await this.doctorModel.findOne({'email': email}).exec()
+        if(!doctor) {throw new NotFoundException("Doctor Not Found")}
+        return doctor
+    }
+
+
+    async getDoctorProfileByNames(firstName: string, lastName: string) {
+        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName}).exec()
+        if(!doctor) {throw new NotFoundException("Doctor Not Found")}
+        return doctor
+    }
+
+
     // this method uploads a file to the Elixir.io bucket
     // /**
     //  * It uploads a file to an S3 bucket
