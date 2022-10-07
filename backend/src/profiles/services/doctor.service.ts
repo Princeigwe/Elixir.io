@@ -15,7 +15,10 @@ import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event
 import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
 import {User} from '../../users/users.schema'
 import {Action} from '../../enums/action.enum'
-import {S3} from 'aws-sdk'
+import { S3BucketOperations } from '../../aws/s3.bucket.operations';
+
+const s3BucketOperations = new S3BucketOperations()
+
 
 
 @Injectable()
@@ -94,33 +97,33 @@ export class DoctorService {
 
 
     // this method uploads a file to the Elixir.io bucket
-    /**
-     * It uploads a file to an S3 bucket
-     * @param {Buffer} body - The image file that we want to upload.
-     * @param {string} fileName - The name of the file that will be saved in S3.
-     * @returns A promise
-     */
-    async uploadProfileAvatar(body: Buffer, fileName: string) {
-        const bucket = process.env.S3_BUCKET
+    // /**
+    //  * It uploads a file to an S3 bucket
+    //  * @param {Buffer} body - The image file that we want to upload.
+    //  * @param {string} fileName - The name of the file that will be saved in S3.
+    //  * @returns A promise
+    //  */
+    // async uploadProfileAvatar(body: Buffer, fileName: string) {
+    //     const bucket = process.env.S3_BUCKET
 
-        const s3 = new S3()
-        const params = {Bucket: bucket, Key: fileName, Body: body}
-        return s3.upload(params).promise()
-    }
+    //     const s3 = new S3()
+    //     const params = {Bucket: bucket, Key: fileName, Body: body}
+    //     return s3.upload(params).promise()
+    // }
 
 
 
-    /**
-     * It deletes a profile avatar from S3
-     * @param {string} fileName - The name of the file to be deleted.
-     */
-    async deleteProfileAvatar(fileName: string) {
-        const bucket = process.env.S3_BUCKET
+    // /**
+    //  * It deletes a profile avatar from S3
+    //  * @param {string} fileName - The name of the file to be deleted.
+    //  */
+    // async deleteProfileAvatar(fileName: string) {
+    //     const bucket = process.env.S3_BUCKET
 
-        const s3 = new S3()
-        const params = {Bucket: bucket, Key: fileName}
-        s3.deleteObject(params).promise()
-    }
+    //     const s3 = new S3()
+    //     const params = {Bucket: bucket, Key: fileName}
+    //     s3.deleteObject(params).promise()
+    // }
 
 /**
  * It deletes the old image from s3 and uploads a new one
@@ -136,7 +139,7 @@ export class DoctorService {
         const doctorImageFileName = doctor.imageUrl.split('elixir.io/')[1]
 
         // deleting the image from s3
-        await this.deleteProfileAvatar(doctorImageFileName)
+        await s3BucketOperations.deleteProfileAvatar(doctorImageFileName)
 
         // uploading a new file
         await this.uploadDoctorProfileAvatar(_id, body, fileName, user)
@@ -148,7 +151,7 @@ export class DoctorService {
         const ability = this.caslAbilityFactory.createForUser(user)
 
         const doctor = await this.getDoctorProfileById(_id)
-        const imageLocation = await (await this.uploadProfileAvatar(body, fileName)).Location
+        const imageLocation = await (await s3BucketOperations.uploadProfileAvatar(body, fileName)).Location
 
         if (ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all')) {
             await this.doctorModel.updateOne({'_id': _id}, {'imageUrl': imageLocation})
@@ -198,7 +201,7 @@ export class DoctorService {
 
         // deleting the doctor's profile avatar from elixir.io s3 bucket
         const doctorImageFileName = doctor.imageUrl.split('elixir.io/')[1]
-        await this.deleteProfileAvatar(doctorImageFileName)
+        await s3BucketOperations.deleteProfileAvatar(doctorImageFileName)
 
         // deletes doctor profile
         await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
