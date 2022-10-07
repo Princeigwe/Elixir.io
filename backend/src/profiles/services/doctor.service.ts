@@ -16,6 +16,8 @@ import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
 import {User} from '../../users/users.schema'
 import {Action} from '../../enums/action.enum'
 import { S3BucketOperations } from '../../aws/s3.bucket.operations';
+import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor.event'
+
 
 const s3BucketOperations = new S3BucketOperations()
 
@@ -157,6 +159,25 @@ export class DoctorService {
 
         // uploading a new file
         await this.uploadDoctorProfileAvatar(_id, body, fileName, user)
+    }
+
+
+    @OnEvent('assigned.patient')
+    async updateDoctorProfileOnAssigned(payload: AssignedPatientToDoctorEvent) {
+        const assignedPatient = {
+            imageUrl: payload.imageUrl,
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            age: payload.age,
+            address: payload.address,
+            telephone: payload.telephone,
+            occupation: payload.occupation,
+            maritalStatus: payload.maritalStatus,
+            medicalIssues: payload.medicalIssues, 
+            prescriptions: payload.prescriptions, 
+            pharmacyTelephone: payload.pharmacyTelephone
+        }
+        await this.doctorModel.updateOne({ 'firstName': payload.subDoctorFirstName, 'lastName': payload.subDoctorLastName, 'department': payload.medicalDepartment}, {$addToSet: { 'assignedPatients': assignedPatient }})
     }
 
 

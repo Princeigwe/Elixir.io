@@ -12,7 +12,8 @@ import {UserCategory} from '../../enums/user.category.enum'
 import {DoctorService} from './doctor.service'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 import {MedicalDepartmentsService} from '../../medical-departments/medical-departments.service'
-
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor.event'
 
 
 const s3BucketOperations = new S3BucketOperations()
@@ -24,6 +25,7 @@ export class PatientService {
         @InjectModel(Patient.name) private patientModel: Model<PatientDocument>,
         private caslAbilityFactory: CaslAbilityFactory,
         private doctorService: DoctorService,
+        private eventEmitter: EventEmitter2,
         @Inject(forwardRef(() => MedicalDepartmentsService)) private medicalDepartmentsService: MedicalDepartmentsService,
     ) {}
 
@@ -125,6 +127,27 @@ export class PatientService {
         await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': subDoctorFullNames, 'doctorTelephone': subordinateDoctor.telephone, 'doctorAddress': subordinateDoctor.address}})
 
         const updatedPatientProfile = await this.getPatientProfileById(patientId)
+        
+        this.eventEmitter.emit(
+            'assigned.patient', 
+            new AssignedPatientToDoctorEvent(
+                doctor.department, 
+                subDoctorFirstName,
+                subDoctorLastName,
+                
+                updatedPatientProfile.imageUrl,
+                updatedPatientProfile.firstName,
+                updatedPatientProfile.lastName,
+                updatedPatientProfile.age,
+                updatedPatientProfile.address,
+                updatedPatientProfile.telephone,
+                updatedPatientProfile.occupation,
+                updatedPatientProfile.maritalStatus,
+                updatedPatientProfile.medicalIssues,
+                updatedPatientProfile.prescriptions,
+                updatedPatientProfile.pharmacyTelephone
+            )
+        )
         return updatedPatientProfile
     }
 
