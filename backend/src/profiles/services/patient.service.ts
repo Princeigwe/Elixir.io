@@ -100,7 +100,7 @@ export class PatientService {
         this action will be executed by a consultant after they are referred to a patient after admission.
         the consultant assigns the patient to a subordinate doctor
     */
-    async assignSubordinateDoctorToPatient(user: User, patientId: string, subDoctorFirstName: string, subDoctorLastName: string) {
+    async assignDoctorToPatient(user: User, patientId: string, doctorFirstName: string, doctorLastName: string) {
         if(user.category != UserCategory.MedicalProvider) {
             throw new HttpException('Forbidden action, as you are not a medical provider', HttpStatus.FORBIDDEN)
         }
@@ -114,13 +114,13 @@ export class PatientService {
         // getting the department the logged in consultant belongs to
         const departmentOfConsultant = await this.medicalDepartmentsService.searchMedicalDepartmentByName(doctor.department)
         
-        const subDoctorFullNames = `${subDoctorFirstName} ${subDoctorLastName}`
+        const subDoctorFullNames = `${doctorFirstName} ${doctorLastName}`
         if( !departmentOfConsultant['members'].includes(subDoctorFullNames) ) {
             throw new HttpException( `${subDoctorFullNames} is not a member of ${doctor.department} department`, HttpStatus.BAD_REQUEST )
         }
 
         // getting the profile of the subordinate doctor that will be assigned to the patient 
-        const subordinateDoctor = await this.doctorService.getDoctorProfileByNames(subDoctorFirstName, subDoctorLastName)
+        const subordinateDoctor = await this.doctorService.getDoctorProfileByNames(doctorFirstName, doctorLastName)
 
         await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': subDoctorFullNames, 'doctorTelephone': subordinateDoctor.telephone, 'doctorAddress': subordinateDoctor.address}})
 
@@ -130,8 +130,8 @@ export class PatientService {
             'assigned.patient', 
             new AssignedPatientToDoctorEvent(
                 doctor.department, 
-                subDoctorFirstName,
-                subDoctorLastName,
+                doctorFirstName,
+                doctorLastName,
 
                 updatedPatientProfile.imageUrl,
                 updatedPatientProfile.firstName,
@@ -150,7 +150,7 @@ export class PatientService {
     }
 
 
-    async removeAssignedPatientFromSubordinateDoctor(user: User, patientId: string, subDoctorFirstName: string, subDoctorLastName: string) {
+    async removeAssignedPatientFromDoctor(user: User, patientId: string, doctorFirstName: string, doctorLastName: string) {
         if(user.category != UserCategory.MedicalProvider) {
             throw new HttpException('Forbidden action, as you are not a medical provider', HttpStatus.FORBIDDEN)
         }
@@ -163,7 +163,7 @@ export class PatientService {
 
         const departmentOfConsultant = await this.medicalDepartmentsService.searchMedicalDepartmentByName(doctor.department)
         
-        const subDoctorFullNames = `${subDoctorFirstName} ${subDoctorLastName}`
+        const subDoctorFullNames = `${doctorFirstName} ${doctorLastName}`
         if( !departmentOfConsultant['members'].includes(subDoctorFullNames) ) {
             throw new HttpException( `${subDoctorFullNames} is not a member of ${doctor.department} department`, HttpStatus.BAD_REQUEST )
         }
@@ -177,8 +177,8 @@ export class PatientService {
             'remove.assigned.patient', 
             new AssignedPatientToDoctorEvent(
                 doctor.department, 
-                subDoctorFirstName,
-                subDoctorLastName,
+                doctorFirstName,
+                doctorLastName,
 
                 updatedPatientProfile.imageUrl,
                 updatedPatientProfile.firstName,

@@ -177,7 +177,7 @@ export class DoctorService {
             prescriptions: payload.prescriptions, 
             pharmacyTelephone: payload.pharmacyTelephone
         }
-        await this.doctorModel.updateOne({ 'firstName': payload.subDoctorFirstName, 'lastName': payload.subDoctorLastName, 'department': payload.medicalDepartment}, {$addToSet: { 'assignedPatients': assignedPatient }})
+        await this.doctorModel.updateOne({ 'firstName': payload.doctorFirstName, 'lastName': payload.doctorLastName, 'department': payload.medicalDepartment}, {$addToSet: { 'assignedPatients': assignedPatient }})
     }
 
 
@@ -197,7 +197,7 @@ export class DoctorService {
             pharmacyTelephone: payload.pharmacyTelephone
         }
 
-        await this.doctorModel.updateOne({ 'firstName': payload.subDoctorFirstName, 'lastName': payload.subDoctorLastName, 'department': payload.medicalDepartment}, {$pull: { 'assignedPatients': assignedPatient }})
+        await this.doctorModel.updateOne({ 'firstName': payload.doctorFirstName, 'lastName': payload.doctorLastName, 'department': payload.medicalDepartment}, {$pull: { 'assignedPatients': assignedPatient }})
 
     }
 

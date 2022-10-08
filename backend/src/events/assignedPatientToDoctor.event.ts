@@ -3,8 +3,8 @@ import {MedicalDepartments} from '../enums/medical.department.enum'
 export class AssignedPatientToDoctorEvent {
     constructor(
         public medicalDepartment: MedicalDepartments,
-        public subDoctorFirstName: string,
-        public subDoctorLastName: string,
+        public doctorFirstName: string,
+        public doctorLastName: string,
 
         public imageUrl ?: string,
         public firstName ?: string,

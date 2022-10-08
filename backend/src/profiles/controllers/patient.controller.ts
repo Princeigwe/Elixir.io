@@ -9,7 +9,7 @@ import {Roles} from '../../roles.decorator'
 import {RolesGuard} from '../../roles.guard'
 import {FileInterceptor} from '@nestjs/platform-express'
 import { UploadAvatarDto } from '../dtos/upload.avatar.dto';
-import {AssignSubordinateDoctorToPatientDto} from '../dtos/assign.subordinate.doctor.dto'
+import {AssignDoctorToPatientDto} from '../dtos/assign.doctor.toPatient.dto'
 
 
 
@@ -97,20 +97,63 @@ export class PatientController {
         return await this.patientService.editPatientProfileAvatar(_id, file.buffer, file.originalname, user)
     }
 
-
+    @ApiOperation({description: 'Assigns a doctor to a patient. The doctor carrying out this action must be a consultant. JWT authentication required. Reference: AssignDoctorToPatientDto'})
+    @ApiParam({
+        name: 'patientId',
+        required: true,
+    })
+    @ApiResponse({
+        status: 200,
+        description: "Returns the updated patient profile"
+    })
+    @ApiResponse({
+        status: 400,
+        description: "Returns a BAD REQUEST if doctor is not a member of the consultant's department"
+    })
+    @ApiResponse({
+        status: 403,
+        description: "Forbidden action, as you are not a medical provider"
+    })
+    @ApiResponse({
+        status: 403,
+        description: "Forbidden action, as you are not a consultant"
+    })
+    @ApiBody({type: AssignDoctorToPatientDto})
     @UseGuards(JwtAuthGuard)
-    @Patch(':patientId/assign-patient-to-subordinate-doctor')
-    async assignSubordinateDoctorToPatient(@Param('patientId') patientId: string, @Request() request, @Body() body: AssignSubordinateDoctorToPatientDto ) {
+    @Patch(':patientId/assign-patient-to-doctor')
+    async assignDoctorToPatient(@Param('patientId') patientId: string, @Request() request, @Body() body: AssignDoctorToPatientDto ) {
         const user = request.user
-        return await this.patientService.assignSubordinateDoctorToPatient(user, patientId, body.subDoctorFirstName, body.subDoctorLastName)
+        return await this.patientService.assignDoctorToPatient(user, patientId, body.doctorFirstName, body.doctorLastName)
     }
 
 
+    @ApiOperation({description: "Removes assigned patient from doctor's care. The doctor carrying out this action must be a consultant. JWT authentication required. Reference: AssignDoctorToPatientDto"})
+    @ApiParam({
+        name: 'patientId',
+        required: true,
+    })
+    @ApiResponse({
+        status: 200,
+        description: "Returns the updated patient profile"
+    })
+    @ApiResponse({
+        status: 400,
+        description: "Returns a BAD REQUEST if doctor is not a member of the consultant's department"
+    })
+    @ApiResponse({
+        status: 403,
+        description: "Forbidden action, as you are not a medical provider"
+    })
+    @ApiResponse({
+        status: 403,
+        description: "Forbidden action, as you are not a consultant"
+    })
+    @ApiBody({type: AssignDoctorToPatientDto})
     @UseGuards(JwtAuthGuard)
-    @Patch(':patientId/remove-assigned-patient-from-subordinate-doctor')
-    async removeAssignedPatientFromSubordinateDoctor( @Param('patientId') patientId: string, @Request() request, @Body() body: AssignSubordinateDoctorToPatientDto ) {
+    @Patch(':patientId/remove-assigned-patient-from-doctor')
+    async removeAssignedPatientFromDoctor( @Param('patientId') patientId: string, @Request() request, @Body() body: AssignDoctorToPatientDto ) {
         const user = request.user
-        return await this.patientService.removeAssignedPatientFromSubordinateDoctor(user, patientId, body.subDoctorFirstName, body.subDoctorLastName)
+        return await this.patientService.removeAssignedPatientFromDoctor(user, patientId, body.doctorFirstName, body.doctorLastName)
     }
 
     // todo: add admin authorization for this action
