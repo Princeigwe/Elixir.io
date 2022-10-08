@@ -111,8 +111,6 @@ export class PatientService {
             throw new HttpException('Forbidden action, as you are not a consultant', HttpStatus.FORBIDDEN)
         }
 
-        // const patientToBeAssignedADoctor = await this.getPatientProfileById(patientId)
-
         // getting the department the logged in consultant belongs to
         const departmentOfConsultant = await this.medicalDepartmentsService.searchMedicalDepartmentByName(doctor.department)
         
@@ -134,7 +132,7 @@ export class PatientService {
                 doctor.department, 
                 subDoctorFirstName,
                 subDoctorLastName,
-                
+
                 updatedPatientProfile.imageUrl,
                 updatedPatientProfile.firstName,
                 updatedPatientProfile.lastName,
@@ -149,6 +147,55 @@ export class PatientService {
             )
         )
         return updatedPatientProfile
+    }
+
+
+    async removeAssignedPatientFromSubordinateDoctor(user: User, patientId: string, subDoctorFirstName: string, subDoctorLastName: string) {
+        if(user.category != UserCategory.MedicalProvider) {
+            throw new HttpException('Forbidden action, as you are not a medical provider', HttpStatus.FORBIDDEN)
+        }
+
+        // getting the profile logged in consultant
+        const doctor = await this.doctorService.getDoctorProfileByEmail(user.email)
+        if(doctor.hierarchy != DoctorHierarchy.Consultant) {
+            throw new HttpException('Forbidden action, as you are not a consultant', HttpStatus.FORBIDDEN)
+        }
+
+        const departmentOfConsultant = await this.medicalDepartmentsService.searchMedicalDepartmentByName(doctor.department)
+        
+        const subDoctorFullNames = `${subDoctorFirstName} ${subDoctorLastName}`
+        if( !departmentOfConsultant['members'].includes(subDoctorFullNames) ) {
+            throw new HttpException( `${subDoctorFullNames} is not a member of ${doctor.department} department`, HttpStatus.BAD_REQUEST )
+        }
+        
+        // removing the assigned subordinate doctor from the patient's profile
+        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': "", 'doctorTelephone': "", 'doctorAddress': ""}})
+
+        const updatedPatientProfile = await this.getPatientProfileById(patientId)
+
+        this.eventEmitter.emit(
+            'remove.assigned.patient', 
+            new AssignedPatientToDoctorEvent(
+                doctor.department, 
+                subDoctorFirstName,
+                subDoctorLastName,
+
+                updatedPatientProfile.imageUrl,
+                updatedPatientProfile.firstName,
+                updatedPatientProfile.lastName,
+                updatedPatientProfile.age,
+                updatedPatientProfile.address,
+                updatedPatientProfile.telephone,
+                updatedPatientProfile.occupation,
+                updatedPatientProfile.maritalStatus,
+                updatedPatientProfile.medicalIssues,
+                updatedPatientProfile.prescriptions,
+                updatedPatientProfile.pharmacyTelephone
+            )
+        )
+
+        return updatedPatientProfile
+
     }
 
     async editAssignedSubordinateDoctorToPatient() {}

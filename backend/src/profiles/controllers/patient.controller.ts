@@ -99,12 +99,19 @@ export class PatientController {
 
 
     @UseGuards(JwtAuthGuard)
-    @Post(':patientId/assign-patient-to-subordinate-doctor')
+    @Patch(':patientId/assign-patient-to-subordinate-doctor')
     async assignSubordinateDoctorToPatient(@Param('patientId') patientId: string, @Request() request, @Body() body: AssignSubordinateDoctorToPatientDto ) {
         const user = request.user
         return await this.patientService.assignSubordinateDoctorToPatient(user, patientId, body.subDoctorFirstName, body.subDoctorLastName)
     }
 
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(':patientId/remove-assigned-patient-from-subordinate-doctor')
+    async removeAssignedPatientFromSubordinateDoctor( @Param('patientId') patientId: string, @Request() request, @Body() body: AssignSubordinateDoctorToPatientDto ) {
+        const user = request.user
+        return await this.patientService.removeAssignedPatientFromSubordinateDoctor(user, patientId, body.subDoctorFirstName, body.subDoctorLastName)
+    }
 
     // todo: add admin authorization for this action
     @ApiOperation({description: "DELETE all patients in the database"})

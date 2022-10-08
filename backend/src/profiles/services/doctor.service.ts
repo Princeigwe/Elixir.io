@@ -163,7 +163,7 @@ export class DoctorService {
 
 
     @OnEvent('assigned.patient')
-    async updateDoctorProfileOnAssigned(payload: AssignedPatientToDoctorEvent) {
+    async updateDoctorProfileOnAssignedPatient(payload: AssignedPatientToDoctorEvent) {
         const assignedPatient = {
             imageUrl: payload.imageUrl,
             firstName: payload.firstName,
@@ -178,6 +178,27 @@ export class DoctorService {
             pharmacyTelephone: payload.pharmacyTelephone
         }
         await this.doctorModel.updateOne({ 'firstName': payload.subDoctorFirstName, 'lastName': payload.subDoctorLastName, 'department': payload.medicalDepartment}, {$addToSet: { 'assignedPatients': assignedPatient }})
+    }
+
+
+    @OnEvent('remove.assigned.patient')
+    async updateDoctorProfileOnRemovedAssignedPatient(payload: AssignedPatientToDoctorEvent) {
+        const assignedPatient = {
+            imageUrl: payload.imageUrl,
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            age: payload.age,
+            address: payload.address,
+            telephone: payload.telephone,
+            occupation: payload.occupation,
+            maritalStatus: payload.maritalStatus,
+            medicalIssues: payload.medicalIssues, 
+            prescriptions: payload.prescriptions, 
+            pharmacyTelephone: payload.pharmacyTelephone
+        }
+
+        await this.doctorModel.updateOne({ 'firstName': payload.subDoctorFirstName, 'lastName': payload.subDoctorLastName, 'department': payload.medicalDepartment}, {$pull: { 'assignedPatients': assignedPatient }})
+
     }
 
 
