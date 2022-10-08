@@ -14,6 +14,9 @@ import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 import {MedicalDepartmentsService} from '../../medical-departments/medical-departments.service'
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor.event'
+import {MedicalDepartments} from '../../enums/medical.department.enum'
+import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
+
 
 
 const s3BucketOperations = new S3BucketOperations()
@@ -114,15 +117,15 @@ export class PatientService {
         // getting the department the logged in consultant belongs to
         const departmentOfConsultant = await this.medicalDepartmentsService.searchMedicalDepartmentByName(doctor.department)
         
-        const subDoctorFullNames = `${doctorFirstName} ${doctorLastName}`
-        if( !departmentOfConsultant['members'].includes(subDoctorFullNames) ) {
-            throw new HttpException( `${subDoctorFullNames} is not a member of ${doctor.department} department`, HttpStatus.BAD_REQUEST )
+        const assigneeDoctorFullNames = `${doctorFirstName} ${doctorLastName}`
+        if( !departmentOfConsultant['members'].includes(assigneeDoctorFullNames) ) {
+            throw new HttpException( `${assigneeDoctorFullNames} is not a member of ${doctor.department} department`, HttpStatus.BAD_REQUEST )
         }
 
         // getting the profile of the subordinate doctor that will be assigned to the patient 
-        const subordinateDoctor = await this.doctorService.getDoctorProfileByNames(doctorFirstName, doctorLastName)
+        const assigneeDoctor = await this.doctorService.getDoctorProfileByNames(doctorFirstName, doctorLastName)
 
-        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': subDoctorFullNames, 'doctorTelephone': subordinateDoctor.telephone, 'doctorAddress': subordinateDoctor.address}})
+        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': assigneeDoctorFullNames, 'doctorTelephone': assigneeDoctor.telephone, 'doctorAddress': assigneeDoctor.address}})
 
         const updatedPatientProfile = await this.getPatientProfileById(patientId)
         
@@ -146,7 +149,37 @@ export class PatientService {
                 updatedPatientProfile.pharmacyTelephone
             )
         )
+
+        //todo: send an email to both patient and doctor notifying them of the changes to their profiles
+
         return updatedPatientProfile
+    }
+
+
+    @OnEvent('remove.doctor')
+    async removeDeletedDoctorFromPatientsProfiles(payload: RemoveDoctorEvent) {
+        // getting the details of the deleted doctor profile
+        const deletedDoctor = await this.doctorService.getDoctorProfileByNamesAndByDepartment( payload.firstName, payload.lastName, payload.department, payload.hierarchy )
+
+        const deletedDoctorNames = `${deletedDoctor.firstName} ${deletedDoctor.lastName}`
+
+        // updating all patients profile that has the details of the deletedDoctor
+        await this.patientModel.updateMany(
+            {
+                'doctorName': deletedDoctorNames,
+                'doctorTelephone': deletedDoctor. telephone,
+                'doctorAddress': deletedDoctor.address,
+                'doctorDepartment': deletedDoctor.department,
+                'doctorHierarchy': deletedDoctor.hierarchy
+            },
+            {$set: {
+                'doctorName': "",
+                'doctorTelephone': "",
+                'doctorAddress': "",
+                'doctorDepartment': "",
+                'doctorHierarchy': ""
+            }}
+        )
     }
 
 
