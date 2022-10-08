@@ -26,6 +26,16 @@ export class RegisterUserConsultantDto {
     @IsString()
     password: string;
 
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    telephone: string
+    
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    address: string
+
 }
 
 
@@ -57,11 +67,20 @@ export class RegisterUserDoctorDto {
     @IsNotEmpty()
     department: MedicalDepartments
 
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    telephone: string
+    
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    address: string
+
     @ApiProperty({
         description: " ['Medical Student','Junior Doctor', 'Associate Specialist'] .Giving data for hierarchy is optional, which sets default to Associate Specialist"
     })
     @IsOptional()
     @IsEnum(DoctorHierarchy)
     hierarchy: DoctorHierarchy
-
 }

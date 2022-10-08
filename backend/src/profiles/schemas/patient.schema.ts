@@ -3,6 +3,8 @@ import {Document} from 'mongoose'
 import {MaritalStatus} from '../../enums/marital.status.enum'
 import * as mongoose from 'mongoose'
 import {User} from '../../users/users.schema'
+import {MedicalDepartments} from '../../enums/medical.department.enum'
+import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 
 
 export type PatientDocument = Patient & Document
@@ -63,6 +65,12 @@ export class Patient {
 
     @Prop()
     doctorAddress: string
+
+    @Prop()
+    doctorDepartment: MedicalDepartments
+
+    @Prop()
+    doctorHierarchy: DoctorHierarchy
 
     @Prop()
     pharmacyTelephone: string

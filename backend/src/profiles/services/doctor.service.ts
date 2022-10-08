@@ -46,7 +46,9 @@ export class DoctorService {
             lastName: payload.lastName, 
             email: payload.email,
             hierarchy: payload.hierarchy, 
-            department: payload.department
+            department: payload.department,
+            address: payload.address,
+            telephone: payload.telephone
         })
         return doctor.save()
     }
@@ -107,6 +109,13 @@ export class DoctorService {
 
     async getDoctorProfileByNames(firstName: string, lastName: string) {
         const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName}).exec()
+        if(!doctor) {throw new NotFoundException("Doctor Not Found")}
+        return doctor
+    }
+
+
+    async getDoctorProfileByNamesAndByDepartment(firstName: string, lastName: string, department: MedicalDepartments, hierarchy) {
+        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy}).exec()
         if(!doctor) {throw new NotFoundException("Doctor Not Found")}
         return doctor
     }

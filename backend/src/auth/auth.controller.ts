@@ -45,7 +45,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Cardiology department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-cardiology')
     async registerConsultantToCardiologyDepartment(@Body() body: RegisterUserConsultantDto) { 
-        return this.authService.registerConsultantToCardiologyDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToCardiologyDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // Dermatology
@@ -53,7 +53,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Dermatology department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-dermatology')
     async registerConsultantToDermatologyDepartment(@Body() body: RegisterUserConsultantDto) {
-        return this.authService.registerConsultantToDermatologyDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToDermatologyDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // - Urology
@@ -61,7 +61,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Urology department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-urology')
     async registerConsultantToUrologyDepartment(@Body() body: RegisterUserConsultantDto) {
-        return this.authService.registerConsultantToUrologyDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToUrologyDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // - IntensiveCareMedicine
@@ -69,7 +69,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Intensive Care Medicine department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-intensive-care-medicine')
     async registerConsultantToIntensiveCareMedicineDepartment(@Body() body: RegisterUserConsultantDto) {
-        return this.authService.registerConsultantToIntensiveCareMedicineDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToIntensiveCareMedicineDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // - Neurology
@@ -77,7 +77,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Neurology department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-neurology')
     async registerConsultantToNeurologyDepartment(@Body() body: RegisterUserConsultantDto) {
-        return this.authService.registerConsultantToNeurologyDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToNeurologyDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // - Surgery
@@ -85,7 +85,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Surgery department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-surgery')
     async registerConsultantToSurgeryDepartment(@Body() body: RegisterUserConsultantDto) {
-        return this.authService.registerConsultantToSurgeryDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToSurgeryDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // - Radiology
@@ -93,7 +93,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Radiology department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-radiology')
     async registerConsultantToRadiologyDepartment(@Body() body: RegisterUserConsultantDto) {
-        return this.authService.registerConsultantToRadiologyDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToRadiologyDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // - Pharmacy
@@ -101,7 +101,7 @@ export class AuthController {
     @ApiOperation({description: "Registers a user as a consultant into the Pharmacy department. Reference: RegisterUserConsultantDto"})
     @Post('registration-consultant-pharmacy')
     async registerConsultantToPharmacyDepartment(@Body() body: RegisterUserConsultantDto) {
-        return this.authService.registerConsultantToPharmacyDepartment(body.email, body.firstName, body.lastName, body.password)
+        return this.authService.registerConsultantToPharmacyDepartment(body.email, body.firstName, body.lastName, body.password, body.telephone, body.address)
     }
 
     // ** REGISTRATION LINK TO REGISTER NON-CONSULTANTS TO VARIOUS DEPARTMENTS WITH ASSOCIATE SPECIALIST HIERARCHY AS DEFAULT **
@@ -110,7 +110,7 @@ export class AuthController {
     @Redirect('http://localhost:3000/api/v1/auth/doctor-form-submitted')
     @Post('registration-doctor')
     async registerDoctorToADepartment(@Body() body: RegisterUserDoctorDto) { 
-        return this.authService.registerDoctorToADepartment(body.email, body.firstName, body.lastName, body.password, body.department, body.hierarchy)
+        return this.authService.registerDoctorToADepartment(body.email, body.firstName, body.lastName, body.password, body.department, body.telephone, body.address, body.hierarchy)
     }
 
 

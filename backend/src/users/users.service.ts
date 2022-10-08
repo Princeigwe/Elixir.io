@@ -67,14 +67,14 @@ export class UsersService {
 
 
     // this method create a user as a MedicalProvider
-    async createUserMedicalProvider(email: string, firstName: string, lastName: string, password: string, hierarchy: DoctorHierarchy, department: MedicalDepartments) {
+    async createUserMedicalProvider(email: string, firstName: string, lastName: string, password: string, hierarchy: DoctorHierarchy, department: MedicalDepartments, telephone: string, address: string) {
         const existingUser = await this.userModel.findOne({email: email}).exec();
         if (existingUser) { 
             throw new HttpException('A user with this email already exists', HttpStatus.BAD_REQUEST) 
         }
         const category = UserCategory.MedicalProvider
         const user = new this.userModel({email: email, password: password, category: category})
-        this.eventEmitter.emit('new.user.medic', new NewMedicalProviderEvent(user, firstName, lastName, email, hierarchy, department)) // event to create medical provider profile
+        this.eventEmitter.emit('new.user.medic', new NewMedicalProviderEvent(user, firstName, lastName, email, hierarchy, department, telephone, address)) // event to create medical provider profile
         return user.save()
     }
 

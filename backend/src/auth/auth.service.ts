@@ -47,16 +47,16 @@ export class AuthService {
     }
 
     // this method registers a user as a medical provider
-    async registerUserMedicalProvider(email: string, firstName: string, lastName: string, password: string, hierarchy: DoctorHierarchy, department: MedicalDepartments) { 
+    async registerUserMedicalProvider(email: string, firstName: string, lastName: string, password: string, hierarchy: DoctorHierarchy, department: MedicalDepartments, telephone: string, address: string) { 
         const salt = await bcrypt.genSalt(10) // generate salt
         const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
-        return this.userService.createUserMedicalProvider(email, firstName, lastName, hashedPassword, hierarchy, department)
+        return this.userService.createUserMedicalProvider(email, firstName, lastName, hashedPassword, hierarchy, department, telephone, address)
     }
 
     //  ** METHODS TO REGISTER CONSULTANTS TO VARIOUS DEPARTMENTS **
 
     // - Cardiology
-    async registerConsultantToCardiologyDepartment(email: string, firstName: string, lastName: string, password: string) {
+    async registerConsultantToCardiologyDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) {
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Cardiology
 
@@ -66,14 +66,14 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the cardiology department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
 
     // - Dermatology 
-    async registerConsultantToDermatologyDepartment(email: string, firstName: string, lastName: string, password: string) {
+    async registerConsultantToDermatologyDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) {
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Dermatology
 
@@ -83,14 +83,14 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the dermatology department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
 
     // - Urology
-    async registerConsultantToUrologyDepartment(email: string, firstName: string, lastName: string, password: string) { 
+    async registerConsultantToUrologyDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) { 
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Urology
 
@@ -100,14 +100,14 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the urology department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
 
     // - IntensiveCareMedicine
-    async registerConsultantToIntensiveCareMedicineDepartment(email: string, firstName: string, lastName: string, password: string) { 
+    async registerConsultantToIntensiveCareMedicineDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) { 
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.IntensiveCareMedicine
 
@@ -117,14 +117,14 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the intensive care medicine department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
 
     // - Neurology
-    async registerConsultantToNeurologyDepartment(email: string, firstName: string, lastName: string, password: string) { 
+    async registerConsultantToNeurologyDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) { 
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Neurology
 
@@ -134,14 +134,14 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the neurology department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
 
     // - Surgery
-    async registerConsultantToSurgeryDepartment(email: string, firstName: string, lastName: string, password: string) { 
+    async registerConsultantToSurgeryDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) { 
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Surgery
 
@@ -151,14 +151,14 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the surgery department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
 
     // - Radiology
-    async registerConsultantToRadiologyDepartment(email: string, firstName: string, lastName: string, password: string) {
+    async registerConsultantToRadiologyDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) {
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Radiology
 
@@ -168,14 +168,14 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the radiology department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
     }
 
     // - Pharmacy
-    async registerConsultantToPharmacyDepartment(email: string, firstName: string, lastName: string, password: string) {
+    async registerConsultantToPharmacyDepartment(email: string, firstName: string, lastName: string, password: string, telephone: string, address: string) {
         const hierarchy = DoctorHierarchy.Consultant
         const department = MedicalDepartments.Pharmacy
 
@@ -185,7 +185,7 @@ export class AuthService {
             throw new NotFoundException(`Consultant cannot be registered to ${department} department, because it does not exist`)
         }
 
-        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const consultant = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         // emitting an event to create a new group in the pharmacy department
         this.eventEmitter.emit('new.consultant', new NewDepartmentConsultantEvent(firstName, lastName, department))
         return consultant
@@ -197,7 +197,7 @@ export class AuthService {
         REGISTRATION HERE REQUIRES THE PARTY TO SPECIFY THE HIERARCHY, OR THE DEFAULT ASSOCIATE SPECIALIST HIERARCHY WILL BE USED
         THE DEPARTMENT DATA IS ALSO REQUIRED
     */
-    async registerDoctorToADepartment(email: string, firstName: string, lastName: string, password: string, department: MedicalDepartments, hierarchy?: DoctorHierarchy) {
+    async registerDoctorToADepartment(email: string, firstName: string, lastName: string, password: string, department: MedicalDepartments, telephone: string, address: string, hierarchy?: DoctorHierarchy) {
 
         // this block checks if a department exists, if it doesn't, the doctor cannot be registered into the department
         let existingDepartment = await this.medicalDepartmentsService.getMedicalDepartmentByName(department)
@@ -207,7 +207,7 @@ export class AuthService {
             throw new HttpException(`Please register consultant into ${department} department with the appropriate url`, HttpStatus.BAD_REQUEST) 
         }
 
-        const doctor = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department)
+        const doctor = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
         this.eventEmitter.emit('new.doctor', new NewMedicalDepartmentDoctorEvent(firstName, lastName, department, hierarchy))
         return doctor
     }
