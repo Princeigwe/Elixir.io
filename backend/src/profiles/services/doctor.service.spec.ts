@@ -9,6 +9,7 @@ import {CaslAbilityFactory} from '../../casl/casl-ability.factory'
 
 
 
+
 describe('DoctorService', () => {
   let service: DoctorService;
 
@@ -43,10 +44,10 @@ describe('DoctorService', () => {
           provide: CaslAbilityFactory,
           useValue: mockCaslAbilityFactory
         },
-        // {
-        //   provide: MedicalDepartmentsService,
-        //   useValue: mockMedicalDepartmentsService
-        // }
+        {
+          provide: MedicalDepartmentsService,
+          useValue: mockMedicalDepartmentsService
+        }
       ],
     }).compile();
 

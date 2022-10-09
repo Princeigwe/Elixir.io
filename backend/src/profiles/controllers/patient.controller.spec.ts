@@ -3,6 +3,7 @@ import { PatientController } from './patient.controller';
 import {PatientService} from '../services/patient.service'
 import {NewUserEvent} from '../../events/createProfileByUser.event'
 import {MaritalStatus} from '../../enums/marital.status.enum'
+import {Request} from '@nestjs/common'
 
 describe('PatientController', () => {
   let controller: PatientController;
@@ -55,7 +56,12 @@ describe('PatientController', () => {
         "firstName": "john",
         "lastName": "Smith",
         "occupation": "Lawyer",
-        "telephone": "53950954"
+        "telephone": "53950954",
+        "doctorAddress": null,
+        "doctorDepartment": null,
+        "doctorHierarchy": null,
+        "doctorName": null,
+        "doctorTelephone": null
       }
     } ),
 
@@ -131,10 +137,15 @@ describe('PatientController', () => {
       "firstName": "john",
       "lastName": "Smith",
       "occupation": "Lawyer",
-      "telephone": "53950954"
+      "telephone": "53950954",
+      "doctorAddress": null,
+      "doctorDepartment": null,
+      "doctorHierarchy": null,
+      "doctorName": null,
+      "doctorTelephone": null
     }
 
-    expect(await controller.editBasicPatientProfileById( '12345678' , {firstName: "John", lastName: "Smith", age: 24, address: "London", telephone: "53950954", occupation: "Lawyer", maritalStatus: MaritalStatus.Single} )).toEqual(patient)
+    expect(await controller.editBasicPatientProfileById( '12345678' , {firstName: "John", lastName: "Smith", age: 24, address: "London", telephone: "53950954", occupation: "Lawyer", maritalStatus: MaritalStatus.Single}, Request )).toEqual(patient)
   })
 
   // it('should return a delete message', async () => {
