@@ -169,15 +169,11 @@ export class PatientService {
                 'doctorName': deletedDoctorNames,
                 'doctorTelephone': deletedDoctor. telephone,
                 'doctorAddress': deletedDoctor.address,
-                'doctorDepartment': deletedDoctor.department,
-                'doctorHierarchy': deletedDoctor.hierarchy
             },
             {$set: {
-                'doctorName': "",
-                'doctorTelephone': "",
-                'doctorAddress': "",
-                'doctorDepartment': "",
-                'doctorHierarchy': ""
+                'doctorName': null,
+                'doctorTelephone': null,
+                'doctorAddress': null,
             }}
         )
     }
