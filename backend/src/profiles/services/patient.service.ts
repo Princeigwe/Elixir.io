@@ -157,7 +157,7 @@ export class PatientService {
 
 
     @OnEvent('remove.doctor')
-    async removeDeletedDoctorFromPatientsProfiles(payload: RemoveDoctorEvent) {
+    async removeDeletedAssignedDoctorFromPatientsProfiles(payload: RemoveDoctorEvent) {
         // getting the details of the deleted doctor profile
         const deletedDoctor = await this.doctorService.getDoctorProfileByNamesAndByDepartment( payload.firstName, payload.lastName, payload.department, payload.hierarchy )
 
