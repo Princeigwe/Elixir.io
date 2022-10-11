@@ -122,5 +122,7 @@
 
     12. Patients and Profile avatar upload by authorization.
 
+    13. Assign and unassign a doctor to a patient... this is only done by a consultant.
+
 
 **Note**: If a new medical department is created, the code for doctors' registration into that department should also be created in the auth controller, and vice versa... The medical-department enum class should also be update
