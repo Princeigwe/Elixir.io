@@ -31,6 +31,10 @@ export class MedicalDepartmentsService {
 
     // this action will only be executed by the admin
     async createMedicalDepartment(name: string) {
+
+        // todo: write a subprocess task that will restore data backup of all members in the department that is to be created, in case the data of the previous data was deleted
+        
+
         const existingMedicalDepartment = await this.medicalDepartmentModel.findOne({name: name}).exec()
         if (existingMedicalDepartment) {
             throw new HttpException('Medical department already exists, create with a different name', HttpStatus.BAD_REQUEST) 
