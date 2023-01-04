@@ -33,6 +33,7 @@ services:
   mongo:
     container_name: elixir_mongodb
     image: mongo
+    restart: always
     environment:
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
       MONGO_INITDB_ROOT_USERNAME: ${MONGOROOTUSERNAME}
@@ -42,4 +43,21 @@ services:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
       - ./mongo-volume:/data/db
     ports: 
-      - '27017-27019:27017-27019'
+      # - '27017-27019:27017-27019'
+      - '27017:27017'
+
+
+  mongo-backup:
+    container_name: elixir_mongodb_backup
+    image: mongo
+    restart: always
+
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGOROOTUSERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGOROOTPASSWD}
+
+    volumes:
+      - ./mongo-backup-volume:/data/db
+    ports: 
+      - '27021:27017'
