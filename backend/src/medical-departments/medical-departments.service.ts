@@ -11,6 +11,8 @@ import * as _ from 'lodash'
 import {DoctorService} from '../profiles/services/doctor.service'
 import { RemoveDoctorEvent } from '../events/removeDoctorFromDepartment.event';
 
+import {exec} from 'node:child_process'
+
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -33,7 +35,20 @@ export class MedicalDepartmentsService {
     async createMedicalDepartment(name: string) {
 
         // todo: write a subprocess task that will restore data backup of all members in the department that is to be created, in case the data of the previous data was deleted
-        
+        if (process.env.NODE_ENV=='development') {
+            exec('sh ./src/bash_scripts/datarestore.sh ', (error, stdout, stderr) => {
+            
+                if(error) {
+                    console.log(`error: ${error.message}`)
+                    return;
+                }
+                if(stderr) {
+                    console.error(`stderr: ${stderr}`)
+                    return
+                }
+                console.log(`stdout: \n${stdout}`)
+            })
+        }
 
         const existingMedicalDepartment = await this.medicalDepartmentModel.findOne({name: name}).exec()
         if (existingMedicalDepartment) {
