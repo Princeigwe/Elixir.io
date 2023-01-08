@@ -25,4 +25,6 @@ mongo --version
 # mongodump --uri="mongodb://elixir_io:elixir_io@localhost:27107/elixir_io?ssl=false&authSource=admin"
 # mongodump --user=elixir_io --db=elixir_io --password=elixir_io --authenticationDatabase=admin
 
-mongodump --host elixir_mongodb --port 27017 --username elixir_io --db elixir_io --password elixir_io --authenticationDatabase admin --out ./
+# mongodump --host elixir_mongodb --port 27017 --username elixir_io --db elixir_io --password elixir_io --authenticationDatabase admin --out ./dump/
+mongodump --host elixir_mongodb --port 27017 --username elixir_io --db elixir_io --password elixir_io --authenticationDatabase admin --archive=elixir.archive
+
