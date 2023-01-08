@@ -8,6 +8,14 @@ WORKDIR /usr/src/app/backend
 # copy package.json and package-lock.json to the image working directory
 COPY package*.json ./
 
+# install tools for mongodump and mongorestore commands
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.6/main' >> /etc/apk/repositories
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.6/community' >> /etc/apk/repositories
+RUN apk update
+RUN apk add mongodb=3.4.4-r0
+RUN apk add mongodb-tools
+
+
 # install development dependencies
 RUN npm install --only=development --force
 
