@@ -36,6 +36,8 @@ RUN apt-get update -qq
 RUN apt-get install -y build-essential
 RUN apt-get install -y git
 
+
+
 # setting the image working directory which the backend folder of the root directory
 WORKDIR /usr/src/app/backend
 
