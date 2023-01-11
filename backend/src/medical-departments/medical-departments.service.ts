@@ -11,9 +11,6 @@ import * as _ from 'lodash'
 import {DoctorService} from '../profiles/services/doctor.service'
 import { RemoveDoctorEvent } from '../events/removeDoctorFromDepartment.event';
 
-import {exec} from 'node:child_process'
-
-
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
 // - Dermatology 
@@ -35,21 +32,6 @@ export class MedicalDepartmentsService {
     async createMedicalDepartment(name: string) {
 
         // todo: write a subprocess task that will restore data backup of all members in the department that is to be created, in case the data of the previous data was deleted
-        if (process.env.NODE_ENV=='development') {
-            exec('sh ./src/bash_scripts/datarestore.sh ', (error, stdout, stderr) => {
-            
-                if(error) {
-                    console.log(`error: ${error.message}`)
-                    return;
-                }
-                if(stderr) {
-                    console.error(`stderr: ${stderr}`)
-                    return
-                }
-                console.log(`stdout: \n${stdout}`)
-            })
-        }
-
         const existingMedicalDepartment = await this.medicalDepartmentModel.findOne({name: name}).exec()
         if (existingMedicalDepartment) {
             throw new HttpException('Medical department already exists, create with a different name', HttpStatus.BAD_REQUEST) 
@@ -59,6 +41,9 @@ export class MedicalDepartmentsService {
     }
 
     async getMedicalDepartments() {
+        const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+        await sleep(120000)
+        
         const medicalDepartments = await this.medicalDepartmentModel.find().exec()
         if (!medicalDepartments.length) {throw new NotFoundException('There are no medical departments found')}
         return medicalDepartments
@@ -451,7 +436,7 @@ export class MedicalDepartmentsService {
         await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
     }
 
-    
+
     async promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
         await this.removeExistingJuniorDoctorFromAGroup(firstName, lastName, department)
         await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
