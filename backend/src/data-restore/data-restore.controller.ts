@@ -6,7 +6,7 @@ export class DataRestoreController {
     constructor(private dataRestoreService: DataRestoreService) {}
 
     @Get()
-    dataRestore() {
+    async dataRestore() {
         return this.dataRestoreService.dataRestore()
     }
 }
