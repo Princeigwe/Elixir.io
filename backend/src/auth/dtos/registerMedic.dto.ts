@@ -51,6 +51,7 @@ export class RegisterUserDoctorDto {
     @IsNotEmpty()
     firstName: string;
 
+    @ApiProperty()
     @IsNotEmpty()
     @IsString()
     lastName: string;

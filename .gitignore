@@ -1,3 +1,4 @@
 .env
 
 mongo-volume/
+mongo-backup-volume/

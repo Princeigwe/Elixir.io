@@ -8,6 +8,9 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MedicalDepartmentsModule } from './medical-departments/medical-departments.module';
 import { CaslModule } from './casl/casl.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { DataBackupModule } from './data-backup/data-backup.module';
+import { DataRestoreModule } from './data-restore/data-restore.module';
 
 @Module({
   imports: [
@@ -17,7 +20,10 @@ import { CaslModule } from './casl/casl.module';
     ProfilesModule,
     EventEmitterModule.forRoot(),
     MedicalDepartmentsModule,
-    CaslModule
+    CaslModule,
+    ScheduleModule.forRoot(),
+    DataBackupModule,
+    DataRestoreModule
   ],
   // controllers: [AppController],
   // providers: [AppService],

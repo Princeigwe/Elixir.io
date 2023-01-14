@@ -1,5 +1,7 @@
 # ELIXIR.IO
 
+![Elixir.io](download.png)
+
 ## Description: A health care wellbeing application.
 
 ## Estimated Features:
