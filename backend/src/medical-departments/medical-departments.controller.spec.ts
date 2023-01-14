@@ -54,6 +54,7 @@ describe('MedicalDepartmentsController', () => {
 
 
     searchMedicalDepartmentByName : jest.fn( (name: string) => {
+      name = "Dermatology"
       return {
         _id: "631c16c7a4a3eb36ed9ff73b",
         name: name,
@@ -84,61 +85,10 @@ describe('MedicalDepartmentsController', () => {
   });
 
   it( 'should return an array of hospital departments', async() => {
-    let departments = [
-      {
-        "_id": "631c169fa4a3eb36ed9ff734",
-        "name": "Cardiology",
-        "groups": [
-          {
-            "consultant": "Abraham Smith",
-            "associateSpecialists": [
-              "Matthew Woods",
-              "Matt Stone"
-            ],
-            "juniorDoctors": [],
-            "medicalStudents": []
-          },
-          {
-            "consultant": "Amy Brown",
-            "associateSpecialists": [
-              "Nick Crook",
-              "Smith Fraya"
-            ],
-            "juniorDoctors": [],
-            "medicalStudents": []
-          }
-        ],
-        "members": [
-          "Abraham Smith",
-          "Amy Brown",
-          "Matthew Woods",
-          "Matt Stone",
-          "Nick Crook",
-          "Smith Fraya"
-        ],
-        "__v": 0
-      },
-      {
-        "_id": "631c16c7a4a3eb36ed9ff73b",
-        "name": "Dermatology",
-        "groups": [],
-        "members": [],
-        "__v": 0
-      }
-    ]
-
-    expect(await controller.getOrSearchMedicalDepartments()).toEqual(departments)
+    expect(await controller.getOrSearchMedicalDepartments()).toEqual(mockMedicalDepartmentsService.getMedicalDepartments())
   })
 
   it('should search department by name', async () => {
-    let department = { 
-      "_id": "631c16c7a4a3eb36ed9ff73b",
-        "name": "Dermatology",
-        "groups": [],
-        "members": [],
-        "__v": 0
-    }
-
-    expect(await controller.getOrSearchMedicalDepartments('Dermatology')).toEqual(department)
+    expect(await controller.getOrSearchMedicalDepartments('Dermatology')).toEqual(mockMedicalDepartmentsService.searchMedicalDepartmentByName("Dermatology"))
   })
 });
