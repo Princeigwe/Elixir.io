@@ -11,6 +11,7 @@ import { CaslModule } from './casl/casl.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DataBackupModule } from './data-backup/data-backup.module';
 import { DataRestoreModule } from './data-restore/data-restore.module';
+import { ElectronicHealthRecordsModule } from './electronic-health-records/electronic-health-records.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { DataRestoreModule } from './data-restore/data-restore.module';
     CaslModule,
     ScheduleModule.forRoot(),
     DataBackupModule,
-    DataRestoreModule
+    DataRestoreModule,
+    ElectronicHealthRecordsModule
   ],
   // controllers: [AppController],
   // providers: [AppService],
