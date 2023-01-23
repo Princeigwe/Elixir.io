@@ -1,4 +1,4 @@
-import {IsEnum, IsNotEmpty, IsOptional, IsString} from 'class-validator'
+import {IsEnum, IsNotEmpty, IsOptional, IsString, IsEmail} from 'class-validator'
 import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import { ApiProperty } from '@nestjs/swagger';
@@ -7,7 +7,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class RegisterUserConsultantDto {
 
     @ApiProperty()
-    @IsString()
+    @IsEmail()
     @IsNotEmpty()
     email: string;
 
@@ -42,7 +42,7 @@ export class RegisterUserConsultantDto {
 export class RegisterUserDoctorDto {
 
     @ApiProperty()
-    @IsString()
+    @IsEmail()
     @IsNotEmpty()
     email: string;
 
