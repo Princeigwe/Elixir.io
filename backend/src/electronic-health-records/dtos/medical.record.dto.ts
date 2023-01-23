@@ -3,24 +3,6 @@ import { IsOptional, IsEmail, IsString, IsNumber, IsArray } from "class-validato
 
 export class MedicalRecordDto {
 
-    @IsString()
-    firstName: string
-
-    @IsString()
-    lastName: string
-
-    @IsEmail()
-    email: string
-
-    @IsNumber()
-    age: string
-
-    @IsString()
-    address: string
-
-    @IsString()
-    telephone: string
-
     @IsArray()
     complaints: string[]
 
