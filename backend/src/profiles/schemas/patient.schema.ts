@@ -1,4 +1,4 @@
-import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
+import {Prop, Schema, SchemaFactory, raw} from '@nestjs/mongoose'
 import {Document} from 'mongoose'
 import {MaritalStatus} from '../../enums/marital.status.enum'
 import * as mongoose from 'mongoose'
@@ -57,20 +57,29 @@ export class Patient {
         // }
     ]
 
-    @Prop()
-    doctorName: string
+    // @Prop()
+    // doctorName: string
 
-    @Prop()
-    doctorTelephone: string
+    // @Prop()
+    // doctorTelephone: string
 
-    @Prop()
-    doctorAddress: string
+    // @Prop()
+    // doctorAddress: string
 
-    @Prop()
-    doctorDepartment: MedicalDepartments
+    // @Prop()
+    // doctorDepartment: MedicalDepartments
 
-    @Prop()
-    doctorHierarchy: DoctorHierarchy
+    // @Prop()
+    // doctorHierarchy: DoctorHierarchy
+
+
+    @Prop(raw({
+        name:       {type: String},
+        telephone:  {type: String},
+        email:      {type: String},
+        department: {type: String},
+    }))
+    assignedDoctor: Record<string, any>
 
     @Prop()
     pharmacyTelephone: string

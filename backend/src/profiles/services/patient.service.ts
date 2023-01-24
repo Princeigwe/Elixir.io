@@ -125,7 +125,9 @@ export class PatientService {
         // getting the profile of the subordinate doctor that will be assigned to the patient 
         const assigneeDoctor = await this.doctorService.getDoctorProfileByNames(doctorFirstName, doctorLastName)
 
-        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': assigneeDoctorFullNames, 'doctorTelephone': assigneeDoctor.telephone, 'doctorAddress': assigneeDoctor.address, "doctorDepartment": assigneeDoctor.department, "doctorHierarchy": assigneeDoctor.hierarchy}})
+        // await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': assigneeDoctorFullNames, 'doctorTelephone': assigneeDoctor.telephone, 'doctorAddress': assigneeDoctor.address, "doctorDepartment": assigneeDoctor.department, "doctorHierarchy": assigneeDoctor.hierarchy}})
+        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'assignedDoctor.name': assigneeDoctorFullNames, 'assignedDoctor.telephone': assigneeDoctor.telephone, 'assignedDoctor.email': assigneeDoctor.email, "assignedDoctor.department": assigneeDoctor.department}})
+
 
         const updatedPatientProfile = await this.getPatientProfileById(patientId)
         
