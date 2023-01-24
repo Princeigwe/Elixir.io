@@ -24,8 +24,6 @@ export class CaslAbilityFactory {
         // ** using the Doctor model here doesn't work, so 'all' is used to find any subject with an email attribute to be compared to user.email **
         can(Action.Update, 'all', {email: user.email})
 
-        can(Action.Create, 'all', {email: user.email})
-
 
         return build({
             detectSubjectType: (item) => item.constructor as ExtractSubjectType<InferSubjects<typeof Doctor | typeof Patient | typeof User | typeof MedicalRecord> | 'all'>
