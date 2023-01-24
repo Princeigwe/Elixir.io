@@ -40,7 +40,11 @@ export class MedicalRecord {
     // }))
     // medication_list: [ Record<string, any> ]
 
-    @Prop()
+    @Prop(raw({
+        doctor_firstName: {type: String},
+        doctor_lastName:  {type: String},
+        doctor_department:{type: String},
+    }))
     issued_by: string
 
     @Prop({type: Date, default: Date.now})
