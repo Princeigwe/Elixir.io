@@ -26,9 +26,10 @@ export class MedicalRecordService {
 
     async createMedicalRecord( patient_id: string, complaints: string[], history_of_illness: string[], vital_signs: string[], medical_allergies: string[], habits: string[], user: User ) {
         const ability = this.caslAbilityFactory.createForUser(user)
+
         const patient = await this.patientService.getPatientProfileById(patient_id)
 
-        if( ability.can(Action.Manage, 'all') ) {
+        if( ability.can(Action.Manage, 'all') || patient['assignedDoctor']['email'] == user.email ) {
 
             // creating medicalRecord object
             const medicalRecord = new this.medicalRecordModel({
