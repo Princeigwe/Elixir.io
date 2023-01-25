@@ -22,13 +22,11 @@ export class MedicalRecordService {
 
     /*
         creating medical record with some parameters of the patients profile, this will be done by either:
-        - the admin
         - the doctor assigned to the patient for which the record is created
         - the consultant of the doctor that's assigned to the patient
     */
 
     async createMedicalRecord( patient_id: string, complaints: string[], history_of_illness: string[], vital_signs: string[], medical_allergies: string[], habits: string[], user: User ) {
-        const ability = this.caslAbilityFactory.createForUser(user)
         const patient = await this.patientService.getPatientProfileById(patient_id)
 
         // getting the logged in doctor's profile
@@ -37,7 +35,7 @@ export class MedicalRecordService {
         // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
         const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
 
-        if( ability.can(Action.Manage, 'all') || patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
+        if( patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
 
             // creating medicalRecord object
             const medicalRecord = new this.medicalRecordModel({
@@ -58,7 +56,11 @@ export class MedicalRecordService {
                 },
                 progress_notes: [],
                 medication_list: [],
-                // issued_by: issued_by
+                issued_by: {
+                    doctor_firstName: loggedMedicalProvider.firstName,
+                    doctor_lastName: loggedMedicalProvider.lastName,
+                    doctor_department: loggedMedicalProvider.department
+                }
             })
 
             return medicalRecord.save()
