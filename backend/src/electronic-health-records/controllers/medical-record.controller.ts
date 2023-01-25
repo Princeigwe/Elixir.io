@@ -1,7 +1,10 @@
-import { Controller, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards, Request, Get } from '@nestjs/common';
 import { MedicalRecordService } from '../services/medical-record.service';
 import { MedicalRecordDto } from '../dtos/medical.record.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { Roles } from '../../roles.decorator';
+import {Role} from '../../enums/role.enum'
+import {RolesGuard} from '../../roles.guard'
 
 @Controller('medical-record')
 export class MedicalRecordController {
@@ -21,5 +24,13 @@ export class MedicalRecordController {
             body.habits,
             user
         )
+    }
+
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get()
+    @Roles(Role.Admin) 
+    async getMedicalRecords() {
+        return await this.medicalRecordService.getMedicalRecords()
     }
 }

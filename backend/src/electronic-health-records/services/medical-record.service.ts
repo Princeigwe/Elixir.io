@@ -71,4 +71,11 @@ export class MedicalRecordService {
         }
     }
 
+
+    // this action will only be performed by the administrative users 
+    async getMedicalRecords() {
+        const medicalRecords = await this.medicalRecordModel.find().exec()
+        return medicalRecords
+    }
+
 }
