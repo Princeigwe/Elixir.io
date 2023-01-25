@@ -467,4 +467,15 @@ export class MedicalDepartmentsService {
         await this.addMedicalStudentToADepartmentGroup(firstName, lastName, department)
     }
 
+
+    // async fetchAllConsultantsInADepartment(department: MedicalDepartments) {
+    //     const medicalDepartment = await this.getMedicalDepartmentByName(department)
+    //     var consultants: string[] = []
+    //     for ( let group of medicalDepartment['groups']){
+    //         consultants.push(group['consultant'])
+    //     }
+    //     console.log(consultants)
+    //     return consultants
+    // }
+
 }

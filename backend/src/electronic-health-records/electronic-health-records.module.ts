@@ -6,6 +6,7 @@ import { MedicalRecord, MedicalRecordSchema } from './schemas/medical.record.sch
 import { ProfilesModule } from '../profiles/profiles.module';
 import { UsersModule } from '../users/users.module';
 import {CaslModule} from '../casl/casl.module'
+import { MedicalDepartmentsModule } from '../medical-departments/medical-departments.module';
 
 
 @Module({
@@ -16,6 +17,7 @@ import {CaslModule} from '../casl/casl.module'
     ProfilesModule,
     UsersModule,
     CaslModule,
+    MedicalDepartmentsModule,
   ],
   providers: [MedicalRecordService],
   controllers: [MedicalRecordController]

@@ -6,6 +6,8 @@ import { PatientService } from '../../profiles/services/patient.service';
 import { User } from '../../users/users.schema';
 import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import {Action} from '../../enums/action.enum'
+import { DoctorService } from '../../profiles/services/doctor.service';
+import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
 
 
 
@@ -15,6 +17,7 @@ export class MedicalRecordService {
         @InjectModel(MedicalRecord.name) private medicalRecordModel: Model<MedicalRecordDocument>,
         private patientService: PatientService,
         private caslAbilityFactory: CaslAbilityFactory,
+        private doctorService: DoctorService
     ){}
 
     /*
@@ -26,10 +29,15 @@ export class MedicalRecordService {
 
     async createMedicalRecord( patient_id: string, complaints: string[], history_of_illness: string[], vital_signs: string[], medical_allergies: string[], habits: string[], user: User ) {
         const ability = this.caslAbilityFactory.createForUser(user)
-
         const patient = await this.patientService.getPatientProfileById(patient_id)
 
-        if( ability.can(Action.Manage, 'all') || patient['assignedDoctor']['email'] == user.email ) {
+        // getting the logged in doctor's profile
+        const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
+
+        // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
+        const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
+
+        if( ability.can(Action.Manage, 'all') || patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
 
             // creating medicalRecord object
             const medicalRecord = new this.medicalRecordModel({
