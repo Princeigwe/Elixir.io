@@ -33,4 +33,11 @@ export class MedicalRecordController {
     async getMedicalRecords() {
         return await this.medicalRecordService.getMedicalRecords()
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('patient/')
+    async getLoggedInPatientRecords(@Request() request) {
+        const user = request.user
+        return await this.medicalRecordService.getLoggedInPatientRecords(user)
+    }
 }

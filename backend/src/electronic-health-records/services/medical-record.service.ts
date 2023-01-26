@@ -5,7 +5,7 @@ import { MedicalRecord, MedicalRecordDocument } from '../schemas/medical.record.
 import { PatientService } from '../../profiles/services/patient.service';
 import { User } from '../../users/users.schema';
 import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
-// import {Action} from '../../enums/action.enum'
+import {Action} from '../../enums/action.enum'
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
 
@@ -16,7 +16,7 @@ export class MedicalRecordService {
     constructor(
         @InjectModel(MedicalRecord.name) private medicalRecordModel: Model<MedicalRecordDocument>,
         private patientService: PatientService,
-        // private caslAbilityFactory: CaslAbilityFactory,
+        private caslAbilityFactory: CaslAbilityFactory,
         private doctorService: DoctorService
     ){}
 
@@ -75,6 +75,14 @@ export class MedicalRecordService {
     // this action will only be performed by the administrative users 
     async getMedicalRecords() {
         const medicalRecords = await this.medicalRecordModel.find().exec()
+        return medicalRecords
+    }
+
+
+    // this action allows a patient access records owned
+    async getLoggedInPatientRecords(user: User) {
+        const medicalRecords = await this.medicalRecordModel.find({'patient_demographics.email': user.email}).exec()
+        console.log(user.email)
         return medicalRecords
     }
 
