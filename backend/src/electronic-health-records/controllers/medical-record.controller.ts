@@ -6,7 +6,7 @@ import { Roles } from '../../roles.decorator';
 import {Role} from '../../enums/role.enum'
 import {RolesGuard} from '../../roles.guard'
 
-@Controller('medical-record')
+@Controller('medical-records')
 export class MedicalRecordController {
     constructor( private medicalRecordService: MedicalRecordService ) {}
 
@@ -39,5 +39,11 @@ export class MedicalRecordController {
     async getLoggedInPatientRecords(@Request() request) {
         const user = request.user
         return await this.medicalRecordService.getLoggedInPatientRecords(user)
+    }
+
+
+    @Get(':medical_record_id/')
+    async getMedicalRecordByID( @Param('medical_record_id') medical_record_id: string) {
+        return await this.medicalRecordService.getMedicalRecordByID(medical_record_id)
     }
 }

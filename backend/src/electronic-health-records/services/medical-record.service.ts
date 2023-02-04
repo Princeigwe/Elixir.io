@@ -75,15 +75,41 @@ export class MedicalRecordService {
     // this action will only be performed by the administrative users 
     async getMedicalRecords() {
         const medicalRecords = await this.medicalRecordModel.find().exec()
+        if(!medicalRecords.length) {throw new NotFoundException("Records not found.")}
         return medicalRecords
+    }
+
+
+    // function to read the details of a medical record by its id
+    // this method will be called for admin user or assigned doctor, or logged in patient
+    async getMedicalRecordByID(record_id: string) {
+        const medicalRecord = await this.medicalRecordModel.findById(record_id).exec()
+        if(!medicalRecord) { throw new NotFoundException("Record not found") }
+        return medicalRecord
     }
 
 
     // this action allows a patient access records owned
     async getLoggedInPatientRecords(user: User) {
         const medicalRecords = await this.medicalRecordModel.find({'patient_demographics.email': user.email}).exec()
-        console.log(user.email)
+        if(!medicalRecords.length) { throw new NotFoundException("Records not found.") }
         return medicalRecords
+    }
+
+
+    async readMedicalRecordOfLoggedInPatientByID(record_id: string, user:User) {
+        const medicalRecord = await this.getMedicalRecordByID(record_id)
+        if( medicalRecord.patient_demographics.email == user.email ) {
+            return medicalRecord
+        }
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.FORBIDDEN)
+        }
+    }
+
+
+    async getOrSearchRecordsOfPatientsUnderCare(patient_id: string, ) {
+
     }
 
 }
