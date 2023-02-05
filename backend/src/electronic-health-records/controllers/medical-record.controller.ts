@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Roles } from '../../roles.decorator';
 import {Role} from '../../enums/role.enum'
 import {RolesGuard} from '../../roles.guard'
+import { request } from 'http';
 
 @Controller('medical-records')
 export class MedicalRecordController {
@@ -42,8 +43,18 @@ export class MedicalRecordController {
     }
 
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Get(':medical_record_id/')
+    @Roles(Role.Admin)
     async getMedicalRecordByID( @Param('medical_record_id') medical_record_id: string) {
         return await this.medicalRecordService.getMedicalRecordByID(medical_record_id)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Get('auth-patient/:medical_record_id/')
+    async readMedicalRecordOfLoggedInPatientByID(@Request() request, @Param('medical_record_id') medical_record_id: string ) {
+        const user = request.user
+        return await this.medicalRecordService.readMedicalRecordOfLoggedInPatientByID(medical_record_id, user)
     }
 }

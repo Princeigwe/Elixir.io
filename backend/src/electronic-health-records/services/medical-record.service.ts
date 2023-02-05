@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MedicalRecord, MedicalRecordDocument } from '../schemas/medical.record.schema';
@@ -8,6 +8,7 @@ import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import {Action} from '../../enums/action.enum'
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 
 
@@ -108,8 +109,13 @@ export class MedicalRecordService {
     }
 
 
-    async getOrSearchRecordsOfPatientsUnderCare(patient_id: string, ) {
-
+    // this list will be used to give access to a medical record to a medical provider, by a patient
+    async createPatientReadRecordPermission() {
+        
     }
+
+    // async getOrSearchRecordsOfPatientsUnderCare(patient_id: string, ) {
+
+    // }
 
 }

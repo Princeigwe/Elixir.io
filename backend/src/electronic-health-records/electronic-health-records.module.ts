@@ -12,7 +12,7 @@ import { MedicalDepartmentsModule } from '../medical-departments/medical-departm
 @Module({
   imports:[
     MongooseModule.forFeature([
-      {name: MedicalRecord.name, schema: MedicalRecordSchema}
+      {name: MedicalRecord.name, schema: MedicalRecordSchema},
     ]),
     ProfilesModule,
     UsersModule,
