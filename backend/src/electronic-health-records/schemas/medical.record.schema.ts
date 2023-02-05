@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory, raw } from "@nestjs/mongoose";
 import { Date, Document } from "mongoose";
+import { ExcludeProperty } from 'nestjs-mongoose-exclude'
 
 export type MedicalRecordDocument = MedicalRecord & Document
 
@@ -49,6 +50,11 @@ export class MedicalRecord {
 
     @Prop({type: Date, default: Date.now})
     created_at: Date
+
+    // this column is used to hold emails of those that have read access to the medical record
+    @ExcludeProperty()
+    @Prop([String])
+    recipients: string[]
 }
 
 

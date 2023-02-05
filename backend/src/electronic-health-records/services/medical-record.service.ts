@@ -61,7 +61,10 @@ export class MedicalRecordService {
                     doctor_firstName: loggedMedicalProvider.firstName,
                     doctor_lastName: loggedMedicalProvider.lastName,
                     doctor_department: loggedMedicalProvider.department
-                }
+                },
+                recipients: [
+                    loggedMedicalProvider.email
+                ]
             })
 
             return medicalRecord.save()
