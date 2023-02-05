@@ -6,6 +6,7 @@ import { Roles } from '../../roles.decorator';
 import {Role} from '../../enums/role.enum'
 import {RolesGuard} from '../../roles.guard'
 import {SanitizeMongooseModelInterceptor} from 'nestjs-mongoose-exclude'
+import { ReadAccessDto } from '../dtos/read.access.dto';
 
 @UseInterceptors(new SanitizeMongooseModelInterceptor({excludeMongooseId: false, excludeMongooseV: false})) // hides recipients of record
 @Controller('medical-records')
@@ -68,5 +69,13 @@ export class MedicalRecordController {
     async readActionOfMedicalRecordByMedicalProvider(@Request() request, @Param('medical_record_id') medical_record_id: string) {
         const user = request.user
         return await this.medicalRecordService.readActionOfMedicalRecordByMedicalProvider(medical_record_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Post('grant-read-access/:medical_record_id')
+    async grantReadAccessOfMedicalRecordToMedicalProvider(@Request() request, @Param('medical_record_id') medical_record_id: string, @Body() body: ReadAccessDto ) {
+        const user =  request.user
+        return await this.medicalRecordService.grantReadAccessOfMedicalRecordToMedicalProvider(user, medical_record_id, body.email)
     }
 }

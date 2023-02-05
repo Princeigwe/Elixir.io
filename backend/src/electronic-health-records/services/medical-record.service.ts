@@ -127,6 +127,23 @@ export class MedicalRecordService {
         return medicalRecord
     }
 
+
+    // this method allows a patient grant read access of a medical provider
+    async grantReadAccessOfMedicalRecordToMedicalProvider(user: User, record_id: string, medical_provider_email: string) {
+        const medicalRecord = await this.getMedicalRecordByID(record_id)
+
+        const medicalProvider = await this.doctorService.getDoctorProfileByEmail(medical_provider_email)
+
+        if( medicalRecord.patient_demographics.email == user.email ) {
+            await this.medicalRecordModel.updateOne({'_id': medicalRecord._id}, { $addToSet: { 'recipients': medical_provider_email } })
+            return { message: `You have successfully granted read access to ${medicalProvider.firstName} ${medicalProvider.lastName}` }
+        }
+
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.FORBIDDEN)
+        }
+    }
+
     // async getOrSearchRecordsOfPatientsUnderCare(patient_id: string, ) {
 
     // }
