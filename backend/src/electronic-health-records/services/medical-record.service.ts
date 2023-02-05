@@ -113,8 +113,18 @@ export class MedicalRecordService {
 
 
     // this list will be used to give access to a medical record to a medical provider, by a patient
-    async createPatientReadRecordPermission() {
-        
+    async readActionOfMedicalRecordByMedicalProvider(record_id: string, user: User) {
+        // get details of logged in medical provider
+        const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
+
+        const medicalRecord = await this.medicalRecordModel.findById(record_id).exec()
+
+        // if the email of logged in provider is not in the recipients property of the medical record, don't allow access
+        if (medicalRecord.recipients.includes(loggedMedicalProvider.email) == false) {
+            throw new HttpException('Forbidden Resource. Request for read access from patient', HttpStatus.FORBIDDEN)
+        }
+
+        return medicalRecord
     }
 
     // async getOrSearchRecordsOfPatientsUnderCare(patient_id: string, ) {

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { MedicalRecordService } from '../services/medical-record.service';
 import { MedicalRecordDto } from '../dtos/medical.record.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -7,7 +7,7 @@ import {Role} from '../../enums/role.enum'
 import {RolesGuard} from '../../roles.guard'
 import {SanitizeMongooseModelInterceptor} from 'nestjs-mongoose-exclude'
 
-@UseInterceptors(new SanitizeMongooseModelInterceptor) // hides recipients of record
+@UseInterceptors(new SanitizeMongooseModelInterceptor({excludeMongooseId: false, excludeMongooseV: false})) // hides recipients of record
 @Controller('medical-records')
 export class MedicalRecordController {
     constructor( private medicalRecordService: MedicalRecordService ) {}
@@ -36,14 +36,16 @@ export class MedicalRecordController {
         return await this.medicalRecordService.getMedicalRecords()
     }
 
+    // this route is used by the logged in patient to get owned medical records
     @UseGuards(JwtAuthGuard)
-    @Get('patient/')
+    @Get('auth-patient/')
     async getLoggedInPatientRecords(@Request() request) {
         const user = request.user
         return await this.medicalRecordService.getLoggedInPatientRecords(user)
     }
 
 
+    // this route is used by the logged in admin to read a medical record
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get(':medical_record_id/')
     @Roles(Role.Admin)
@@ -52,10 +54,19 @@ export class MedicalRecordController {
     }
 
 
+    // this route is used by the logged in patient to read owned medical record
     @UseGuards(JwtAuthGuard)
     @Get('auth-patient/:medical_record_id/')
     async readMedicalRecordOfLoggedInPatientByID(@Request() request, @Param('medical_record_id') medical_record_id: string ) {
         const user = request.user
         return await this.medicalRecordService.readMedicalRecordOfLoggedInPatientByID(medical_record_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Get('read-access/:medical_record_id/')
+    async readActionOfMedicalRecordByMedicalProvider(@Request() request, @Param('medical_record_id') medical_record_id: string) {
+        const user = request.user
+        return await this.medicalRecordService.readActionOfMedicalRecordByMedicalProvider(medical_record_id, user)
     }
 }
