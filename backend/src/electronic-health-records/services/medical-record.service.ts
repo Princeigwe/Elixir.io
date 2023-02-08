@@ -5,10 +5,9 @@ import { MedicalRecord, MedicalRecordDocument } from '../schemas/medical.record.
 import { PatientService } from '../../profiles/services/patient.service';
 import { User } from '../../users/users.schema';
 import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
-import {Action} from '../../enums/action.enum'
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import {UserCategory} from '../../enums/user.category.enum'
 
 
 
@@ -84,6 +83,28 @@ export class MedicalRecordService {
     }
 
 
+    // filter medical response of patients by email
+    async filterMedicalRecordsOfPatientByEmail( patient_email: string, user: User ) {
+
+        // ensuring the user making the request is a medical provider or admin
+        if(user.category == UserCategory.Patient) {
+            throw new HttpException('Forbidden action, records are kept confidential for medical staffs', HttpStatus.FORBIDDEN)
+        }
+
+        const patientMedicalRecords = await this.medicalRecordModel.find({ "patient_demographics.email": patient_email }).exec()
+        if(!patientMedicalRecords.length) { throw new NotFoundException("Records not found") }
+        
+        // to return subsets of each record
+        return patientMedicalRecords.map( patientMedicalRecord => ({ 
+            record_id: patientMedicalRecord['_id'].toString(),
+            // record_url: ` http://localhost:3000/api/v1/medical-records/read-access/${patientMedicalRecord._id} `, 
+            created_at: patientMedicalRecord.created_at
+        }) )
+
+        // return patientMedicalRecords
+    }
+
+
     // function to read the details of a medical record by its id
     // this method will be called for admin user or assigned doctor, or logged in patient
     async getMedicalRecordByID(record_id: string) {
@@ -140,7 +161,7 @@ export class MedicalRecordService {
         }
 
         else {
-            throw new HttpException('Forbidden Resource', HttpStatus.FORBIDDEN)
+            throw new HttpException('Forbidden Action', HttpStatus.FORBIDDEN)
         }
     }
 
@@ -157,7 +178,7 @@ export class MedicalRecordService {
         }
 
         else {
-            throw new HttpException('Forbidden Resource', HttpStatus.FORBIDDEN)
+            throw new HttpException('Forbidden Action', HttpStatus.FORBIDDEN)
         }
     }
 

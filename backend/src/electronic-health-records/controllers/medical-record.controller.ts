@@ -86,4 +86,12 @@ export class MedicalRecordController {
         const user =  request.user
         return await this.medicalRecordService.revokeReadAccessOfMedicalRecordFromMedicalProvider(user, medical_record_id, body.email)
     }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Get('patient/:patient_email')
+    async filterMedicalRecordsOfPatientByEmail ( @Param('patient_email') patient_email: string, @Request() request) {
+        const user = request.user
+        return await this.medicalRecordService.filterMedicalRecordsOfPatientByEmail(patient_email, user)
+    }
 }
