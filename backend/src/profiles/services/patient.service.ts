@@ -168,23 +168,30 @@ export class PatientService {
         // updating all patients profile that has the details of the deletedDoctor
         await this.patientModel.updateMany(
             {
-                'doctorName': deletedDoctorNames,
-                'doctorTelephone': deletedDoctor. telephone,
-                'doctorAddress': deletedDoctor.address,
-                'doctorDepartment': deletedDoctor.department,
-                'doctorHierarchy': deletedDoctor.hierarchy,
+                'assignedDoctor.name': deletedDoctorNames,
+                'assignedDoctor.telephone': deletedDoctor. telephone,
+                'assignedDoctor.email': deletedDoctor.email,
+                'assignedDoctor.department': deletedDoctor.department,
             },
             {$set: {
-                'doctorName': null,
-                'doctorTelephone': null,
-                'doctorAddress': null,
-                'doctorDepartment': null,
-                'doctorHierarchy': null,
+                'assignedDoctor.name': null,
+                'assignedDoctor.telephone': null,
+                'assignedDoctor.email': null,
+                'assignedDoctor.department': null,
             }}
         )
     }
 
 
+    /**
+     * It removes a patient from a subordinate doctor's profile, and emits an event to notify the
+     * patient that he/she has been removed from the doctor's profile
+     * @param {User} user - User - the user object of the logged in user
+     * @param {string} patientId - the id of the patient to be removed from the doctor's profile
+     * @param {string} doctorFirstName - the first name of the subordinate doctor
+     * @param {string} doctorLastName - string,
+     * @returns The updated patient profile
+     */
     async removeAssignedPatientFromDoctor(user: User, patientId: string, doctorFirstName: string, doctorLastName: string) {
         if(user.category != UserCategory.MedicalProvider) {
             throw new HttpException('Forbidden action, as you are not a medical provider', HttpStatus.FORBIDDEN)
@@ -204,7 +211,7 @@ export class PatientService {
         }
         
         // removing the assigned subordinate doctor from the patient's profile
-        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'doctorName': "", 'doctorTelephone': "", 'doctorAddress': ""}})
+        await this.patientModel.updateOne({'_id': patientId}, {$set: { 'assignedDoctor.name': null, 'assignedDoctor.telephone': null, 'assignedDoctor.email': null, 'assignedDoctor.department': null}})
 
         const updatedPatientProfile = await this.getPatientProfileById(patientId)
 
