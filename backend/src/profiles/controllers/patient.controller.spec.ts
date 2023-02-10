@@ -104,6 +104,34 @@ describe('PatientController', () => {
       }
     } ),
 
+    assignDoctorToPatient: jest.fn( (patientId: string, doctorFirstName: string, doctorLastName: string) => {
+      patientId = '1234567',
+      doctorFirstName = 'Matthew'
+      doctorLastName = 'Smith'
+
+      return {
+        "assignedDoctor": {
+          "department": "Cardiology",
+          "email": "testuser5@gmail.com",
+          "name": `${doctorFirstName} ${doctorLastName}`,
+          "telephone": "12121212"
+        },
+        "_id": patientId,
+        "user": "63e3c3b22eb5c00110c25ffc",
+        "email": "testuser11@gmail.com",
+        "maritalStatus": "Single",
+        "medicalIssues": [],
+        "prescriptions": [],
+        "__v": 0,
+        "address": "Spain",
+        "age": 24,
+        "firstName": "Amyyy",
+        "lastName": "Woodsss",
+        "occupation": "Lawyer",
+        "telephone": "53950954"
+      }
+    } )
+
     // deletePatientsProfiles: jest.fn( () => {
     //   return { message: 'Patients profiles deleted'}
     // } ),
@@ -139,6 +167,10 @@ describe('PatientController', () => {
   it('should edit basic patient profile data', async () => {
 
     expect(await controller.editBasicPatientProfileById( '12345678' , {firstName: "John", lastName: "Smith", age: 24, address: "London", telephone: "53950954", occupation: "Lawyer", maritalStatus: MaritalStatus.Single}, Request )).toEqual(mockPatientService.editBasicPatientProfileById('12345678', "John", "Smith", 24, "London", "53950954", "Lawyer", "Single"))
+  })
+
+  it('should assert that the assigned doctor name', async () => {
+    expect( await controller.assignDoctorToPatient('1234567', Request, { doctorFirstName: 'Matthew', doctorLastName: 'Smith' })).toEqual(mockPatientService.assignDoctorToPatient('1234567', 'Matthew', 'Smith'))
   })
 
   // it('should return a delete message', async () => {
