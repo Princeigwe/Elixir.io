@@ -108,7 +108,7 @@ export class AuthController {
     
     @ApiOperation({description: "Registers a doctor that is not a consultant into the defined department. Reference: RegisterUserDoctorDto"})
     @Redirect('http://localhost:3000/api/v1/auth/doctor-form-submitted')
-    @Post('registration-doctor')
+    @Post('register-doctor')
     async registerDoctorToADepartment(@Body() body: RegisterUserDoctorDto) { 
         return this.authService.registerDoctorToADepartment(body.email, body.firstName, body.lastName, body.password, body.department, body.telephone, body.address, body.hierarchy)
     }
