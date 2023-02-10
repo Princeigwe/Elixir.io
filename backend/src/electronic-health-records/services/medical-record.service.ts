@@ -16,7 +16,7 @@ export class MedicalRecordService {
     constructor(
         @InjectModel(MedicalRecord.name) private medicalRecordModel: Model<MedicalRecordDocument>,
         private patientService: PatientService,
-        private caslAbilityFactory: CaslAbilityFactory,
+        // private caslAbilityFactory: CaslAbilityFactory,
         private doctorService: DoctorService
     ){}
 
