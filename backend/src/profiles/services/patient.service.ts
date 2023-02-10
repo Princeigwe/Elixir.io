@@ -89,7 +89,7 @@ export class PatientService {
             return patient.save()
         }
         else {
-            throw new HttpException('Forbidden Resource', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Forbidden action', HttpStatus.BAD_REQUEST)
         }
     }
 
