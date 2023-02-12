@@ -34,7 +34,8 @@ export class DataBackupService {
                 ELIXIR_PASSWORD: process.env.MONGO_ATLAS_ELIXIR_PASSWORD,
                 ELIXIR_DATABASE: process.env.MONGO_ATLAS_ELIXIR_DATABASE,
 
-                ELIXIR_BACKUP_PASSWORD: process.env.ELIXIR_BACKUP_PASSWORD
+                ELIXIR_BACKUP_PASSWORD: process.env.MONGO_ATLAS_ELIXIR_BACKUP_PASSWORD,
+                ELIXIR_BACKUP_DATABASE: process.env.MONGO_ATLAS_ELIXIR_BACKUP_DATABASE
             };
 
             /* 
