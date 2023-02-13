@@ -81,7 +81,7 @@ COPY . .
 #  copy the compiled javascript code to out production image
 COPY --from=development /usr/src/app/backend/dist ./dist
 
-# EXPOSE 3000
+EXPOSE 3000
 
 # run the application
 CMD ["node", "dist/main"]
