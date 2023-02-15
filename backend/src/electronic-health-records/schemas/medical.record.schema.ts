@@ -39,7 +39,7 @@ export class MedicalRecord {
     //     dose:              {type: String},
     //     method_of_intake:  {type: String}
     // }))
-    // medication_list: [ Record<string, any> ]
+    // medications: [ Record<string, any> ]
 
     @Prop(raw({
         doctor_firstName: {type: String},
