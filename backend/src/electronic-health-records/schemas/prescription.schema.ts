@@ -44,8 +44,8 @@ export class Prescription {
     }))
     prescriber: string
 
-    @Prop()
-    medications: any[]
+    @Prop([Medication])
+    medications: Medication[]
 
     @Prop()
     instructions: string
