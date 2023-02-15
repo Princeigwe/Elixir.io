@@ -142,7 +142,7 @@ export class MedicalRecordService {
 
         // if the email of logged in provider is not in the recipients property of the medical record, don't allow access
         if (medicalRecord.recipients.includes(loggedMedicalProvider.email) == false) {
-            throw new HttpException('Forbidden Resource. Request for read access from patient', HttpStatus.FORBIDDEN)
+            throw new HttpException('Forbidden action. Request for access to medical record from patient', HttpStatus.FORBIDDEN)
         }
 
         return medicalRecord
