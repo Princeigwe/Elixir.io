@@ -7,19 +7,23 @@ import { ProfilesModule } from '../profiles/profiles.module';
 import { UsersModule } from '../users/users.module';
 import {CaslModule} from '../casl/casl.module'
 import { MedicalDepartmentsModule } from '../medical-departments/medical-departments.module';
+import { Prescription, PrescriptionSchema } from './schemas/prescription.schema';
+import { PrescriptionService } from './services/prescription.service';
+import { PrescriptionController } from './controllers/prescription.controller';
 
 
 @Module({
   imports:[
     MongooseModule.forFeature([
       {name: MedicalRecord.name, schema: MedicalRecordSchema},
+      {name: Prescription.name, schema: PrescriptionSchema}
     ]),
     ProfilesModule,
     UsersModule,
     CaslModule,
     MedicalDepartmentsModule,
   ],
-  providers: [MedicalRecordService],
-  controllers: [MedicalRecordController]
+  providers: [MedicalRecordService, PrescriptionService],
+  controllers: [MedicalRecordController, PrescriptionController]
 })
 export class ElectronicHealthRecordsModule {}
