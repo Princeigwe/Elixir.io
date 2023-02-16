@@ -43,20 +43,6 @@ export class Patient {
     @Prop({default: MaritalStatus.Single})
     maritalStatus: MaritalStatus
 
-    @Prop([String])
-    medicalIssues: string[]
-
-    @Prop({ type: mongoose.Schema.Types.Array })
-    prescriptions: [
-        // {
-        //     drug: string,
-        //     dosage: string,
-        //     issueDate: Date,
-        //     issuerName: string
-        //     issuerTelephone: string
-        // }
-    ]
-
     // @Prop()
     // doctorName: string
 

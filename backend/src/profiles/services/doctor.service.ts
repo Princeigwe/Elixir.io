@@ -181,9 +181,7 @@ export class DoctorService {
             address: payload.address,
             telephone: payload.telephone,
             occupation: payload.occupation,
-            maritalStatus: payload.maritalStatus,
-            medicalIssues: payload.medicalIssues, 
-            prescriptions: payload.prescriptions, 
+            maritalStatus: payload.maritalStatus, 
             pharmacyTelephone: payload.pharmacyTelephone
         }
         await this.doctorModel.updateOne({ 'firstName': payload.doctorFirstName, 'lastName': payload.doctorLastName, 'department': payload.medicalDepartment}, {$addToSet: { 'assignedPatients': assignedPatient }})
@@ -200,9 +198,7 @@ export class DoctorService {
             address: payload.address,
             telephone: payload.telephone,
             occupation: payload.occupation,
-            maritalStatus: payload.maritalStatus,
-            medicalIssues: payload.medicalIssues, 
-            prescriptions: payload.prescriptions, 
+            maritalStatus: payload.maritalStatus, 
             pharmacyTelephone: payload.pharmacyTelephone
         }
 

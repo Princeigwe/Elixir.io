@@ -146,8 +146,6 @@ export class PatientService {
                 updatedPatientProfile.telephone,
                 updatedPatientProfile.occupation,
                 updatedPatientProfile.maritalStatus,
-                updatedPatientProfile.medicalIssues,
-                updatedPatientProfile.prescriptions,
                 updatedPatientProfile.pharmacyTelephone
             )
         )
@@ -230,8 +228,6 @@ export class PatientService {
                 updatedPatientProfile.telephone,
                 updatedPatientProfile.occupation,
                 updatedPatientProfile.maritalStatus,
-                updatedPatientProfile.medicalIssues,
-                updatedPatientProfile.prescriptions,
                 updatedPatientProfile.pharmacyTelephone
             )
         )

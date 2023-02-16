@@ -58,8 +58,6 @@
         - occupation
         - maritalStatus
         - occupation
-        - medicalIssues: This will based on diagnostics and test results.
-        - prescriptions: Drug prescriptions that contains the issued date, issuer, drug info and dosage.
         - doctorName: This is the full name of the assigned doctor observing the patient.
         - doctorTelephone
         - doctorAddress
