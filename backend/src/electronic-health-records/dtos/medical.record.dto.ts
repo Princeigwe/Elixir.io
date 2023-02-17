@@ -22,3 +22,28 @@ export class MedicalRecordDto {
 
 }
 
+
+
+export class UpdateMedicalRecordDto {
+
+    @IsArray()
+    @IsOptional()
+    complaints: string[]
+
+    @IsArray()
+    @IsOptional()
+    history_of_illness: string[]
+
+    @IsArray()
+    vital_signs: string[]
+
+    @IsArray()
+    @IsOptional()
+    medical_allergies: string[]
+
+    @IsArray()
+    @IsOptional()
+    habits: string[]
+
+}
+

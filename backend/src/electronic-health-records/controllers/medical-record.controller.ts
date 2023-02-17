@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors, ClassSerializerInterceptor, Patch } from '@nestjs/common';
 import { MedicalRecordService } from '../services/medical-record.service';
-import { MedicalRecordDto } from '../dtos/medical.record.dto';
+import { MedicalRecordDto, UpdateMedicalRecordDto } from '../dtos/medical.record.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Roles } from '../../roles.decorator';
 import {Role} from '../../enums/role.enum'
@@ -27,6 +27,14 @@ export class MedicalRecordController {
             body.habits,
             user
         )
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(':medical_record_id/')
+    async updateMedicalRecordByID( @Param('medical_record_id') medical_record_id: string, @Request() request, @Body() body: UpdateMedicalRecordDto ) {
+        const user = request.user
+        return await this.medicalRecordService.updateMedicalRecordByID(medical_record_id, user, body.complaints, body.history_of_illness, body.vital_signs, body.medical_allergies, body.habits)
     }
 
 

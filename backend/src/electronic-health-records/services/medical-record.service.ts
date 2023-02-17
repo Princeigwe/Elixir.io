@@ -38,7 +38,8 @@ export class MedicalRecordService {
         if( patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
 
             // creating medicalRecord object
-            const medicalRecord = new this.medicalRecordModel({
+        const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
+        const medicalRecord = new this.medicalRecordModel({
                 patient_demographics: {
                 firstName: patient.firstName,
                 lastName: patient.lastName,
@@ -54,8 +55,6 @@ export class MedicalRecordService {
                     medical_allergies: medical_allergies,
                     habits: habits
                 },
-                progress_notes: [],
-                medication_list: [],
                 issued_by: {
                     doctor_firstName: loggedMedicalProvider.firstName,
                     doctor_lastName: loggedMedicalProvider.lastName,
@@ -75,6 +74,42 @@ export class MedicalRecordService {
     }
 
 
+    // method to allow only the treatment subset of a medical record to be updated by a medical provider
+    async updateMedicalRecordByID(
+        record_id: string, user: User, 
+        treatment_history__complaints: string[], treatment_history__history_of_illness: string[], 
+        treatment_history__vital_signs: string[], treatment_history__medical_allergies: string[], 
+        treatment_history__habits: string[] 
+        ) {
+        
+        const medicalRecord = await this.getMedicalRecordByID(record_id)
+        const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
+
+        // getting the details of the patient that owns the medical record
+        const patient = await this.patientService.getPatientProfileByEmail(medicalRecord.patient_demographics.email)
+
+        // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
+        const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
+
+        if( patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
+            
+            return await this.medicalRecordModel.findByIdAndUpdate( {'_id': medicalRecord._id}, { $set: { 
+                'treatment_history.complaints': treatment_history__complaints, 
+                'treatment_history.history_of_illness': treatment_history__history_of_illness, 
+                'treatment_history.vital_signs': treatment_history__vital_signs, 
+                'treatment_history.medical_allergies': treatment_history__medical_allergies, 
+                'treatment_history.habits': treatment_history__habits, 'updated_by.doctor_firstName': loggedMedicalProvider.firstName, 
+                'updated_by.doctor_lastName': loggedMedicalProvider.lastName, 'updated_by.doctor_department': loggedMedicalProvider.department  } }, 
+                {new: true}
+            )
+        }
+        else{
+            throw new HttpException('Forbidden action, as you are not responsible for this patient', HttpStatus.FORBIDDEN)
+        }
+
+    }
+
+
     // this action will only be performed by the administrative users 
     async getMedicalRecords() {
         const medicalRecords = await this.medicalRecordModel.find().exec()
@@ -83,7 +118,7 @@ export class MedicalRecordService {
     }
 
 
-    // filter medical response of patients by email
+    // filter medical records of patients by email
     async filterMedicalRecordsOfPatientByEmail( patient_email: string, user: User ) {
 
         // ensuring the user making the request is a medical provider or admin
