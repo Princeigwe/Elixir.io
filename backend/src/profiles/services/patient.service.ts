@@ -51,6 +51,12 @@ export class PatientService {
     }
 
 
+    async getPatientProfileByEmail(email: string) {
+        const patient = await this.patientModel.findOne({'email': email}).exec()
+        if (!patient) {throw new NotFoundException("Patient Not Found")}
+        return patient
+    }
+
 
     async uploadPatientProfileAvatar(_id: string, body: Buffer, fileName: string, user: User) {
         const ability = this.caslAbilityFactory.createForUser(user)
