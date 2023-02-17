@@ -5,7 +5,7 @@ import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 export type MedicalRecordDocument = MedicalRecord & Document
 
-@Schema()
+@Schema( {timestamps: true} )
 export class MedicalRecord {
 
     @Prop(raw({
@@ -56,11 +56,7 @@ export class MedicalRecord {
     }))
     updated_by: string
 
-    @Prop({type: Date, default: Date.now})
-    created_at: Date
 
-    @Prop({type:Date, default: Date.now})
-    updatedAt: Date
 
     // this column is used to hold emails of those that have read access to the medical record
     @ExcludeProperty()
