@@ -8,6 +8,7 @@ import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
 import {UserCategory} from '../../enums/user.category.enum'
+import { timeStamp } from 'node:console';
 
 
 
@@ -27,7 +28,18 @@ export class MedicalRecordService {
     */
 
     async createMedicalRecord( patient_id: string, complaints: string[], history_of_illness: string[], vital_signs: string[], medical_allergies: string[], habits: string[], user: User ) {
+
+        if(user.category == UserCategory.Patient) {
+            throw new HttpException('Forbidden action, records are kept confidential for medical staffs', HttpStatus.FORBIDDEN)
+        }
+
         const patient = await this.patientService.getPatientProfileById(patient_id)
+
+        const existingMedicalRecord = await this.medicalRecordModel.findOne({'patient_demographics.email': patient.email}).exec()
+
+        if(existingMedicalRecord){
+            throw new HttpException('An existing record exists for this patient, please make relevant changes to it.', HttpStatus.FORBIDDEN)
+        }
 
         // getting the logged in doctor's profile
         const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
