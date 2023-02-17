@@ -133,7 +133,7 @@ export class MedicalRecordService {
         return patientMedicalRecords.map( patientMedicalRecord => ({ 
             record_id: patientMedicalRecord['_id'].toString(),
             // record_url: ` http://localhost:3000/api/v1/medical-records/read-access/${patientMedicalRecord._id} `, 
-            // created_at: patientMedicalRecord.created_at
+            created_at: patientMedicalRecord['createdAt']
         }) )
 
         // return patientMedicalRecords
@@ -217,8 +217,11 @@ export class MedicalRecordService {
         }
     }
 
-    // async getOrSearchRecordsOfPatientsUnderCare(patient_id: string, ) {
 
-    // }
+    //** this action will conly be performed by an administrative user */
+    async deleteMedicalRecords( user:User ) {
+        await this.medicalRecordModel.deleteMany()
+        throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
+    }
 
 }

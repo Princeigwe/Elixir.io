@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors, ClassSerializerInterceptor, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors, ClassSerializerInterceptor, Patch, Delete } from '@nestjs/common';
 import { MedicalRecordService } from '../services/medical-record.service';
 import { MedicalRecordDto, UpdateMedicalRecordDto } from '../dtos/medical.record.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -101,5 +101,14 @@ export class MedicalRecordController {
     async filterMedicalRecordsOfPatientByEmail ( @Param('patient_email') patient_email: string, @Request() request) {
         const user = request.user
         return await this.medicalRecordService.filterMedicalRecordsOfPatientByEmail(patient_email, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete()
+    @Roles(Role.Admin)
+    async deleteMedicalRecords(@Request() request) {
+        const user = request.user
+        return await this.medicalRecordService.deleteMedicalRecords(user)
     }
 }
