@@ -8,7 +8,10 @@ import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
 import {UserCategory} from '../../enums/user.category.enum'
-import { timeStamp } from 'node:console';
+import * as AesEncryption from 'aes-encryption'
+
+const aes = new AesEncryption()
+aes.setSecretKey(process.env.ENCRYPTION_KEY)
 
 
 
@@ -35,9 +38,9 @@ export class MedicalRecordService {
 
         const patient = await this.patientService.getPatientProfileById(patient_id)
 
-        const existingMedicalRecord = await this.medicalRecordModel.findOne({'patient_demographics.email': patient.email}).exec()
+        const existingMedicalRecord = await this.medicalRecordModel.findOne({'patient_demographics.email': aes.encrypt(patient.email)}).exec() // this line fetches a record that has the encrypted email of the patient in question
 
-        if(existingMedicalRecord){
+        if( existingMedicalRecord ){
             throw new HttpException('An existing record exists for this patient, please make relevant changes to it.', HttpStatus.FORBIDDEN)
         }
 
@@ -49,16 +52,17 @@ export class MedicalRecordService {
 
         if( patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
 
-            // creating medicalRecord object
-        const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
-        const medicalRecord = new this.medicalRecordModel({
+            // creating medicalRecord object, and encrypting some sections of it before saving to database
+            // * the encrypted properties of the medical record are the patient's demographics data and the medical provider that created the record
+            const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
+            const medicalRecord = new this.medicalRecordModel({
                 patient_demographics: {
-                firstName: patient.firstName,
-                lastName: patient.lastName,
-                email: patient.email,
-                age: patient.age,
-                address: patient.address,
-                telephone: patient.telephone
+                    firstName: aes.encrypt(patient.firstName),
+                    lastName: aes.encrypt(patient.lastName),
+                    email: aes.encrypt(patient.email),
+                    age: patient.age, // encryption package does not work with number
+                    address: aes.encrypt(patient.address),
+                    telephone: aes.encrypt(patient.telephone)
                 },
                 treatment_history: {
                     complaints: complaints,
@@ -68,9 +72,9 @@ export class MedicalRecordService {
                     habits: habits
                 },
                 issued_by: {
-                    doctor_firstName: loggedMedicalProvider.firstName,
-                    doctor_lastName: loggedMedicalProvider.lastName,
-                    doctor_department: loggedMedicalProvider.department
+                    doctor_firstName: aes.encrypt(loggedMedicalProvider.firstName),
+                    doctor_lastName: aes.encrypt(loggedMedicalProvider.lastName),
+                    doctor_department: aes.encrypt(loggedMedicalProvider.department)
                 },
                 recipients: [
                     loggedMedicalProvider.email
@@ -78,8 +82,8 @@ export class MedicalRecordService {
             })
 
             return medicalRecord.save()
-
         }
+        
         else {
             throw new HttpException('Forbidden action, as you are not responsible for this patient', HttpStatus.FORBIDDEN)
         }
@@ -122,34 +126,37 @@ export class MedicalRecordService {
     }
 
 
-    // this action will only be performed by the administrative users 
+    // this action will only be performed by the administrative users
+    // this function get the encrypted records, decrypts the encrypted data for each document, and returns their decrypted values
     async getMedicalRecords() {
         const medicalRecords = await this.medicalRecordModel.find().exec()
         if(!medicalRecords.length) {throw new NotFoundException("Records not found.")}
-        return medicalRecords
+        const decryptedMedicalRecords = medicalRecords.map(medicalRecord =>  {
+
+            // decrypting the patient_demographics property of each medical record document
+            const decryptedPatientDemographics = {
+                firstName : aes.decrypt(medicalRecord.patient_demographics['firstName']),
+                lastName : aes.decrypt(medicalRecord.patient_demographics['lastName']),
+                email : aes.decrypt(medicalRecord.patient_demographics['email']),
+                age : medicalRecord.patient_demographics['age'],
+                address : aes.decrypt(medicalRecord.patient_demographics['address']),
+                telephone : aes.decrypt(medicalRecord.patient_demographics['telephone'])
+            }
+
+            // decrypting the issued_by property of each medical record document
+            const decryptedIssuedBy = {
+                doctor_firstName: aes.decrypt(medicalRecord.issued_by['doctor_firstName']),
+                doctor_lastName: aes.decrypt(medicalRecord.issued_by['doctor_lastName']),
+                doctor_department: aes.decrypt(medicalRecord.issued_by['doctor_department']),
+
+            }
+
+            return { _id: medicalRecord._id.toString(), patient_demographics: decryptedPatientDemographics, treatment_history: medicalRecord.treatment_history, issued_by: decryptedIssuedBy, createdAt: medicalRecord['createdAt'], updatedAt: medicalRecord['updatedAt'], __v: medicalRecord.__v }
+        } )
+
+        return decryptedMedicalRecords
     }
 
-
-    // filter medical records of patients by email
-    async filterMedicalRecordsOfPatientByEmail( patient_email: string, user: User ) {
-
-        // ensuring the user making the request is a medical provider or admin
-        if(user.category == UserCategory.Patient) {
-            throw new HttpException('Forbidden action, records are kept confidential for medical staffs', HttpStatus.FORBIDDEN)
-        }
-
-        const patientMedicalRecords = await this.medicalRecordModel.find({ "patient_demographics.email": patient_email }).exec()
-        if(!patientMedicalRecords.length) { throw new NotFoundException("Records not found") }
-        
-        // to return subsets of each record
-        return patientMedicalRecords.map( patientMedicalRecord => ({ 
-            record_id: patientMedicalRecord['_id'].toString(),
-            // record_url: ` http://localhost:3000/api/v1/medical-records/read-access/${patientMedicalRecord._id} `, 
-            created_at: patientMedicalRecord['createdAt']
-        }) )
-
-        // return patientMedicalRecords
-    }
 
 
     // function to read the details of a medical record by its id

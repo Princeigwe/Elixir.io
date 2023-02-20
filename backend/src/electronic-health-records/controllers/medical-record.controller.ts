@@ -96,14 +96,6 @@ export class MedicalRecordController {
     }
 
 
-    // @UseGuards(JwtAuthGuard)
-    // @Get('patient/:patient_email')
-    // async filterMedicalRecordsOfPatientByEmail ( @Param('patient_email') patient_email: string, @Request() request) {
-    //     const user = request.user
-    //     return await this.medicalRecordService.filterMedicalRecordsOfPatientByEmail(patient_email, user)
-    // }
-
-
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()
     @Roles(Role.Admin)
