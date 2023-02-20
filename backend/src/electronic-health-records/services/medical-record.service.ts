@@ -114,8 +114,8 @@ export class MedicalRecordService {
                 'treatment_history.history_of_illness': treatment_history__history_of_illness, 
                 'treatment_history.vital_signs': treatment_history__vital_signs, 
                 'treatment_history.medical_allergies': treatment_history__medical_allergies, 
-                'treatment_history.habits': treatment_history__habits, 'updated_by.doctor_firstName': loggedMedicalProvider.firstName, 
-                'updated_by.doctor_lastName': loggedMedicalProvider.lastName, 'updated_by.doctor_department': loggedMedicalProvider.department  } }, 
+                'treatment_history.habits': treatment_history__habits, 'updated_by.doctor_firstName': aes.encrypt(loggedMedicalProvider.firstName), 
+                'updated_by.doctor_lastName': aes.encrypt(loggedMedicalProvider.lastName), 'updated_by.doctor_department': aes.encrypt(loggedMedicalProvider.department)  } }, 
                 {new: true}
             )
         }
@@ -151,7 +151,22 @@ export class MedicalRecordService {
 
             }
 
-            return { _id: medicalRecord._id.toString(), patient_demographics: decryptedPatientDemographics, treatment_history: medicalRecord.treatment_history, issued_by: decryptedIssuedBy, createdAt: medicalRecord['createdAt'], updatedAt: medicalRecord['updatedAt'], __v: medicalRecord.__v }
+            const decryptedUpdatedBy = {
+                doctor_firstName: medicalRecord.updated_by['doctor_firstName']   == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_firstName']),
+                doctor_lastName: medicalRecord.updated_by['doctor_lastName']     == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_lastName']),
+                doctor_department: medicalRecord.updated_by['doctor_department'] == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_department']),
+            }
+
+            return { 
+                _id: medicalRecord._id.toString(), 
+                patient_demographics: decryptedPatientDemographics, 
+                treatment_history: medicalRecord.treatment_history, 
+                issued_by: decryptedIssuedBy, 
+                updated_by: decryptedUpdatedBy,
+                createdAt: medicalRecord['createdAt'], 
+                updatedAt: medicalRecord['updatedAt'], 
+                __v: medicalRecord.__v 
+            }
         } )
 
         return decryptedMedicalRecords
