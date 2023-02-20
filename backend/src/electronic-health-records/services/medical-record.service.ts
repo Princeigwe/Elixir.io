@@ -77,7 +77,7 @@ export class MedicalRecordService {
                     doctor_department: aes.encrypt(loggedMedicalProvider.department)
                 },
                 recipients: [
-                    loggedMedicalProvider.email
+                    aes.encrypt(loggedMedicalProvider.email)
                 ]
             })
 
