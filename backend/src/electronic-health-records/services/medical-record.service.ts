@@ -175,10 +175,26 @@ export class MedicalRecordService {
 
 
     // function to read the details of a medical record by its id
-    // this method will be called for admin user or assigned doctor, or logged in patient
+    // this method will be called for admin user or assigned doctor
     async getMedicalRecordByID(record_id: string) {
         const medicalRecord = await this.medicalRecordModel.findById(record_id).exec()
         if(!medicalRecord) { throw new NotFoundException("Record not found") }
+
+        // decrypting the encrypted data
+        medicalRecord.patient_demographics.firstName = aes.decrypt(medicalRecord.patient_demographics.firstName)
+        medicalRecord.patient_demographics.lastName  = aes.decrypt(medicalRecord.patient_demographics.lastName),
+        medicalRecord.patient_demographics.email     = aes.decrypt(medicalRecord.patient_demographics.email),
+        medicalRecord.patient_demographics.address   = aes.decrypt(medicalRecord.patient_demographics.address),
+        medicalRecord.patient_demographics.telephone = aes.decrypt(medicalRecord.patient_demographics.telephone)
+
+        medicalRecord.issued_by['doctor_firstName']  = aes.decrypt(medicalRecord.issued_by['doctor_firstName'])
+        medicalRecord.issued_by['doctor_lastName']   = aes.decrypt(medicalRecord.issued_by['doctor_lastName'])
+        medicalRecord.issued_by['doctor_department'] = aes.decrypt(medicalRecord.issued_by['doctor_department'])
+
+        medicalRecord.updated_by['doctor_firstName']  = medicalRecord.updated_by['doctor_firstName']  == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_firstName'])
+        medicalRecord.updated_by['doctor_lastName']   = medicalRecord.updated_by['doctor_lastName']   == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_lastName'])
+        medicalRecord.updated_by['doctor_department'] = medicalRecord.updated_by['doctor_department'] == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_department'])
+
         return medicalRecord
     }
 
@@ -190,47 +206,41 @@ export class MedicalRecordService {
 
         // decrypting the encrypted data
         medicalRecord.patient_demographics.firstName = aes.decrypt(medicalRecord.patient_demographics.firstName)
-        medicalRecord.patient_demographics.lastName = aes.decrypt(medicalRecord.patient_demographics.lastName),
-        medicalRecord.patient_demographics.email = aes.decrypt(medicalRecord.patient_demographics.email),
-        medicalRecord.patient_demographics.address =  aes.decrypt(medicalRecord.patient_demographics.address),
+        medicalRecord.patient_demographics.lastName  = aes.decrypt(medicalRecord.patient_demographics.lastName),
+        medicalRecord.patient_demographics.email     = aes.decrypt(medicalRecord.patient_demographics.email),
+        medicalRecord.patient_demographics.address   = aes.decrypt(medicalRecord.patient_demographics.address),
         medicalRecord.patient_demographics.telephone = aes.decrypt(medicalRecord.patient_demographics.telephone)
 
-        medicalRecord.issued_by['doctor_firstName'] = aes.decrypt(medicalRecord.issued_by['doctor_firstName'])
-        medicalRecord.issued_by['doctor_lastName'] = aes.decrypt(medicalRecord.issued_by['doctor_lastName'])
+        medicalRecord.issued_by['doctor_firstName']  = aes.decrypt(medicalRecord.issued_by['doctor_firstName'])
+        medicalRecord.issued_by['doctor_lastName']   = aes.decrypt(medicalRecord.issued_by['doctor_lastName'])
         medicalRecord.issued_by['doctor_department'] = aes.decrypt(medicalRecord.issued_by['doctor_department'])
 
         medicalRecord.updated_by['doctor_firstName'] = medicalRecord.updated_by['doctor_firstName']  == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_firstName'])
         medicalRecord.updated_by['doctor_firstName'] = medicalRecord.updated_by['doctor_lastName']   == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_lastName'])
         medicalRecord.updated_by['doctor_firstName'] = medicalRecord.updated_by['doctor_department'] == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_department'])
 
-
         return medicalRecord
     }
 
 
-    async readMedicalRecordOfLoggedInPatientByID(record_id: string, user:User) {
-        const medicalRecord = await this.getMedicalRecordByID(record_id)
-        if( medicalRecord.patient_demographics.email == user.email ) {
-            return medicalRecord
-        }
-        else {
-            throw new HttpException('Forbidden Resource', HttpStatus.FORBIDDEN)
-        }
-    }
-
-
-    // this list will be used to give access to a medical record to a medical provider, by a patient
+    /**
+     * It checks if the logged in medical provider is in the recipients list of the medical record. If
+     * not, it throws an error
+     * @param {string} record_id - the id of the medical record
+     * @param {User} user - User - this is the user object that is passed in from the auth.guard.ts
+     * file.
+     * @returns The medical record is being returned.
+     */
     async readActionOfMedicalRecordByMedicalProvider(record_id: string, user: User) {
         // get details of logged in medical provider
         const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
 
-        const medicalRecord = await this.medicalRecordModel.findById(record_id).exec()
+        const medicalRecord = await this.getMedicalRecordByID(record_id)  // this fetches the decrypted medical record by ID
 
         // if the email of logged in provider is not in the recipients property of the medical record, don't allow access
-        if (medicalRecord.recipients.includes(loggedMedicalProvider.email) == false) {
+        if (medicalRecord.recipients.includes(aes.encrypt(loggedMedicalProvider.email)) == false) {
             throw new HttpException('Forbidden action. Request for access to medical record from patient', HttpStatus.FORBIDDEN)
         }
-
         return medicalRecord
     }
 
@@ -270,7 +280,7 @@ export class MedicalRecordService {
 
 
     //** this action will conly be performed by an administrative user */
-    async deleteMedicalRecords( user:User ) {
+    async deleteMedicalRecords() {
         await this.medicalRecordModel.deleteMany()
         throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
     }

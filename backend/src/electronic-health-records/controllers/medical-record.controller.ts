@@ -48,9 +48,9 @@ export class MedicalRecordController {
     // this route is used by the logged in patient to get owned medical records
     @UseGuards(JwtAuthGuard)
     @Get('auth-patient/')
-    async getLoggedInPatientRecords(@Request() request) {
+    async getLoggedInPatientRecord(@Request() request) {
         const user = request.user
-        return await this.medicalRecordService.getLoggedInPatientRecords(user)
+        return await this.medicalRecordService.getLoggedInPatientRecord(user)
     }
 
 
@@ -60,15 +60,6 @@ export class MedicalRecordController {
     @Roles(Role.Admin)
     async getMedicalRecordByID( @Param('medical_record_id') medical_record_id: string) {
         return await this.medicalRecordService.getMedicalRecordByID(medical_record_id)
-    }
-
-
-    // this route is used by the logged in patient to read owned medical record
-    @UseGuards(JwtAuthGuard)
-    @Get('auth-patient/:medical_record_id/')
-    async readMedicalRecordOfLoggedInPatientByID(@Request() request, @Param('medical_record_id') medical_record_id: string ) {
-        const user = request.user
-        return await this.medicalRecordService.readMedicalRecordOfLoggedInPatientByID(medical_record_id, user)
     }
 
 
@@ -99,8 +90,7 @@ export class MedicalRecordController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()
     @Roles(Role.Admin)
-    async deleteMedicalRecords(@Request() request) {
-        const user = request.user
-        return await this.medicalRecordService.deleteMedicalRecords(user)
+    async deleteMedicalRecords() {
+        return await this.medicalRecordService.deleteMedicalRecords()
     }
 }
