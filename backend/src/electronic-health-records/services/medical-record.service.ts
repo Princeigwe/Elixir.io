@@ -184,10 +184,27 @@ export class MedicalRecordService {
 
 
     // this action allows a patient access records owned
-    async getLoggedInPatientRecords(user: User) {
-        const medicalRecords = await this.medicalRecordModel.find({'patient_demographics.email': user.email}).exec()
-        if(!medicalRecords.length) { throw new NotFoundException("Records not found.") }
-        return medicalRecords
+    async getLoggedInPatientRecord(user: User) {
+        const medicalRecord = await this.medicalRecordModel.findOne({'patient_demographics.email': aes.encrypt(user.email)}).exec()
+        if(!medicalRecord) { throw new NotFoundException("Record not found.") }
+
+        // decrypting the encrypted data
+        medicalRecord.patient_demographics.firstName = aes.decrypt(medicalRecord.patient_demographics.firstName)
+        medicalRecord.patient_demographics.lastName = aes.decrypt(medicalRecord.patient_demographics.lastName),
+        medicalRecord.patient_demographics.email = aes.decrypt(medicalRecord.patient_demographics.email),
+        medicalRecord.patient_demographics.address =  aes.decrypt(medicalRecord.patient_demographics.address),
+        medicalRecord.patient_demographics.telephone = aes.decrypt(medicalRecord.patient_demographics.telephone)
+
+        medicalRecord.issued_by['doctor_firstName'] = aes.decrypt(medicalRecord.issued_by['doctor_firstName'])
+        medicalRecord.issued_by['doctor_lastName'] = aes.decrypt(medicalRecord.issued_by['doctor_lastName'])
+        medicalRecord.issued_by['doctor_department'] = aes.decrypt(medicalRecord.issued_by['doctor_department'])
+
+        medicalRecord.updated_by['doctor_firstName'] = medicalRecord.updated_by['doctor_firstName']  == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_firstName'])
+        medicalRecord.updated_by['doctor_firstName'] = medicalRecord.updated_by['doctor_lastName']   == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_lastName'])
+        medicalRecord.updated_by['doctor_firstName'] = medicalRecord.updated_by['doctor_department'] == undefined ? null:  aes.decrypt(medicalRecord.updated_by['doctor_department'])
+
+
+        return medicalRecord
     }
 
 
