@@ -245,7 +245,16 @@ export class MedicalRecordService {
     }
 
 
-    // this method allows a patient grant read access of a medical provider
+
+    /**
+     * This function allows a patient to grant read access to a medical provider to their medical
+     * record
+     * @param {User} user - User - this is the user object that is passed in from the controller.
+     * @param {string} record_id - the id of the medical record that you want to grant access to
+     * @param {string} medical_provider_email - The email of the medical provider that you want to
+     * grant access to.
+     * @returns a message that the user has successfully granted read access to the medical provider.
+     */
     async grantReadAccessOfMedicalRecordToMedicalProvider(user: User, record_id: string, medical_provider_email: string) {
         const medicalRecord = await this.getMedicalRecordByID(record_id)
 
