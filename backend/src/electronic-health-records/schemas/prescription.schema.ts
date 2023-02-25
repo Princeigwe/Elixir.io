@@ -18,7 +18,7 @@ export class Medication {
 }
 
 
-@Schema()
+@Schema({timestamps: true})
 export class Prescription {
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'MedicalRecord'})
