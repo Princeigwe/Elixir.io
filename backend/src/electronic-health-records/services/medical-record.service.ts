@@ -279,9 +279,15 @@ export class MedicalRecordService {
     }
 
 
-    //** this action will conly be performed by an administrative user */
+    //** this action will only be performed by an administrative user */
     async deleteMedicalRecords() {
         await this.medicalRecordModel.deleteMany()
+        throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
+    }
+
+    //** this action will only be performed by an administrative user */
+    async deleteMedicalRecord(medical_record_id: string) {
+        await this.medicalRecordModel.deleteOne({'__id': medical_record_id})
         throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
     }
 
