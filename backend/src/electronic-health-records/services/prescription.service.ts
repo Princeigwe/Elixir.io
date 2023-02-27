@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Prescription, PrescriptionDocument } from '../schemas/prescription.schema';
@@ -78,8 +78,44 @@ export class PrescriptionService {
         return prescription.save()
     }
 
+
+
     // * this action will be performed by an administrator to read all medical prescriptions
     async getPrescriptions() {
+        const prescriptions = await this.prescriptionModel.find().exec()
+        if(!prescriptions.length) { throw new NotFoundException("Prescriptions not found.") }
+        const decryptedPrescriptions = prescriptions.map(prescription => {
 
+            const decryptedPatientDemographics = {
+                firstName: aes.decrypt(prescription.patient_demographics.firstName),
+                lastName: aes.decrypt(prescription.patient_demographics.lastName),
+                email: aes.decrypt(prescription.patient_demographics.email),
+                age: prescription.patient_demographics.age,
+                address: aes.decrypt(prescription.patient_demographics.address),
+                telephone: aes.decrypt(prescription.patient_demographics.telephone)
+            }
+
+            const decryptedPrescriber = {
+                doctor_firstName: aes.decrypt(prescription.prescriber['doctor_firstName']),
+                doctor_lastName: aes.decrypt(prescription.prescriber['doctor_lastName']),
+                doctor_department: aes.decrypt(prescription.prescriber['doctor_department']),
+                doctor_email: aes.decrypt(prescription.prescriber['doctor_email']),
+                doctor_telephone: aes.decrypt(prescription.prescriber['doctor_telephone']),
+            }
+
+            const decryptedInstructions = aes.decrypt(prescription.instructions)
+
+            return {
+                _id: prescription._id.toString(),
+                medicalRecord: prescription.medicalRecord['_id'],
+                patient_demographics: decryptedPatientDemographics,
+                prescriber: decryptedPrescriber,
+                instructions: decryptedInstructions,
+                createdAt: prescription['createdAt'],
+                __v: prescription.__v
+            }
+        })
+
+        return decryptedPrescriptions
     }
 }
