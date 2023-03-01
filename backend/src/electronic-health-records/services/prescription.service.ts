@@ -90,31 +90,42 @@ export class PrescriptionService {
 
             const decryptedPatientDemographics = {
                 firstName: aes.decrypt(prescription.patient_demographics.firstName),
-                lastName: aes.decrypt(prescription.patient_demographics.lastName),
-                email: aes.decrypt(prescription.patient_demographics.email),
-                age: prescription.patient_demographics.age,
-                address: aes.decrypt(prescription.patient_demographics.address),
+                lastName:  aes.decrypt(prescription.patient_demographics.lastName),
+                email:     aes.decrypt(prescription.patient_demographics.email),
+                age:       prescription.patient_demographics.age,
+                address:   aes.decrypt(prescription.patient_demographics.address),
                 telephone: aes.decrypt(prescription.patient_demographics.telephone)
             }
 
             const decryptedPrescriber = {
-                doctor_firstName: aes.decrypt(prescription.prescriber['doctor_firstName']),
-                doctor_lastName: aes.decrypt(prescription.prescriber['doctor_lastName']),
+                doctor_firstName:  aes.decrypt(prescription.prescriber['doctor_firstName']),
+                doctor_lastName:   aes.decrypt(prescription.prescriber['doctor_lastName']),
                 doctor_department: aes.decrypt(prescription.prescriber['doctor_department']),
-                doctor_email: aes.decrypt(prescription.prescriber['doctor_email']),
-                doctor_telephone: aes.decrypt(prescription.prescriber['doctor_telephone']),
+                doctor_email:      aes.decrypt(prescription.prescriber['doctor_email']),
+                doctor_telephone:  aes.decrypt(prescription.prescriber['doctor_telephone']),
             }
+
+            const decryptedMedications = prescription.medications.map( (medication) => {
+                return {
+                    name                  : aes.decrypt(medication.name),
+                    dosage                : aes.decrypt(medication.dosage),
+                    duration              : aes.decrypt(medication.duration),
+                    frequency             : aes.decrypt(medication.frequency),
+                    routeOfAdministration : aes.decrypt(medication.routeOfAdministration)
+                }
+            } )
 
             const decryptedInstructions = aes.decrypt(prescription.instructions)
 
             return {
-                _id: prescription._id.toString(),
-                medicalRecord: prescription.medicalRecord['_id'],
+                _id                 : prescription._id.toString(),
+                medicalRecord       : prescription.medicalRecord['_id'],
                 patient_demographics: decryptedPatientDemographics,
-                prescriber: decryptedPrescriber,
-                instructions: decryptedInstructions,
-                createdAt: prescription['createdAt'],
-                __v: prescription.__v
+                prescriber          : decryptedPrescriber,
+                medications         : decryptedMedications,
+                instructions        : decryptedInstructions,
+                createdAt           : prescription['createdAt'],
+                __v                 : prescription.__v
             }
         })
 
@@ -152,11 +163,11 @@ export class PrescriptionService {
         prescription.medications = prescription.medications.map(medication => {
             
             return {
-                name: aes.decrypt(medication.name),
-                dosage: aes.decrypt(medication.dosage),
+                name                 : aes.decrypt(medication.name),
+                dosage               : aes.decrypt(medication.dosage),
                 routeOfAdministration: aes.decrypt(medication.routeOfAdministration),
-                frequency: aes.decrypt(medication.frequency),
-                duration: aes.decrypt(medication.duration)
+                frequency            : aes.decrypt(medication.frequency),
+                duration             : aes.decrypt(medication.duration)
             }
 
         });
@@ -186,32 +197,43 @@ export class PrescriptionService {
         const decryptedPrescriptions = prescriptions.map(prescription => {
 
             const decryptedPatientDemographics = {
-                firstName: aes.decrypt(prescription.patient_demographics.firstName),
-                lastName: aes.decrypt(prescription.patient_demographics.lastName),
-                email: aes.decrypt(prescription.patient_demographics.email),
-                age: prescription.patient_demographics.age,
-                address: aes.decrypt(prescription.patient_demographics.address),
-                telephone: aes.decrypt(prescription.patient_demographics.telephone)
+                firstName   : aes.decrypt(prescription.patient_demographics.firstName),
+                lastName    : aes.decrypt(prescription.patient_demographics.lastName),
+                email       : aes.decrypt(prescription.patient_demographics.email),
+                age         : prescription.patient_demographics.age,
+                address     : aes.decrypt(prescription.patient_demographics.address),
+                telephone   : aes.decrypt(prescription.patient_demographics.telephone)
             }
 
             const decryptedPrescriber = {
-                doctor_firstName: aes.decrypt(prescription.prescriber['doctor_firstName']),
-                doctor_lastName: aes.decrypt(prescription.prescriber['doctor_lastName']),
+                doctor_firstName : aes.decrypt(prescription.prescriber['doctor_firstName']),
+                doctor_lastName  : aes.decrypt(prescription.prescriber['doctor_lastName']),
                 doctor_department: aes.decrypt(prescription.prescriber['doctor_department']),
-                doctor_email: aes.decrypt(prescription.prescriber['doctor_email']),
-                doctor_telephone: aes.decrypt(prescription.prescriber['doctor_telephone']),
+                doctor_email     : aes.decrypt(prescription.prescriber['doctor_email']),
+                doctor_telephone : aes.decrypt(prescription.prescriber['doctor_telephone']),
             }
+
+            const decryptedMedications = prescription.medications.map( (medication) => {
+                return {
+                    name                  : aes.decrypt(medication.name),
+                    dosage                : aes.decrypt(medication.dosage),
+                    duration              : aes.decrypt(medication.duration),
+                    frequency             : aes.decrypt(medication.frequency),
+                    routeOfAdministration : aes.decrypt(medication.routeOfAdministration)
+                }
+            } )
 
             const decryptedInstructions = aes.decrypt(prescription.instructions)
 
             return {
-                _id: prescription._id.toString(),
-                medicalRecord: prescription.medicalRecord['_id'],
+                _id                 : prescription._id.toString(),
+                medicalRecord       : prescription.medicalRecord['_id'],
                 patient_demographics: decryptedPatientDemographics,
-                prescriber: decryptedPrescriber,
-                instructions: decryptedInstructions,
-                createdAt: prescription['createdAt'],
-                __v: prescription.__v
+                prescriber          : decryptedPrescriber,
+                medications         : decryptedMedications,
+                instructions        : decryptedInstructions,
+                createdAt           : prescription['createdAt'],
+                __v                 : prescription.__v,
             }
         })
 
