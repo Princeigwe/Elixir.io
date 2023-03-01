@@ -134,10 +134,6 @@ export class PrescriptionService {
      */
     async getPrescriptionByID(prescription_id: string, user: User) {
 
-        if(user.category == UserCategory.Patient) {
-            throw new HttpException('Forbidden action, records are kept confidential for medical staffs', HttpStatus.FORBIDDEN)
-        }
-        
         const prescription = await this.prescriptionModel.findById(prescription_id).exec()
 
         // decrypting the encrypted data
@@ -153,22 +149,74 @@ export class PrescriptionService {
         prescription.prescriber['doctor_email']      = aes.decrypt(prescription.prescriber['doctor_email'])
         prescription.prescriber['doctor_telephone']  = aes.decrypt(prescription.prescriber['doctor_telephone'])
 
-        prescription.instructions = aes.decrypt(prescription.instructions)
+        prescription.medications = prescription.medications.map(medication => {
+            
+            return {
+                name: aes.decrypt(medication.name),
+                dosage: aes.decrypt(medication.dosage),
+                routeOfAdministration: aes.decrypt(medication.routeOfAdministration),
+                frequency: aes.decrypt(medication.frequency),
+                duration: aes.decrypt(medication.duration)
+            }
 
-        if(user.role == Role.Admin) {
+        });
+
+        prescription.instructions = aes.decrypt(prescription.instructions)
+        const medicalRecord = await this. medicalRecordService.getMedicalRecordByID(prescription.medicalRecord.toString())
+
+        console.log(prescription.patient_demographics.email)
+        console.log(user.email)
+        console.log(prescription.patient_demographics.email == user.email)
+
+
+        if(user.role == Role.Admin || medicalRecord.recipients.includes( aes.encrypt(user.email) ) || prescription.patient_demographics.email == user.email) {
             return prescription
         }
         else {
-            const medicalRecord = await this. medicalRecordService.getMedicalRecordByID(prescription.medicalRecord.toString())
-            if( medicalRecord.recipients.includes( aes.encrypt(user.email) ) ){
-                return prescription
-            }
+            throw new HttpException('Forbidden action, as you are not authorized to access resource', HttpStatus.FORBIDDEN)
         }
 
     }
 
 
-    async getPrescriptionsOfLoggedInPatient() {}
+    // async getPrescriptionsOfLoggedInPatient(user: User) {
+    //     const prescriptions = await this.prescriptionModel.find({'patient_demographics.email': user.email}).exec()
+    //     if(!prescriptions.length) { throw new NotFoundException("Prescriptions not found.") }
+
+    //     const decryptedPrescriptions = prescriptions.map(prescription => {
+
+    //         const decryptedPatientDemographics = {
+    //             firstName: aes.decrypt(prescription.patient_demographics.firstName),
+    //             lastName: aes.decrypt(prescription.patient_demographics.lastName),
+    //             email: aes.decrypt(prescription.patient_demographics.email),
+    //             age: prescription.patient_demographics.age,
+    //             address: aes.decrypt(prescription.patient_demographics.address),
+    //             telephone: aes.decrypt(prescription.patient_demographics.telephone)
+    //         }
+
+    //         const decryptedPrescriber = {
+    //             doctor_firstName: aes.decrypt(prescription.prescriber['doctor_firstName']),
+    //             doctor_lastName: aes.decrypt(prescription.prescriber['doctor_lastName']),
+    //             doctor_department: aes.decrypt(prescription.prescriber['doctor_department']),
+    //             doctor_email: aes.decrypt(prescription.prescriber['doctor_email']),
+    //             doctor_telephone: aes.decrypt(prescription.prescriber['doctor_telephone']),
+    //         }
+
+    //         const decryptedInstructions = aes.decrypt(prescription.instructions)
+
+    //         return {
+    //             _id: prescription._id.toString(),
+    //             medicalRecord: prescription.medicalRecord['_id'],
+    //             patient_demographics: decryptedPatientDemographics,
+    //             prescriber: decryptedPrescriber,
+    //             instructions: decryptedInstructions,
+    //             createdAt: prescription['createdAt'],
+    //             __v: prescription.__v
+    //         }
+    //     })
+
+    //     return decryptedPrescriptions
+    // }
 
 
     async filterPatientPrescriptions() {}

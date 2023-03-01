@@ -22,6 +22,12 @@ export class PrescriptionController {
         return await this.prescriptionService.addPrescriptionToMedicalRecord( medical_record_id, user, body.medications, body.instructions)
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get(':prescription_id/')
+    async getPrescriptionByID( @Param('prescription_id') prescription_id: string, @Request() request ) {
+        const user = request.user
+        return await this.prescriptionService.getPrescriptionByID(prescription_id, user)
+    }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
@@ -31,14 +37,14 @@ export class PrescriptionController {
     }
 
 
-    @UseGuards(JwtAuthGuard)
-    @Get(':prescription_id')
-    async getPrescriptionByID( @Param('prescription_id') prescription_id: string, @Request() request ) {
-        const user = request.user
-        return await this.prescriptionService.getPrescriptionByID(prescription_id, user)
-    }
 
 
     // * ENDPOINTS MEANT FOR THE PATIENT
-    
+
+    // @UseGuards(JwtAuthGuard)
+    // @Get('/auth-patient/')
+    // async getPrescriptionsOfLoggedInPatient( @Request() request ) {
+    //     const user = request.user
+    //     return await this.prescriptionService.getPrescriptionsOfLoggedInPatient(user)
+    // }
 }
