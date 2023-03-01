@@ -175,11 +175,6 @@ export class PrescriptionService {
         prescription.instructions = aes.decrypt(prescription.instructions)
         const medicalRecord = await this. medicalRecordService.getMedicalRecordByID(prescription.medicalRecord.toString())
 
-        console.log(prescription.patient_demographics.email)
-        console.log(user.email)
-        console.log(prescription.patient_demographics.email == user.email)
-
-
         if(user.role == Role.Admin || medicalRecord.recipients.includes( aes.encrypt(user.email) ) || prescription.patient_demographics.email == user.email) {
             return prescription
         }
