@@ -23,6 +23,13 @@ export class PrescriptionController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get('auth-patient/')
+    async getPrescriptionsOfLoggedInPatient( @Request() request ) {
+        const user = request.user
+        return await this.prescriptionService.getPrescriptionsOfLoggedInPatient(user)
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get(':prescription_id/')
     async getPrescriptionByID( @Param('prescription_id') prescription_id: string, @Request() request ) {
         const user = request.user
@@ -37,14 +44,5 @@ export class PrescriptionController {
     }
 
 
-
-
-    // * ENDPOINTS MEANT FOR THE PATIENT
-
-    // @UseGuards(JwtAuthGuard)
-    // @Get('/auth-patient/')
-    // async getPrescriptionsOfLoggedInPatient( @Request() request ) {
-    //     const user = request.user
-    //     return await this.prescriptionService.getPrescriptionsOfLoggedInPatient(user)
-    // }
+    
 }
