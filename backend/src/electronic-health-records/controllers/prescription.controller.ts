@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Request, UseGuards, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, Request, UseGuards, Get, Query } from '@nestjs/common';
 import { PrescriptionService } from '../services/prescription.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PrescriptionDto } from '../dtos/prescription.dto';
@@ -39,10 +39,21 @@ export class PrescriptionController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
     @Roles(Role.Admin)
-    async getPrescriptions() {
-        return await this.prescriptionService.getPrescriptions()
+    async getPrescriptions( @Request() request, @Query('medical_record_id') medical_record_id?: string ) {
+        const user = request.user
+        if(medical_record_id) {
+            return await this.prescriptionService.filterPrescriptionsTiedToMedicalRecord(medical_record_id, user)
+        }
+        else {
+            return await this.prescriptionService.getPrescriptions()
+        }
     }
 
-
-    
+    // this endpoint allows a medical provider filter prescriptions of the the patient under their care. It can also be used by the admin
+    @UseGuards(JwtAuthGuard)
+    @Get('patient-prescriptions/:medical_record_id')
+    async filterPrescriptionsTiedToMedicalRecord( @Param('medical_record_id') medical_record_id: string, @Request() request ) {
+        const user = request.user
+        return await this.prescriptionService.filterPrescriptionsTiedToMedicalRecord(medical_record_id, user)
+    }
 }

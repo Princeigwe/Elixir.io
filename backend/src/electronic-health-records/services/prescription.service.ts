@@ -138,7 +138,7 @@ export class PrescriptionService {
      * @param user : the logged in user
      * @returns prescription
      * 
-     * this method checks if the user is a patient. If true, it throws an Http Exception,
+     * this method checks if the user is a patient; then checks if the patient owns the prescription If true, the prescription is decrypted and returned, else it throws an Http Exception,
      * if the user happens to be an administrative user, the prescription is fetched and decrypted for the admin.
      * if the user is not an admin, it checks if they have read access to the medical record of the prescription...
      * if true, the prescription is decrypted and returned
@@ -236,5 +236,64 @@ export class PrescriptionService {
     }
 
 
-    async filterPatientPrescriptions() {}
+    /* with this method, the administrative user and the medical provider 
+    of whom the patient gives read access to is able to fetch prescriptions tied to the record 
+    */
+    async filterPrescriptionsTiedToMedicalRecord(medical_record_id: string, user:User) {
+        const prescriptions = await this.prescriptionModel.find({'medicalRecord': medical_record_id}).exec()
+        const medicalRecord = await this. medicalRecordService.getMedicalRecordByID(medical_record_id)
+
+        if(!prescriptions.length) { throw new NotFoundException("Prescriptions not found.") }
+
+        const decryptedPrescriptions = prescriptions.map(prescription => {
+
+            const decryptedPatientDemographics = {
+                firstName   : aes.decrypt(prescription.patient_demographics.firstName),
+                lastName    : aes.decrypt(prescription.patient_demographics.lastName),
+                email       : aes.decrypt(prescription.patient_demographics.email),
+                age         : prescription.patient_demographics.age,
+                address     : aes.decrypt(prescription.patient_demographics.address),
+                telephone   : aes.decrypt(prescription.patient_demographics.telephone)
+            }
+
+            const decryptedPrescriber = {
+                doctor_firstName : aes.decrypt(prescription.prescriber['doctor_firstName']),
+                doctor_lastName  : aes.decrypt(prescription.prescriber['doctor_lastName']),
+                doctor_department: aes.decrypt(prescription.prescriber['doctor_department']),
+                doctor_email     : aes.decrypt(prescription.prescriber['doctor_email']),
+                doctor_telephone : aes.decrypt(prescription.prescriber['doctor_telephone']),
+            }
+
+            const decryptedMedications = prescription.medications.map( (medication) => {
+                return {
+                    name                  : aes.decrypt(medication.name),
+                    dosage                : aes.decrypt(medication.dosage),
+                    duration              : aes.decrypt(medication.duration),
+                    frequency             : aes.decrypt(medication.frequency),
+                    routeOfAdministration : aes.decrypt(medication.routeOfAdministration)
+                }
+            } )
+
+            const decryptedInstructions = aes.decrypt(prescription.instructions)
+
+            return {
+                _id                 : prescription._id.toString(),
+                medicalRecord       : prescription.medicalRecord['_id'],
+                patient_demographics: decryptedPatientDemographics,
+                prescriber          : decryptedPrescriber,
+                medications         : decryptedMedications,
+                instructions        : decryptedInstructions,
+                createdAt           : prescription['createdAt'],
+                __v                 : prescription.__v,
+            }
+        })
+
+        if( user.role == Role.Admin || medicalRecord.recipients.includes(aes.encrypt(user.email)) == true){
+            return decryptedPrescriptions
+        }
+        else {
+            throw new HttpException("Unauthorized access to prescriptions. If you are a medical provider, request read access to medical record", HttpStatus.FORBIDDEN)
+        }
+
+    }
 }
