@@ -10,13 +10,15 @@ import { MedicalDepartmentsModule } from '../medical-departments/medical-departm
 import { Prescription, PrescriptionSchema } from './schemas/prescription.schema';
 import { PrescriptionService } from './services/prescription.service';
 import { PrescriptionController } from './controllers/prescription.controller';
+import { ProgressNote, ProgressNoteSchema } from './schemas/progress.note.schema';
 
 
 @Module({
   imports:[
     MongooseModule.forFeature([
       {name: MedicalRecord.name, schema: MedicalRecordSchema},
-      {name: Prescription.name, schema: PrescriptionSchema}
+      {name: Prescription.name, schema: PrescriptionSchema},
+      {name: ProgressNote.name, schema: ProgressNoteSchema}
     ]),
     ProfilesModule,
     UsersModule,
