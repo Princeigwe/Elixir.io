@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Request, UseGuards, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Param, Request, UseGuards, Get, Query, Delete } from '@nestjs/common';
 import { PrescriptionService } from '../services/prescription.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PrescriptionDto } from '../dtos/prescription.dto';
@@ -30,7 +30,7 @@ export class PrescriptionController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':prescription_id/')
+    @Get('/:prescription_id')
     async getPrescriptionByID( @Param('prescription_id') prescription_id: string, @Request() request ) {
         const user = request.user
         return await this.prescriptionService.getPrescriptionByID(prescription_id, user)
@@ -55,5 +55,21 @@ export class PrescriptionController {
     async filterPrescriptionsTiedToMedicalRecord( @Param('medical_record_id') medical_record_id: string, @Request() request ) {
         const user = request.user
         return await this.prescriptionService.filterPrescriptionsTiedToMedicalRecord(medical_record_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete()
+    @Roles(Role.Admin)
+    async deletePrescriptions( ) {
+        return await this.prescriptionService.deletePrescriptions()
+    }
+
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete('/:prescription_id')
+    @Roles(Role.Admin)
+    async deletePrescription( @Param('prescription_id') prescription_id: string ) {
+        return await this.prescriptionService.deletePrescription(prescription_id)
     }
 }

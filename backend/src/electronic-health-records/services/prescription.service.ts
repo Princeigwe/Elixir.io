@@ -146,6 +146,9 @@ export class PrescriptionService {
     async getPrescriptionByID(prescription_id: string, user: User) {
 
         const prescription = await this.prescriptionModel.findById(prescription_id).exec()
+        if(!prescription) {
+            throw new HttpException("Prescription not Found", HttpStatus.NOT_FOUND)
+        }
 
         // decrypting the encrypted data
         prescription.patient_demographics.firstName = aes.decrypt(prescription.patient_demographics.firstName)
@@ -296,4 +299,19 @@ export class PrescriptionService {
         }
 
     }
+
+
+    //** this action will only be performed by an administrative user */
+    async deletePrescriptions() {
+        await this.prescriptionModel.deleteMany()
+        throw new HttpException( "Prescriptions Deleted", HttpStatus.NO_CONTENT)
+    }
+
+
+    //** this action will only be performed by an administrative user */
+    async deletePrescription(prescription_id: string) {
+        await this.prescriptionModel.deleteOne({'__id': prescription_id})
+        throw new HttpException( "Prescription Deleted", HttpStatus.NO_CONTENT)
+    }
+
 }
