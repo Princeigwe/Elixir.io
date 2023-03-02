@@ -292,18 +292,22 @@ export class MedicalRecordService {
 
     //** this action will only be performed by an administrative user */
     async deleteMedicalRecords() {
+        const recordPrescriptions = await this.prescriptionService.getAllPrescriptions()
+        if(recordPrescriptions.length) {
+            throw new HttpException('There are prescriptions tied to medical records, please delete them before attempting to delete record', HttpStatus.BAD_REQUEST)
+        }
         await this.medicalRecordModel.deleteMany()
         throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
     }
 
     //** this action will only be performed by an administrative user */
     async deleteMedicalRecord(medical_record_id: string) {
-        const recordPrescriptions = await this.prescriptionService.getMedicalRecordPrescriptions(medical_record_id)
+        const recordPrescriptions = await this.prescriptionService.getPrescriptionsTiedToMedicalRecord(medical_record_id)
         if(recordPrescriptions.length) {
             throw new HttpException('There is/are prescription(s) tied to this medical record, please delete them before attempting to delete record', HttpStatus.BAD_REQUEST)
         }
         await this.medicalRecordModel.deleteOne({'__id': medical_record_id})
-        throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
+        throw new HttpException( "Record Deleted", HttpStatus.NO_CONTENT)
     }
 
 }

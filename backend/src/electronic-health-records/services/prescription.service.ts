@@ -302,8 +302,14 @@ export class PrescriptionService {
 
 
     // * this method will be used in the medical record service when deleting a medical record
-    async getMedicalRecordPrescriptions(medical_record_id: string) {
+    async getPrescriptionsTiedToMedicalRecord(medical_record_id: string) {
         const prescriptions = await this.prescriptionModel.find({'medicalRecord': medical_record_id}).exec()
+        return prescriptions
+    }
+
+    // * this method will be used in the medical record service when deleting medical records
+    async getAllPrescriptions() {
+        const prescriptions = await this.prescriptionModel.find().exec()
         return prescriptions
     }
 
