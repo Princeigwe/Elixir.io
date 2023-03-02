@@ -90,7 +90,7 @@ export class MedicalRecordController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete('/:medical_record_id')
     @Roles(Role.Admin)
-    async deleteMedicalRecords(@Param('medical_record_id') medical_record_id: string ) {
+    async deleteMedicalRecords(@Param('medical_record_id') medical_record_id: string) {
         if(medical_record_id) {
             return await this.medicalRecordService.deleteMedicalRecord(medical_record_id)
         }

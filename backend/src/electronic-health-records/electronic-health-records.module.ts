@@ -24,6 +24,8 @@ import { PrescriptionController } from './controllers/prescription.controller';
     MedicalDepartmentsModule,
   ],
   providers: [MedicalRecordService, PrescriptionService],
-  controllers: [MedicalRecordController, PrescriptionController]
+  controllers: [MedicalRecordController, PrescriptionController],
+  exports: [MedicalRecordService, PrescriptionService],
+
 })
 export class ElectronicHealthRecordsModule {}

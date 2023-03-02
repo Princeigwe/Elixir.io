@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Prescription, PrescriptionDocument } from '../schemas/prescription.schema';
@@ -27,7 +27,7 @@ export class PrescriptionService {
 
     constructor(
         @InjectModel(Prescription.name) private prescriptionModel: Model<PrescriptionDocument>,
-        private medicalRecordService: MedicalRecordService,
+        @Inject( forwardRef( () => MedicalRecordService ) )private medicalRecordService: MedicalRecordService,
         private doctorService: DoctorService,
     ) {}
 
@@ -298,6 +298,13 @@ export class PrescriptionService {
             throw new HttpException("Unauthorized access to prescriptions. If you are a medical provider, request read access to medical record", HttpStatus.FORBIDDEN)
         }
 
+    }
+
+
+    // * this method will be used in the medical record service when deleting a medical record
+    async getMedicalRecordPrescriptions(medical_record_id: string) {
+        const prescriptions = await this.prescriptionModel.find({'medicalRecord': medical_record_id}).exec()
+        return prescriptions
     }
 
 

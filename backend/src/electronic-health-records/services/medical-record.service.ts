@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, UseGuards, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MedicalRecord, MedicalRecordDocument } from '../schemas/medical.record.schema';
@@ -8,6 +8,7 @@ import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
 import {UserCategory} from '../../enums/user.category.enum'
+import { PrescriptionService } from './prescription.service';
 import * as AesEncryption from 'aes-encryption'
 
 const aes = new AesEncryption()
@@ -21,7 +22,8 @@ export class MedicalRecordService {
         @InjectModel(MedicalRecord.name) private medicalRecordModel: Model<MedicalRecordDocument>,
         private patientService: PatientService,
         // private caslAbilityFactory: CaslAbilityFactory,
-        private doctorService: DoctorService
+        private doctorService: DoctorService,
+        @Inject( forwardRef( () => PrescriptionService ) ) private prescriptionService: PrescriptionService
     ){}
 
     /*
@@ -296,6 +298,10 @@ export class MedicalRecordService {
 
     //** this action will only be performed by an administrative user */
     async deleteMedicalRecord(medical_record_id: string) {
+        const recordPrescriptions = await this.prescriptionService.getMedicalRecordPrescriptions(medical_record_id)
+        if(recordPrescriptions.length) {
+            throw new HttpException('There is/are prescription(s) tied to this medical record, please delete them before attempting to delete record', HttpStatus.BAD_REQUEST)
+        }
         await this.medicalRecordModel.deleteOne({'__id': medical_record_id})
         throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
     }
