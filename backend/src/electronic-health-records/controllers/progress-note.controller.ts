@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards, Request, Get } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards, Request, Get, Query } from '@nestjs/common';
 import { ProgressNoteService } from '../services/progress-note.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { ProgressNoteDto } from '../dtos/progress.note.dto';
@@ -25,7 +25,13 @@ export class ProgressNoteController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
     @Roles(Role.Admin)
-    async getAllProgressNotes() {
-        return await this.progressNoteService.getAllProgressNotes()
+    async getAllProgressNotes( @Request() request, @Query('medical_record_id') medical_record_id: string) {
+        const user = request.user
+        if(medical_record_id) {
+            return await this.progressNoteService.filterProgressNotesTiedToMedicalRecord(medical_record_id, user)
+        }
+        else{
+            return await this.progressNoteService.getAllProgressNotes()
+        }
     }
 }
