@@ -11,6 +11,8 @@ import { Prescription, PrescriptionSchema } from './schemas/prescription.schema'
 import { PrescriptionService } from './services/prescription.service';
 import { PrescriptionController } from './controllers/prescription.controller';
 import { ProgressNote, ProgressNoteSchema } from './schemas/progress.note.schema';
+import { ProgressNoteService } from './services/progress-note.service';
+import { ProgressNoteController } from './controllers/progress-note.controller';
 
 
 @Module({
@@ -25,8 +27,8 @@ import { ProgressNote, ProgressNoteSchema } from './schemas/progress.note.schema
     CaslModule,
     MedicalDepartmentsModule,
   ],
-  providers: [MedicalRecordService, PrescriptionService],
-  controllers: [MedicalRecordController, PrescriptionController],
+  providers: [MedicalRecordService, PrescriptionService, ProgressNoteService],
+  controllers: [MedicalRecordController, PrescriptionController, ProgressNoteController],
   exports: [MedicalRecordService, PrescriptionService],
 
 })
