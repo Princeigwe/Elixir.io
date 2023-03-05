@@ -157,14 +157,48 @@ export class ProgressNoteService {
     }
 
 
-    async getProgressNoteByID() {
+    async getProgressNoteByID(progress_note_id: string, user: User) {
 
+        const progressNote = await this.progressNoteModel.findById(progress_note_id).exec()
+        if(!progressNote) {
+            throw new HttpException('Progress note not found', HttpStatus.NOT_FOUND)
+        }
+
+        // decrypting the encrypted data
+        progressNote.patient_demographics.firstName = aes.decrypt(progressNote.patient_demographics.firstName)
+        progressNote.patient_demographics.lastName  = aes.decrypt(progressNote.patient_demographics.lastName),
+        progressNote.patient_demographics.email     = aes.decrypt(progressNote.patient_demographics.email),
+        progressNote.patient_demographics.address   = aes.decrypt(progressNote.patient_demographics.address),
+        progressNote.patient_demographics.telephone = aes.decrypt(progressNote.patient_demographics.telephone)
+
+        progressNote.subjectiveInformation = progressNote.subjectiveInformation == undefined ? null : aes.decrypt(progressNote.subjectiveInformation)
+        progressNote.objectiveInformation  = progressNote.objectiveInformation  == undefined ? null : aes.decrypt(progressNote.objectiveInformation)
+        progressNote.assessment            = progressNote.assessment            == undefined ? null : aes.decrypt(progressNote.assessment)
+        progressNote.plan                  = progressNote.plan                  == undefined ? null : aes.decrypt(progressNote.plan)
+        progressNote.progress              = aes.decrypt(progressNote.progress) // the elvis operator is not used here because it can't be without a value when creating a progress note
+
+        progressNote.issued_by['doctor_firstName']  = aes.decrypt(progressNote.issued_by['doctor_firstName'])
+        progressNote.issued_by['doctor_lastName']   = aes.decrypt(progressNote.issued_by['doctor_lastName'])
+        progressNote.issued_by['doctor_department'] = aes.decrypt(progressNote.issued_by['doctor_department'])
+        progressNote.issued_by['doctor_email']      = aes.decrypt(progressNote.issued_by['doctor_email'])
+        progressNote.issued_by['doctor_telephone']  = aes.decrypt(progressNote.issued_by['doctor_telephone'])
+
+        const medicalRecord = await this. medicalRecordService.getMedicalRecordByID(progressNote.medicalRecord.toString())
+
+        if(user.role == Role.Admin || medicalRecord.recipients.includes( aes.encrypt(user.email) ) || progressNote.patient_demographics.email == user.email) {
+            return progressNote
+        }
+        else {
+            throw new HttpException('Forbidden action, as you are not authorized to access resource. If you are a medical provider, request read access to medical record tied to this progress note', HttpStatus.FORBIDDEN)
+        }
     }
 
 
     async updateProgressNoteByID() {
 
     }
+
+    async getProgressNotesOfLoggedInPatient() {}
 
 
     async deleteProgressNoteByID() {

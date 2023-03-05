@@ -34,4 +34,12 @@ export class ProgressNoteController {
             return await this.progressNoteService.getAllProgressNotes()
         }
     }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':progress_note_id')
+    async getProgressNoteByID( @Param('progress_note_id') progress_note_id: string, @Request() request ) {
+        const user = request.user
+        return await this.progressNoteService.getProgressNoteByID(progress_note_id, user)
+    }
 }
