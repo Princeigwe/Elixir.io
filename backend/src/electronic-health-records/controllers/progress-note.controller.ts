@@ -1,7 +1,8 @@
-import { Body, Controller, Param, Post, UseGuards, Request, Get, Query } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards, Request, Get, Query, Patch } from '@nestjs/common';
 import { ProgressNoteService } from '../services/progress-note.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { ProgressNoteDto } from '../dtos/progress.note.dto';
+import { UpdateProgressNoteDto } from '../dtos/update.progress.note.dto';
 import {Roles} from '../../roles.decorator'
 import {Role} from '../../enums/role.enum'
 import { RolesGuard } from '../../roles.guard';
@@ -50,6 +51,14 @@ export class ProgressNoteController {
     async getProgressNoteByID( @Param('progress_note_id') progress_note_id: string, @Request() request ) {
         const user = request.user
         return await this.progressNoteService.getProgressNoteByID(progress_note_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(':progress_note_id')
+    async updateProgressNoteByID( @Param('progress_note_id') progress_note_id: string, @Request() request, @Body() body: UpdateProgressNoteDto ) {
+        const user = request.user
+        return await this.progressNoteService.updateProgressNoteByID(progress_note_id, body.subjectiveInformation, body.objectiveInformation, body.assessment, body.plan, body.progress, user)
     }
 
     

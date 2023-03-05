@@ -39,7 +39,7 @@ export class ProgressNoteService {
             subjectiveInformation: subjectiveInformation == undefined ? null : aes.encrypt(subjectiveInformation),
             objectiveInformation:  objectiveInformation  == undefined ? null : aes.encrypt(objectiveInformation),
             assessment:            assessment            == undefined ? null : aes.encrypt(assessment),
-            plan:                  plan                  == undefined ? null :aes.encrypt(plan),
+            plan:                  plan                  == undefined ? null : aes.encrypt(plan),
             progress:              aes.encrypt(progress), // progress cannot be undefined because of the dto defined
 
             issued_by: {
@@ -183,7 +183,7 @@ export class ProgressNoteService {
         progressNote.issued_by['doctor_email']      = aes.decrypt(progressNote.issued_by['doctor_email'])
         progressNote.issued_by['doctor_telephone']  = aes.decrypt(progressNote.issued_by['doctor_telephone'])
 
-        const medicalRecord = await this. medicalRecordService.getMedicalRecordByID(progressNote.medicalRecord.toString())
+        const medicalRecord = await this.medicalRecordService.getMedicalRecordByID(progressNote.medicalRecord.toString())
 
         if(user.role == Role.Admin || medicalRecord.recipients.includes( aes.encrypt(user.email) ) || progressNote.patient_demographics.email == user.email) {
             return progressNote
@@ -194,9 +194,25 @@ export class ProgressNoteService {
     }
 
 
-    async updateProgressNoteByID() {
+    async updateProgressNoteByID( progress_note_id: string, subjectiveInformation: string, objectiveInformation: string, assessment: string, plan: string, progress: string , user: User ) {
+        const progressNote = await this.progressNoteModel.findById(progress_note_id).exec()
+        const medicalRecord = await this.medicalRecordService.getMedicalRecordByID(progressNote.medicalRecord.toString())
 
+        if(!medicalRecord.recipients.includes( aes.encrypt(user.email) )) {
+            throw new HttpException('Forbidden action, as you are not authorized to make changes to this resource. If you are a medical provider, request read access to medical record tied to this progress note', HttpStatus.FORBIDDEN)
+        }
+
+        return await this.progressNoteModel.findByIdAndUpdate({'_id': progress_note_id}, { $set: { 
+            'subjectiveInformation': subjectiveInformation == undefined ? progressNote.subjectiveInformation : aes.encrypt(subjectiveInformation),
+            'objectiveInformation':  objectiveInformation  == undefined ? progressNote.objectiveInformation  : aes.encrypt(objectiveInformation),
+            'assessment':            assessment            == undefined ? progressNote.assessment            : aes.encrypt(assessment),
+            'plan':                  plan                  == undefined ? progressNote.plan                  : aes.encrypt(plan),
+            'progress':              progress              == undefined ? progressNote.progress              : aes.encrypt(progress)
+            } },
+            {new: true}
+        )
     }
+
 
     async getProgressNotesOfLoggedInPatient( user: User) {
         const progressNotes = await this.progressNoteModel.find({'patient_demographics.email': aes.encrypt(user.email)}).exec()
