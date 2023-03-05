@@ -182,7 +182,7 @@ export class PrescriptionService {
             return prescription
         }
         else {
-            throw new HttpException('Forbidden action, as you are not authorized to access resource', HttpStatus.FORBIDDEN)
+            throw new HttpException('Forbidden action, as you are not authorized to access resource. If you are a medical provider, request read access to medical record tied to this prescription', HttpStatus.FORBIDDEN)
         }
 
     }
