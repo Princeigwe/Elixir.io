@@ -37,9 +37,20 @@ export class ProgressNoteController {
 
 
     @UseGuards(JwtAuthGuard)
+    @Get('/auth-patient')
+    @Roles(Role.Admin)
+    async getProgressNotesOfLoggedInPatient( @Request() request ) {
+        const user = request.user
+        return await this.progressNoteService.getProgressNotesOfLoggedInPatient(user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
     @Get(':progress_note_id')
     async getProgressNoteByID( @Param('progress_note_id') progress_note_id: string, @Request() request ) {
         const user = request.user
         return await this.progressNoteService.getProgressNoteByID(progress_note_id, user)
     }
+
+    
 }
