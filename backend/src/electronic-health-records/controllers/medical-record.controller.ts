@@ -7,12 +7,20 @@ import {Role} from '../../enums/role.enum'
 import {RolesGuard} from '../../roles.guard'
 import {SanitizeMongooseModelInterceptor} from 'nestjs-mongoose-exclude'
 import { ReadAccessDto } from '../dtos/read.access.dto';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Medical Records')
 @UseInterceptors(new SanitizeMongooseModelInterceptor({excludeMongooseId: false, excludeMongooseV: false})) // hides recipients of record
 @Controller('medical-records')
 export class MedicalRecordController {
     constructor( private medicalRecordService: MedicalRecordService ) {}
 
+    @ApiOperation({description: "This endpoint creates a medical record for a patient. This action is only possible for medical provider that is responsible for the patient, or the consultant responsible for the medical provider. Authentication is required"})
+    @ApiParam({name: 'patient_id', required: true})
+    @ApiBody({type: MedicalRecordDto})
+    @ApiResponse({status: 200, description: "Returns a resource with some encrypted properties"})
+    @ApiResponse({status: 403, description: "Forbidden action, as you are not responsible for this patient"})
+    @ApiResponse({status: 400, description: "An existing record exists for this patient, please make relevant changes to it"})
     @UseGuards(JwtAuthGuard)
     @Post(':patient_id/')
     async createMedicalRecord( @Body() body: MedicalRecordDto, @Param('patient_id') patient_id: string, @Request() request ) {
@@ -30,6 +38,7 @@ export class MedicalRecordController {
     }
 
 
+    @ApiOperation({description: "This endpoint updates an existing medical record for a patient. This action is only possible for medical provider that is responsible for the patient, or the consultant responsible for the medical provider. Authentication is required"})
     @UseGuards(JwtAuthGuard)
     @Patch(':medical_record_id/')
     async updateMedicalRecordByID( @Param('medical_record_id') medical_record_id: string, @Request() request, @Body() body: UpdateMedicalRecordDto ) {

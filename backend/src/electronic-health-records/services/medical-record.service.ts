@@ -45,7 +45,7 @@ export class MedicalRecordService {
         const existingMedicalRecord = await this.medicalRecordModel.findOne({'patient_demographics.email': aes.encrypt(patient.email)}).exec() // this line fetches a record that has the encrypted email of the patient in question
 
         if( existingMedicalRecord ){
-            throw new HttpException('An existing record exists for this patient, please make relevant changes to it.', HttpStatus.FORBIDDEN)
+            throw new HttpException('An existing record exists for this patient, please make relevant changes to it.', HttpStatus.BAD_REQUEST)
         }
 
         // getting the logged in doctor's profile
