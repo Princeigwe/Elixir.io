@@ -15,8 +15,8 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/s
 export class MedicalRecordController {
     constructor( private medicalRecordService: MedicalRecordService ) {}
 
-    @ApiOperation({description: "This endpoint creates a medical record for a patient. This action is only possible for medical provider that is responsible for the patient, or the consultant responsible for the medical provider. Authentication is required"})
-    @ApiParam({name: 'patient_id', required: true})
+    @ApiOperation({description: "This endpoint creates a medical record for a patient. This action is only possible for medical provider that is responsible for the patient, or the consultant responsible for the medical provider. Authentication is required. Reference: MedicalRecordDto"})
+    @ApiParam({name: 'patient_id', required: true, description: "the patient's id"})
     @ApiBody({type: MedicalRecordDto})
     @ApiResponse({status: 200, description: "Returns a resource with some encrypted properties"})
     @ApiResponse({status: 403, description: "Forbidden action, as you are not responsible for this patient"})
@@ -38,7 +38,11 @@ export class MedicalRecordController {
     }
 
 
-    @ApiOperation({description: "This endpoint updates an existing medical record for a patient. This action is only possible for medical provider that is responsible for the patient, or the consultant responsible for the medical provider. Authentication is required"})
+    @ApiOperation({description: "This endpoint updates an existing medical record for a patient. This action is only possible for medical provider that is responsible for the patient, or the consultant responsible for the medical provider. Authentication is required. Reference: UpdateMedicalRecordDto"})
+    @ApiParam({name: 'medical_record_id', required: true, description: "the id of the medical record"})
+    @ApiBody({type: UpdateMedicalRecordDto})
+    @ApiResponse({status:403, description: "Forbidden action, as you are not responsible for this patient"})
+    @ApiResponse({status: 200, description: "Return an updated medical record with some encrypted properties"})
     @UseGuards(JwtAuthGuard)
     @Patch(':medical_record_id/')
     async updateMedicalRecordByID( @Param('medical_record_id') medical_record_id: string, @Request() request, @Body() body: UpdateMedicalRecordDto ) {

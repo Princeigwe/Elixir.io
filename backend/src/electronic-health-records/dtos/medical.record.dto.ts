@@ -1,5 +1,5 @@
 import { IsOptional, IsEmail, IsString, IsNumber, IsArray } from "class-validator"
-import { ApiProperty } from "@nestjs/swagger"
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 
 
 export class MedicalRecordDto {
@@ -16,12 +16,12 @@ export class MedicalRecordDto {
     @IsArray()
     vital_signs: string[]
 
-    @ApiProperty({description: "medical allergies of patient"})
+    @ApiPropertyOptional({description: "medical allergies of patient"})
     @IsArray()
     @IsOptional()
     medical_allergies: string[]
 
-    @ApiProperty({description: "habits of patient"})
+    @ApiPropertyOptional({description: "habits of patient"})
     @IsArray()
     @IsOptional()
     habits: string[]
@@ -32,21 +32,26 @@ export class MedicalRecordDto {
 
 export class UpdateMedicalRecordDto {
 
+    @ApiPropertyOptional({description: "the patent's complaints"})
     @IsArray()
     @IsOptional()
     complaints: string[]
 
+    @ApiPropertyOptional({description: "the patient's history of illness"})
     @IsArray()
     @IsOptional()
     history_of_illness: string[]
 
+    @ApiProperty({description: "vital signs observed"})
     @IsArray()
     vital_signs: string[]
 
+    @ApiPropertyOptional({description: "medical allergies of patient"})
     @IsArray()
     @IsOptional()
     medical_allergies: string[]
 
+    @ApiPropertyOptional({description: "habits of patient"})
     @IsArray()
     @IsOptional()
     habits: string[]
