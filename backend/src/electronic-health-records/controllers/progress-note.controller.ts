@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards, Request, Get, Query, Patch } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards, Request, Get, Query, Patch, Delete } from '@nestjs/common';
 import { ProgressNoteService } from '../services/progress-note.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { ProgressNoteDto } from '../dtos/progress.note.dto';
@@ -61,5 +61,20 @@ export class ProgressNoteController {
         return await this.progressNoteService.updateProgressNoteByID(progress_note_id, body.subjectiveInformation, body.objectiveInformation, body.assessment, body.plan, body.progress, user)
     }
 
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete()
+    @Roles(Role.Admin)
+    async deleteAllProgressNotes() {
+        return await this.progressNoteService.deleteAllProgressNotes()
+    }
+
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete('/:progress_note_id')
+    @Roles(Role.Admin)
+    async deleteProgressNote(@Param('progress_note_id') progress_note_id: string) {
+        return await this.progressNoteService.deleteProgressNote(progress_note_id)
+    }
     
 }

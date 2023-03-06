@@ -260,14 +260,16 @@ export class ProgressNoteService {
         return decryptedProgressNotes
     }
 
-
-    async deleteProgressNoteByID() {
-
+    //** this action will only be performed by an administrative user */
+    async deleteProgressNote(progress_note_id: string) {
+        await this.progressNoteModel.deleteOne({'_id': progress_note_id})
+        throw new HttpException( "Progress note deleted", HttpStatus.NO_CONTENT)
     }
 
-
+    //** this action will only be performed by an administrative user */
     async deleteAllProgressNotes() {
-
+        await this.progressNoteModel.deleteMany()
+        throw new HttpException( "Progress notes deleted", HttpStatus.NO_CONTENT)
     }
 
 }
