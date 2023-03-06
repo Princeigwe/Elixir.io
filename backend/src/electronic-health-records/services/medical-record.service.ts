@@ -9,6 +9,7 @@ import { DoctorService } from '../../profiles/services/doctor.service';
 import { DoctorHierarchy } from '../../enums/doctor.hierarchy.enum';
 import {UserCategory} from '../../enums/user.category.enum'
 import { PrescriptionService } from './prescription.service';
+import { ProgressNoteService } from './progress-note.service';
 import * as AesEncryption from 'aes-encryption'
 
 const aes = new AesEncryption()
@@ -23,7 +24,8 @@ export class MedicalRecordService {
         private patientService: PatientService,
         // private caslAbilityFactory: CaslAbilityFactory,
         private doctorService: DoctorService,
-        @Inject( forwardRef( () => PrescriptionService ) ) private prescriptionService: PrescriptionService
+        @Inject( forwardRef( () => PrescriptionService ) ) private prescriptionService: PrescriptionService,
+        @Inject( forwardRef( () => ProgressNoteService ) ) private progressNoteService: ProgressNoteService
     ){}
 
     /*
@@ -293,8 +295,13 @@ export class MedicalRecordService {
     //** this action will only be performed by an administrative user */
     async deleteMedicalRecords() {
         const recordPrescriptions = await this.prescriptionService.getAllPrescriptions()
+        const progressNotes = await this.progressNoteService.getAllProgressNotes()
+
         if(recordPrescriptions.length) {
             throw new HttpException('There are prescriptions tied to medical records, please delete them before attempting to delete record', HttpStatus.BAD_REQUEST)
+        }
+        else if(progressNotes.length) {
+            throw new HttpException('There are progress notes tied to medical records, please delete them before attempting to delete record', HttpStatus.BAD_REQUEST)
         }
         await this.medicalRecordModel.deleteMany()
         throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
@@ -303,8 +310,12 @@ export class MedicalRecordService {
     //** this action will only be performed by an administrative user */
     async deleteMedicalRecord(medical_record_id: string) {
         const recordPrescriptions = await this.prescriptionService.getPrescriptionsTiedToMedicalRecord(medical_record_id)
+        const progressNotes = await this.progressNoteService.getProgressNotesTiedToMedicalRecord(medical_record_id)
         if(recordPrescriptions.length) {
             throw new HttpException('There is/are prescription(s) tied to this medical record, please delete them before attempting to delete record', HttpStatus.BAD_REQUEST)
+        }
+        if(progressNotes.length) {
+            throw new HttpException('There is/are progress note(s) tied to this medical record, please delete them before attempting to delete record', HttpStatus.BAD_REQUEST)
         }
         await this.medicalRecordModel.deleteOne({'__id': medical_record_id})
         throw new HttpException( "Record Deleted", HttpStatus.NO_CONTENT)

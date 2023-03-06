@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel }  from '@nestjs/mongoose';
 import {Model} from 'mongoose'
 import { ProgressNote, ProgressNoteDocument } from '../schemas/progress.note.schema';
@@ -17,7 +17,7 @@ export class ProgressNoteService {
 
     constructor(
         @InjectModel(ProgressNote.name) private progressNoteModel: Model<ProgressNoteDocument>,
-        private medicalRecordService: MedicalRecordService,
+        @Inject( forwardRef( () => MedicalRecordService ) )private medicalRecordService: MedicalRecordService,
         private doctorService: DoctorService
     ) {}
 
@@ -56,7 +56,7 @@ export class ProgressNoteService {
 
 
     // * this action will be performed by an administrator to read all progress notes
-    async getAllProgressNotes() {
+    async getProgressNotes() {
         const progressNotes = await this.progressNoteModel.find().exec()
         if(!progressNotes.length) { throw new NotFoundException("Progress notes not found") }
 
@@ -259,6 +259,20 @@ export class ProgressNoteService {
 
         return decryptedProgressNotes
     }
+
+
+    // * this method will be used in the medical record service when deleting a medical record
+    async getProgressNotesTiedToMedicalRecord(medical_record_id: string) {
+        const progressNotes = await this.progressNoteModel.find({'medicalRecord': medical_record_id}).exec()
+        return progressNotes
+    }
+
+    // * this method will be used in the medical record service when deleting medical records
+    async getAllProgressNotes() {
+        const progressNotes = await this.progressNoteModel.find().exec()
+        return progressNotes
+    }
+
 
     //** this action will only be performed by an administrative user */
     async deleteProgressNote(progress_note_id: string) {

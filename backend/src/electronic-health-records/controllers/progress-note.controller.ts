@@ -32,7 +32,7 @@ export class ProgressNoteController {
             return await this.progressNoteService.filterProgressNotesTiedToMedicalRecord(medical_record_id, user)
         }
         else{
-            return await this.progressNoteService.getAllProgressNotes()
+            return await this.progressNoteService.getProgressNotes()
         }
     }
 
