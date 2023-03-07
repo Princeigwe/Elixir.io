@@ -41,7 +41,7 @@ export class MedicalRecordController {
     @ApiOperation({description: "This endpoint updates an existing medical record for a patient. This action is only possible for medical provider that is responsible for the patient, or the consultant responsible for the medical provider. Authentication is required. Reference: UpdateMedicalRecordDto"})
     @ApiParam({name: 'medical_record_id', required: true, description: "the id of the medical record"})
     @ApiBody({type: UpdateMedicalRecordDto})
-    @ApiResponse({status:403, description: "Forbidden action, as you are not responsible for this patient"})
+    @ApiResponse({status:403,  description: "Forbidden action, as you are not responsible for this patient"})
     @ApiResponse({status: 200, description: "Return an updated medical record with some encrypted properties"})
     @UseGuards(JwtAuthGuard)
     @Patch(':medical_record_id/')
@@ -51,6 +51,8 @@ export class MedicalRecordController {
     }
 
 
+    @ApiOperation({description: "Gets all the medical records to be viewed by an admin"})
+    @ApiResponse({status: 403,  description: "Forbidden Resource"})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
     @Roles(Role.Admin) 
@@ -59,6 +61,9 @@ export class MedicalRecordController {
     }
 
     // this route is used by the logged in patient to get owned medical records
+    @ApiOperation({description: "This endpoint gets medical record of the logged in patient. Authentication is required"})
+    @ApiResponse({status: 200, description: "This returns the medical record of a logged in patient"})
+    @ApiResponse({status: 400, description: "Record not found"})
     @UseGuards(JwtAuthGuard)
     @Get('auth-patient/')
     async getLoggedInPatientRecord(@Request() request) {
@@ -68,6 +73,10 @@ export class MedicalRecordController {
 
 
     // this route is used by the logged in admin to read a medical record
+    @ApiOperation({description: "Get a medical record to be viewed by the admin"})
+    @ApiParam({name: 'medical_record_id', required: false, description: "the id of the medical record"})
+    @ApiResponse({status: 200, description: "This returns the medical record of a patient for the admin"})
+    @ApiResponse({status: 403,  description: "Forbidden Resource"})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get(':medical_record_id/')
     @Roles(Role.Admin)
@@ -76,6 +85,10 @@ export class MedicalRecordController {
     }
 
 
+    @ApiOperation({description: "Returns a medical record to the medical provider that is authorized to view it. Authentication required"})
+    @ApiParam({name: 'medical_record_id', required: true, description: "the id of the medical record"})
+    @ApiResponse({status: 200, description: "This returns the medical record of a patient for the authorized medical provider"})
+    @ApiResponse({status: 403,  description: "Forbidden action. Request for access to medical record from patient"})
     @UseGuards(JwtAuthGuard)
     @Get('read-access/:medical_record_id/')
     async readActionOfMedicalRecordByMedicalProvider(@Request() request, @Param('medical_record_id') medical_record_id: string) {
@@ -84,6 +97,11 @@ export class MedicalRecordController {
     }
 
 
+    @ApiOperation({description: "This endpoint enables the patient give read permission of their medical record to a medical provider that is not assigned to them, by their email"})
+    @ApiParam({name: 'medical_record_id', required: true, description: "the id of the medical record"})
+    @ApiBody({type: ReadAccessDto})
+    @ApiResponse({status: 200, description: "You have successfully granted read access to <medical provider.firstName> <medical provider.lastName>"})
+    @ApiResponse({status: 403,  description: "Forbidden action. (If the person trying to give the patient is not a patient)"})
     @UseGuards(JwtAuthGuard)
     @Post('grant-read-access/:medical_record_id')
     async grantReadAccessOfMedicalRecordToMedicalProvider(@Request() request, @Param('medical_record_id') medical_record_id: string, @Body() body: ReadAccessDto ) {
@@ -92,6 +110,11 @@ export class MedicalRecordController {
     }
 
 
+    @ApiOperation({description: "This endpoint enables the patient revoke read permission of their medical record from a medical provider that is not assigned to them, by their email"})
+    @ApiParam({name: 'medical_record_id', required: true, description: "the id of the medical record"})
+    @ApiBody({type: ReadAccessDto})
+    @ApiResponse({status: 200, description: "You have successfully revoke read access from <medical provider.firstName> <medical provider.lastName>"})
+    @ApiResponse({status: 403,  description: "Forbidden action. (If the person trying to give the patient is not a patient)"})
     @UseGuards(JwtAuthGuard)
     @Post('revoke-read-access/:medical_record_id')
     async revokeReadAccessOfMedicalRecordFromMedicalProvider( @Request() request, @Param('medical_record_id') medical_record_id: string, @Body() body: ReadAccessDto ) {
@@ -100,6 +123,8 @@ export class MedicalRecordController {
     }
 
 
+    @ApiOperation({description: "Delete medical records by the admin"})
+    @ApiResponse({status: 204})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()
     @Roles(Role.Admin)
@@ -108,6 +133,9 @@ export class MedicalRecordController {
     }
 
 
+    @ApiOperation({description: "Delete a medical record by the admin"})
+    @ApiParam({name: 'medical_record_id', required: false, description: "the id of the medical record"})
+    @ApiResponse({status: 204})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete('/:medical_record_id')
     @Roles(Role.Admin)
