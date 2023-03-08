@@ -13,7 +13,7 @@ import { ProgressNoteService } from './progress-note.service';
 import * as AesEncryption from 'aes-encryption'
 
 const aes = new AesEncryption()
-aes.setSecretKey(process.env.ENCRYPTION_KEY)
+aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
 
 
 

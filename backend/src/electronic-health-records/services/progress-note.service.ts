@@ -4,12 +4,12 @@ import {Model} from 'mongoose'
 import { ProgressNote, ProgressNoteDocument } from '../schemas/progress.note.schema';
 import {User} from '../../users/users.schema'
 import * as AesEncryption from 'aes-encryption'
-import { Role } from 'src/enums/role.enum';
+import { Role } from '../../enums/role.enum';
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { MedicalRecordService } from './medical-record.service';
 
 const aes = new AesEncryption()
-aes.setSecretKey(process.env.ENCRYPTION_KEY)
+aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
 
 
 @Injectable()

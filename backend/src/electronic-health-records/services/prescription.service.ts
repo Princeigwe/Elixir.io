@@ -8,10 +8,10 @@ import { RouteOfAdministration } from '../../enums/route.of.administration.enum'
 import { DoctorService } from '../../profiles/services/doctor.service';
 import * as AesEncryption from 'aes-encryption'
 import {UserCategory} from '../../enums/user.category.enum'
-import { Role } from 'src/enums/role.enum';
+import { Role } from '../../enums/role.enum';
 
 const aes = new AesEncryption()
-aes.setSecretKey(process.env.ENCRYPTION_KEY)
+aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
 
 type medication = {
     name: string,
