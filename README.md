@@ -11,4 +11,4 @@
 - MongoDB
 - CircleCI
 
-Proper documentation is in development process.
+Proper documentation is currently in development.
