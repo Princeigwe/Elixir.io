@@ -2,7 +2,7 @@
 
 ![Elixir.io](download.png)
 
-## Description: A health care wellbeing application.
+## Description: A health care wellbeing API.
 
 
 ## Estimated Technologies:
