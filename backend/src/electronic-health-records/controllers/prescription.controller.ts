@@ -42,6 +42,7 @@ export class PrescriptionController {
     @ApiParam({name: "prescription_id", description: "The id of the prescription"})
     @ApiResponse({status: 200})
     @ApiResponse({status: 403, description: "Forbidden action, as you are not authorized to access resource. If you are a medical provider, request read access to medical record tied to this prescription"})
+    @ApiResponse({status: 404, description: "Progress note not found"})
     @UseGuards(JwtAuthGuard)
     @Get('/:prescription_id')
     async getPrescriptionByID( @Param('prescription_id') prescription_id: string, @Request() request ) {

@@ -6,8 +6,10 @@ import { UpdateProgressNoteDto } from '../dtos/update.progress.note.dto';
 import {Roles} from '../../roles.decorator'
 import {Role} from '../../enums/role.enum'
 import { RolesGuard } from '../../roles.guard';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 
+@ApiTags('Progress Notes')
 @Controller('progress-notes')
 export class ProgressNoteController {
 
@@ -15,6 +17,11 @@ export class ProgressNoteController {
         private progressNoteService: ProgressNoteService
     ) {}
 
+    @ApiOperation({description: "Enables the medical provider authorized to medical record add a progress note concerning changes in a patient's medical record. Reference: ProgressNoteDto"})
+    @ApiParam({name: "medical_record_id", description: "id of the medical record"})
+    @ApiBody({type: ProgressNoteDto})
+    @ApiResponse({status: 200})
+    @ApiResponse({status: 403, description: "Forbidden action. Request for access to medical record from patient"})
     @UseGuards(JwtAuthGuard)
     @Post(':medical_record_id')
     async createProgressNoteForMedicalRecord( @Param('medical_record_id') medical_record_id, @Body() body: ProgressNoteDto, @Request() request ) {
@@ -23,6 +30,10 @@ export class ProgressNoteController {
     }
 
 
+    @ApiOperation({description: "Endpoint that allows administrator to read all progress notes, or query by medical record id"})
+    @ApiQuery({name: "medical_record_id", description: "id of medical record", required: false})
+    @ApiResponse({status: 403, description: 'Forbidden Resource'})
+    @ApiResponse({status: 200})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
     @Roles(Role.Admin)
@@ -37,6 +48,9 @@ export class ProgressNoteController {
     }
 
 
+    @ApiOperation({description: "This endpoint allows the authenticated patient read their progress notes"})
+    @ApiResponse({status: 404,  description: "Progress notes not found."})
+    @ApiResponse({status: 200,  description: "Returns progress notes"})
     @UseGuards(JwtAuthGuard)
     @Get('/auth-patient')
     @Roles(Role.Admin)
@@ -46,6 +60,11 @@ export class ProgressNoteController {
     }
 
 
+    @ApiOperation({description: "Get a progress note by its id. This action can be performed by the admin, the patient and the authorized medical provider"})
+    @ApiParam({name: "progress_note_id", description: "id of the progress note"})
+    @ApiResponse({status: 200})
+    @ApiResponse({status: 403, description: "Forbidden action, as you are not authorized to access resource. If you are a medical provider, request read access to medical record tied to this progress note"})
+    @ApiResponse({status: 404, description: "Progress note not found"})
     @UseGuards(JwtAuthGuard)
     @Get(':progress_note_id')
     async getProgressNoteByID( @Param('progress_note_id') progress_note_id: string, @Request() request ) {
@@ -54,6 +73,11 @@ export class ProgressNoteController {
     }
 
 
+    @ApiOperation({description: "This endpoint enables authorized medical providers make changes to a progress note"})
+    @ApiParam({name: "progress_note_id", description: "progress note id"})
+    @ApiBody({type: UpdateProgressNoteDto})
+    @ApiResponse({status: 200})
+    @ApiResponse({status: 403, description: "Forbidden action, as you are not authorized to make changes to this resource. If you are a medical provider, request read access to medical record tied to this progress note"})
     @UseGuards(JwtAuthGuard)
     @Patch(':progress_note_id')
     async updateProgressNoteByID( @Param('progress_note_id') progress_note_id: string, @Request() request, @Body() body: UpdateProgressNoteDto ) {
@@ -62,6 +86,8 @@ export class ProgressNoteController {
     }
 
 
+    @ApiOperation({description: "This endpoint deletes all progress notes by the admin"})
+    @ApiResponse({status: 203})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()
     @Roles(Role.Admin)
@@ -70,6 +96,9 @@ export class ProgressNoteController {
     }
 
 
+    @ApiOperation({description: "This endpoint deletes a progress note by the admin"})
+    @ApiParam({name: "prescription_id", description: "The id of the progress note"})
+    @ApiResponse({status: 203})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete('/:progress_note_id')
     @Roles(Role.Admin)
