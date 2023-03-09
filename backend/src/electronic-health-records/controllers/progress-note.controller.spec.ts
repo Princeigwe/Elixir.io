@@ -5,6 +5,7 @@ import * as AesEncryption from 'aes-encryption'
 import { User } from '../../users/users.schema';
 import {UserCategory} from '../../enums/user.category.enum'
 import {Role} from '../../enums/role.enum'
+import { Request } from 'express';
 
 const aes = new AesEncryption()
 aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
@@ -22,11 +23,6 @@ describe('ProgressNoteController', () => {
       // assessment = null
       plan = "the whole team will have to perform another checkup on her"
       progress = "getting better"
-
-      // user.email = "testuser@gmail.com"
-      // user.password = "testpass123" 
-      // user.role = Role.User
-      // user.category = UserCategory.MedicalProvider
       
       return {
         "medical_record_id": medical_record_id,
@@ -57,6 +53,118 @@ describe('ProgressNoteController', () => {
         "updatedAt": "2023-03-06T01:49:29.800Z",
         "__v": 0
       }
+    } ),
+
+    getProgressNotes: jest.fn( () => {
+      const medical_record_id: string = "6405466ba1facf807b676ab2"
+      const subjectiveInformation: string = "the patient said she felt sharp pain in her lower abdomen"
+      const objectiveInformation: string = "I believe this is some complications with the surgery that was performed earlier"
+      const assessment: string = undefined
+      const plan: string = "the whole team will have to perform another checkup on her"
+      const progress: string = "getting better"
+
+      return [
+        {
+          "medical_record_id": medical_record_id,
+          "patient_demographics": {
+            "firstName" : "John",
+            "lastName"  : "Smith",
+            "email"     : "johnsmith@gmail.com",
+            "age"       : 24,
+            "address"   : "London, UK",
+            "telephone" : "9090909090"
+          },
+  
+          "subjectiveInformation" : subjectiveInformation,
+          "objectiveInformation"  : objectiveInformation,
+          "assessment"            : assessment,
+          "plan"                  : plan,
+          "progress"              : progress,
+
+          "issued_by": {
+            "doctor_firstName"  : "Matthew",
+            "doctor_lastName"   : "Clark",
+            "doctor_department" : "Cardiology",
+            "doctor_email"      : "testuser@gmail.com",
+            "doctor_telephone"  : "898989898"
+          },
+          "_id": "640546a9a1facf807b676ab8",
+          "createdAt": "2023-03-06T01:49:29.800Z",
+          "updatedAt": "2023-03-06T01:49:29.800Z",
+          "__v": 0
+        },
+
+        {
+          "medical_record_id": medical_record_id,
+          "patient_demographics": {
+            "firstName" : "John",
+            "lastName"  : "Smith",
+            "email"     : "johnsmith@gmail.com",
+            "age"       : 24,
+            "address"   : "London, UK",
+            "telephone" : "9090909090"
+          },
+  
+          "subjectiveInformation" : subjectiveInformation,
+          "objectiveInformation"  : objectiveInformation,
+          "assessment"            : assessment,
+          "plan"                  : plan,
+          "progress"              : progress,
+  
+          "issued_by": {
+            "doctor_firstName"  : "Matthew",
+            "doctor_lastName"   : "Clark",
+            "doctor_department" : "Cardiology",
+            "doctor_email"      : "testuser@gmail.com",
+            "doctor_telephone"  : "898989898",
+          },
+          "_id": "640546a9a1facf807b676ab9",
+          "createdAt": "2023-03-06T01:49:29.800Z",
+          "updatedAt": "2023-03-06T01:49:29.800Z",
+          "__v": 0
+        }
+      ]
+    } ),
+
+    filterProgressNotesTiedToMedicalRecord: jest.fn( (medical_record_id: string, user: User) => {
+      medical_record_id = "6405466ba1facf807b676ab2"
+      const subjectiveInformation: string = "the patient said she felt sharp pain in her lower abdomen"
+      const objectiveInformation: string = "I believe this is some complications with the surgery that was performed earlier"
+      const assessment: string = undefined
+      const plan: string = "the whole team will have to perform another checkup on her"
+      const progress: string = "getting better"
+
+      return [
+        {
+          "medical_record_id": medical_record_id,
+          "patient_demographics": {
+            "firstName" : "John",
+            "lastName"  : "Smith",
+            "email"     : "johnsmith@gmail.com",
+            "age"       : 24,
+            "address"   : "London, UK",
+            "telephone" : "9090909090"
+          },
+  
+          "subjectiveInformation" : subjectiveInformation,
+          "objectiveInformation"  : objectiveInformation,
+          "assessment"            : assessment,
+          "plan"                  : plan,
+          "progress"              : progress,
+
+          "issued_by": {
+            "doctor_firstName"  : "Matthew",
+            "doctor_lastName"   : "Clark",
+            "doctor_department" : "Cardiology",
+            "doctor_email"      : "testuser@gmail.com",
+            "doctor_telephone"  : "898989898"
+          },
+          "_id": "640546a9a1facf807b676ab8",
+          "createdAt": "2023-03-06T01:49:29.800Z",
+          "updatedAt": "2023-03-06T01:49:29.800Z",
+          "__v": 0
+        }
+      ]
     } )
 
   }
@@ -96,5 +204,12 @@ describe('ProgressNoteController', () => {
         assessment: assessment, 
         progress: progress
       }, user)).toEqual(mockProgressNoteService.createProgressNoteForMedicalRecord(medical_record_id, subjectiveInformation, objectiveInformation, assessment, plan, progress, user))
+  })
+
+  it('should filter progress notes', async () => {
+    const mockRequest = { body: {email: "testadmin@gmail.com", password: "testpass123", role: Role.Admin, category: UserCategory.MedicalProvider} } as Request
+    const medical_record_id = "6405466ba1facf807b676ab2"
+    const user = {email: "testadmin@gmail.com", password: "testpass123", role: Role.Admin, category: UserCategory.MedicalProvider}
+    expect(await controller.getAllProgressNotes(mockRequest, medical_record_id)).toEqual(mockProgressNoteService.filterProgressNotesTiedToMedicalRecord(medical_record_id, user))
   })
 });
