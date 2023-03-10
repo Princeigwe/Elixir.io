@@ -18,8 +18,8 @@ jobs:
       - run:
           name: test
           command: |
-            npm cache clean --force
             npm install rimraf 
+            npm cache clean --force
             npm test
       - when:
           condition:
