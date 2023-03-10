@@ -15,9 +15,11 @@ jobs:
       - run:
           name: npm update
           command: sudo npm install -g npm@latest
+
       - run:
           name: test
           command: |
+            npm i --force
             npm install rimraf 
             npm test
       - when:
