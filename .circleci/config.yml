@@ -18,9 +18,9 @@ jobs:
       - run:
           name: test
           command: |
+            npm install --legacy-peer-deps
             npm install rimraf 
             npm test
-            npm install --legacy-peer-deps
       - when:
           condition:
             equal: [ main, << pipeline.git.branch >> ]  # when the name of the git branch that was pushed to trigger the pipeline is "main", build and push docker image
