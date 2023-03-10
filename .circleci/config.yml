@@ -19,7 +19,7 @@ jobs:
       - run:
           name: test
           command: |
-            npm i --force
+            npm i --legacy-peer-deps
             npm audit fix --force
             npm install rimraf 
             npm test
