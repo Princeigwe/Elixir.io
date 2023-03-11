@@ -69,8 +69,6 @@ export class Doctor {
         //     telephone: string,
         //     occupation: string,
         //     maritalStatus: string,
-        //     medicalIssues: string[],
-        //     prescriptions: [],
         //     pharmacyTelephone: string
         // }
     ]

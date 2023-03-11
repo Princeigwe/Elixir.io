@@ -1,4 +1,4 @@
-import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
+import {Prop, Schema, SchemaFactory, raw} from '@nestjs/mongoose'
 import {Document} from 'mongoose'
 import {MaritalStatus} from '../../enums/marital.status.enum'
 import * as mongoose from 'mongoose'
@@ -43,34 +43,29 @@ export class Patient {
     @Prop({default: MaritalStatus.Single})
     maritalStatus: MaritalStatus
 
-    @Prop([String])
-    medicalIssues: string[]
+    // @Prop()
+    // doctorName: string
 
-    @Prop({ type: mongoose.Schema.Types.Array })
-    prescriptions: [
-        // {
-        //     drug: string,
-        //     dosage: string,
-        //     issueDate: Date,
-        //     issuerName: string
-        //     issuerTelephone: string
-        // }
-    ]
+    // @Prop()
+    // doctorTelephone: string
 
-    @Prop()
-    doctorName: string
+    // @Prop()
+    // doctorAddress: string
 
-    @Prop()
-    doctorTelephone: string
+    // @Prop()
+    // doctorDepartment: MedicalDepartments
 
-    @Prop()
-    doctorAddress: string
+    // @Prop()
+    // doctorHierarchy: DoctorHierarchy
 
-    @Prop()
-    doctorDepartment: MedicalDepartments
 
-    @Prop()
-    doctorHierarchy: DoctorHierarchy
+    @Prop(raw({
+        name:       {type: String},
+        telephone:  {type: String},
+        email:      {type: String},
+        department: {type: String},
+    }))
+    assignedDoctor: Record<string, any>
 
     @Prop()
     pharmacyTelephone: string

@@ -10,8 +10,9 @@ describe('DoctorController', () => {
   let mockDoctorService = {
 
     getDoctorProfileById: jest.fn( (_id: string) => {
+      _id = '1234567'
       return {
-        _id: "6311006facc97637eed89309",
+        _id: _id,
         user: "6311006facc97637eed89307",
         maritalStatus: "Single",
         specialties: [],
@@ -29,25 +30,34 @@ describe('DoctorController', () => {
         {
           _id: "1234567",
           user: "6311006facc97637eed89307",
+          firstName: "Mike",
+          lastName: "Faraday",
+          email: "testuser3@gmail.com",
+          address: "Abujs",
+          telephone: "08100002222",
           maritalStatus: "Single",
           specialties: [],
           certificates: [],
-          hierarchy: "Medical Student",
+          hierarchy: "Consultant",
           languages: [],
-          department: 'Cardiology',
+          department: "Dermatology",
           assignedPatients: [],
-          __v: 0
         },
 
         {
           _id: "12345678",
           user: "6311006facc97637eed89307",
-          maritalStatus: "Single",
+          firstName: "Mike",
+          lastName: "Faraday",
+          email: "testuser3@gmail.com",
+          address: "Abuja",
+          telephone: "08100002222",
+          maritalStatus: "Married",
           specialties: [],
           certificates: [],
-          hierarchy: "Medical Student",
+          hierarchy: "Consultant",
           languages: [],
-          department: 'Cardiology',
+          department: "Cardiology",
           assignedPatients: [],
           __v: 0
         },
@@ -81,50 +91,11 @@ describe('DoctorController', () => {
   });
 
   it('should return doctor by id', async() => {
-    let response = {
-      "_id": "6311006facc97637eed89309",
-      "user": "6311006facc97637eed89307",
-      "maritalStatus": "Single",
-      "specialties": [],
-      "certificates": [],
-      "hierarchy": "Medical Student",
-      "languages": [],
-      "department": "Surgery",
-      "assignedPatients": [],
-      "__v": 0
-    }
-
-    expect(await controller.getDoctorProfileById('6311006facc97637eed89309')).toEqual(response)
+    expect(await controller.getDoctorProfileById('1234567')).toEqual(mockDoctorService.getDoctorProfileById('1234567'))
   })
 
   it('should return array of doctors', async () => {
-    let response = [
-      {
-        "_id": "1234567",
-        "user": "6311006facc97637eed89307",
-        "maritalStatus": "Single",
-        "specialties": [],
-        "certificates": [],
-        "hierarchy": "Medical Student",
-        "languages": [],
-        "department": "Cardiology",
-        "assignedPatients": [],
-        "__v": 0
-      },
-      {
-        "_id": "12345678",
-        "user": "6311006facc97637eed89307",
-        "maritalStatus": "Single",
-        "specialties": [],
-        "certificates": [],
-        "hierarchy": "Medical Student",
-        "languages": [],
-        "department": "Cardiology",
-        "assignedPatients": [],
-        "__v": 0
-      }
-    ]
-    expect(await controller.getDoctorProfiles()).toMatchObject(response)
+    expect(await controller.getDoctorProfiles()).toMatchObject(mockDoctorService.getDoctorProfiles())
   })
 
   // it('should return a delete message', async () => {

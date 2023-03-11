@@ -43,9 +43,9 @@ export class MedicalDepartmentsController {
     @Get()
     async getOrSearchMedicalDepartments(@Query('name') name?: string) { // name is optional in order to pass test
         if(name) {
-            return this.medicalDepartmentsService.searchMedicalDepartmentByName(name)
+            return await this.medicalDepartmentsService.searchMedicalDepartmentByName(name)
         }
-        return this.medicalDepartmentsService.getMedicalDepartments()
+        return await this.medicalDepartmentsService.getMedicalDepartments()
     }
 
     @ApiOperation({description: "DELETE departments or one by name query, executed by an admin"})

@@ -16,8 +16,6 @@ export class AssignedPatientToDoctorEvent {
         public telephone ?: string,
         public occupation ?: string,
         public maritalStatus ?: string,
-        public medicalIssues ?: string[],
-        public prescriptions ?: [],
         public pharmacyTelephone ?: string
 
     ) {}

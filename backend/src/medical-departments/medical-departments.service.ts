@@ -31,7 +31,6 @@ export class MedicalDepartmentsService {
     // this action will only be executed by the admin
     async createMedicalDepartment(name: string) {
 
-        // todo: write a subprocess task that will restore data backup of all members in the department that is to be created, in case the data of the previous data was deleted
         const existingMedicalDepartment = await this.medicalDepartmentModel.findOne({name: name}).exec()
         if (existingMedicalDepartment) {
             throw new HttpException('Medical department already exists, create with a different name', HttpStatus.BAD_REQUEST) 
@@ -41,8 +40,8 @@ export class MedicalDepartmentsService {
     }
 
     async getMedicalDepartments() {
-        const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
-        await sleep(120000)
+        // const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+        // await sleep(120000)
         
         const medicalDepartments = await this.medicalDepartmentModel.find().exec()
         if (!medicalDepartments.length) {throw new NotFoundException('There are no medical departments found')}
@@ -467,5 +466,16 @@ export class MedicalDepartmentsService {
         await this.removeExistingJuniorDoctorFromAGroup(firstName, lastName, department)
         await this.addMedicalStudentToADepartmentGroup(firstName, lastName, department)
     }
+
+
+    // async fetchAllConsultantsInADepartment(department: MedicalDepartments) {
+    //     const medicalDepartment = await this.getMedicalDepartmentByName(department)
+    //     var consultants: string[] = []
+    //     for ( let group of medicalDepartment['groups']){
+    //         consultants.push(group['consultant'])
+    //     }
+    //     console.log(consultants)
+    //     return consultants
+    // }
 
 }

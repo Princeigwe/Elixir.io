@@ -15,19 +15,24 @@ jobs:
       - run:
           name: npm update
           command: sudo npm install -g npm@latest
+
       - run:
           name: test
           command: |
-            npm install rimraf 
+            npm install rimraf --legacy-peer-deps
             npm test
-      - run:
-          name: build Docker image
-          command: docker build -t princeigwe/elixir.io:latest .
-      - run: 
-          name: push Docker image
-          command: |
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD docker.io
-            docker push princeigwe/elixir.io:latest
+      - when:
+          condition:
+            equal: [ main, << pipeline.git.branch >> ]  # when the name of the git branch that was pushed to trigger the pipeline is "main", build and push docker image
+          steps:
+            - run:
+                name: build Docker image
+                command: docker build -t princeigwe/elixir.io:latest .
+            - run: 
+                name: push Docker image
+                command: |
+                  docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD docker.io
+                  docker push princeigwe/elixir.io:latest
 
 
 workflows:

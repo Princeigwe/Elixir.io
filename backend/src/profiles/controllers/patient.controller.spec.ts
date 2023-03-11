@@ -10,60 +10,117 @@ describe('PatientController', () => {
 
 
   let mockPatientService = {
+    
+
     getPatientProfileById: jest.fn((_id: string) => {
+      _id = '1234567'
       return {
+        "assignedDoctor": {
+          "department": "Cardiology",
+          "email": "testuser5@gmail.com",
+          "name": "Clark Peterson",
+          "telephone": "12121212"
+        },
         "_id": "1234567",
-        "user": "630f9ec1ccfea4acf8eb4986",
+        "user": "123456789",
+        "email": "testuser11@gmail.com",
         "maritalStatus": "Single",
-        "medicalIssues": [],
-        "prescriptions": [],
-        "__v": 0
+        "__v": 0,
+        "address": "Spain",
+        "age": 24,
+        "firstName": "Amyyy",
+        "lastName": "Woodsss",
+        "occupation": "Lawyer",
+        "telephone": "53950954"
       }
     }),
 
     getPatientProfiles: jest.fn( () => {
       return [
         {
-          "_id": "1234567",
-          "user": "630f9ec1ccfea4acf8eb4986",
+          "assignedDoctor": {
+            "department": "Cardiology",
+            "email": "testuser5@gmail.com",
+            "name": "Clark Peterson",
+            "telephone": "12121212"
+          },
+          "_id": "63e3c3b22eb5c00110c25ffd",
+          "user": "63e3c3b22eb5c00110c25ffc",
+          "email": "testuser11@gmail.com",
           "maritalStatus": "Single",
-          "medicalIssues": [],
-          "prescriptions": [],
-          "__v": 0
+          "__v": 0,
+          "address": "Spain",
+          "age": 24,
+          "firstName": "Amyyy",
+          "lastName": "Woodsss",
+          "occupation": "Lawyer",
+          "telephone": "53950954"
         },
-
         {
-          "_id": "12345678",
-          "user": "630f9ec1ccfea4acf8eb4986",
-          "maritalStatus": "Single",
-          "medicalIssues": [],
-          "prescriptions": [],
-          "__v": 0
+          "_id": "63e3c3bd2eb5c00110c26002",
+          "user": "63e3c3bd2eb5c00110c26001",
+          "email": "testuser12@gmail.com",
+          "maritalStatus": "Married",
+          "__v": 0,
+          "address": "Rome",
+          "age": 24,
+          "firstName": "Jackson",
+          "lastName": "Michael",
+          "occupation": "Artist",
+          "telephone": "53950954"
         }
       ]
     } ),
 
-    editBasicPatientProfileById: jest.fn( (_id: string, firstName: string, lastName: string, age: number, address: string, telephone: string, occupants: string, maritalStatus: string) => {
+    editBasicPatientProfileById: jest.fn( (_id: string, firstName: string, lastName: string, age: number, address: string, telephone: string, occupation: string, maritalStatus: string) => {
+      _id = '12345678'
+      firstName = "john"
+      lastName = "Smith"
+      age = 24
+      address = "London"
+      telephone = "53950954"
+      occupation = "Lawyer"
+      maritalStatus = "Single"
+
       return {
-        "_id": "12345678",
+        "_id": _id,
         "user": "630f9ec1ccfea4acf8eb4986",
-        "maritalStatus": "Single",
-        "medicalIssues": [],
-        "prescriptions": [],
+        "maritalStatus": maritalStatus,
         "__v": 0,
-        "address": "London",
-        "age": 24,
-        "firstName": "john",
-        "lastName": "Smith",
-        "occupation": "Lawyer",
-        "telephone": "53950954",
-        "doctorAddress": null,
-        "doctorDepartment": null,
-        "doctorHierarchy": null,
-        "doctorName": null,
-        "doctorTelephone": null
+        "address": address,
+        "age": age,
+        "firstName": firstName,
+        "lastName": lastName,
+        "occupation": occupation,
+        "telephone": telephone,
       }
     } ),
+
+    assignDoctorToPatient: jest.fn( (patientId: string, doctorFirstName: string, doctorLastName: string) => {
+      patientId = '1234567',
+      doctorFirstName = 'Matthew'
+      doctorLastName = 'Smith'
+
+      return {
+        "assignedDoctor": {
+          "department": "Cardiology",
+          "email": "testuser5@gmail.com",
+          "name": `${doctorFirstName} ${doctorLastName}`,
+          "telephone": "12121212"
+        },
+        "_id": patientId,
+        "user": "63e3c3b22eb5c00110c25ffc",
+        "email": "testuser11@gmail.com",
+        "maritalStatus": "Single",
+        "__v": 0,
+        "address": "Spain",
+        "age": 24,
+        "firstName": "Amyyy",
+        "lastName": "Woodsss",
+        "occupation": "Lawyer",
+        "telephone": "53950954"
+      }
+    } )
 
     // deletePatientsProfiles: jest.fn( () => {
     //   return { message: 'Patients profiles deleted'}
@@ -90,62 +147,20 @@ describe('PatientController', () => {
   });
 
   it('should return a single patient', async() => {
-    let patient = {
-        "_id": "1234567",
-        "user": "630f9ec1ccfea4acf8eb4986",
-        "maritalStatus": "Single",
-        "medicalIssues": [],
-        "prescriptions": [],
-        "__v": 0
-    }
-    expect(await controller.getPatientProfileById('1234567')).toEqual(patient)
+    expect(await controller.getPatientProfileById('1234567')).toEqual(mockPatientService.getPatientProfileById('1234567'))
   })
 
   it('should return an array of patients', async () => {
-    let patients = [
-      {
-        "_id": "1234567",
-        "user": "630f9ec1ccfea4acf8eb4986",
-        "maritalStatus": "Single",
-        "medicalIssues": [],
-        "prescriptions": [],
-        "__v": 0
-      },
-
-      {
-        "_id": "12345678",
-        "user": "630f9ec1ccfea4acf8eb4986",
-        "maritalStatus": "Single",
-        "medicalIssues": [],
-        "prescriptions": [],
-        "__v": 0
-      }
-    ]
-    expect(await controller.getPatientProfiles()).toEqual(patients)
+    expect(await controller.getPatientProfiles()).toEqual(mockPatientService.getPatientProfiles())
   })
 
   it('should edit basic patient profile data', async () => {
-    let patient = {
-      "_id": "12345678",
-      "user": "630f9ec1ccfea4acf8eb4986",
-      "maritalStatus": "Single",
-      "medicalIssues": [],
-      "prescriptions": [],
-      "__v": 0,
-      "address": "London",
-      "age": 24,
-      "firstName": "john",
-      "lastName": "Smith",
-      "occupation": "Lawyer",
-      "telephone": "53950954",
-      "doctorAddress": null,
-      "doctorDepartment": null,
-      "doctorHierarchy": null,
-      "doctorName": null,
-      "doctorTelephone": null
-    }
 
-    expect(await controller.editBasicPatientProfileById( '12345678' , {firstName: "John", lastName: "Smith", age: 24, address: "London", telephone: "53950954", occupation: "Lawyer", maritalStatus: MaritalStatus.Single}, Request )).toEqual(patient)
+    expect(await controller.editBasicPatientProfileById( '12345678' , {firstName: "John", lastName: "Smith", age: 24, address: "London", telephone: "53950954", occupation: "Lawyer", maritalStatus: MaritalStatus.Single}, Request )).toEqual(mockPatientService.editBasicPatientProfileById('12345678', "John", "Smith", 24, "London", "53950954", "Lawyer", "Single"))
+  })
+
+  it('should assert that the assigned doctor name', async () => {
+    expect( await controller.assignDoctorToPatient('1234567', Request, { doctorFirstName: 'Matthew', doctorLastName: 'Smith' })).toEqual(mockPatientService.assignDoctorToPatient('1234567', 'Matthew', 'Smith'))
   })
 
   // it('should return a delete message', async () => {
