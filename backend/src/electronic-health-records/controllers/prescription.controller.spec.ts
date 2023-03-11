@@ -125,7 +125,48 @@ describe('PrescriptionController', () => {
       ]
     } ),
 
-    getPrescriptionByID: jest.fn(  ),
+    getPrescriptionByID: jest.fn( (prescription_id: string, user: User) => {
+      prescription_id = '12345678'
+      return {
+          "_id": prescription_id,
+          "medicalRecord": "6400b3815bf4070503a7fb28",
+          "patient_demographics": {
+            "firstName": "Amyyy",
+            "lastName": "Woodsss",
+            "email": "testuser11@gmail.com",
+            "age": 24,
+            "address": "Spain",
+            "telephone": "53950954"
+          },
+          "prescriber": {
+            "doctor_firstName": "Clark",
+            "doctor_lastName": "Peterson",
+            "doctor_department": "Cardiology",
+            "doctor_email": "testuser5@gmail.com",
+            "doctor_telephone": "12121212"
+          },
+          "medications": [
+            {
+              "name": "Paracetamol",
+              "dosage": "two tablets",
+              "duration": "5 days",
+              "frequency": "twice daily",
+              "routeOfAdministration": "Oral"
+            },
+            {
+              "name": "Ampliclox",
+              "dosage": "two tablets",
+              "duration": "2 years",
+              "frequency": "thrice weekly",
+              "routeOfAdministration": "Injection"
+            }
+          ],
+          "instructions": "Drink water and rest a lot. Have fun too",
+          "createdAt": "2023-03-02T14:32:57.341Z",
+          "__v": 1
+
+      }
+    } ),
 
     filterPrescriptionsTiedToMedicalRecord: jest.fn(  ),
 
@@ -183,5 +224,12 @@ describe('PrescriptionController', () => {
     const user = {email: "testuser2@gmail.com", password: "testpass123", role: Role.User, category: UserCategory.Patient}
     const mockRequest = { body: user } as Request
     expect( await controller.getPrescriptionsOfLoggedInPatient(mockRequest) ).toEqual( mockPrescriptionService.getPrescriptionsOfLoggedInPatient(user) )
+  })
+
+  it('should return a prescription by id', async () => {
+    const user = {email: "testuser2@gmail.com", password: "testpass123", role: Role.User, category: UserCategory.Patient}
+    const mockRequest = { body: user } as Request
+    expect (await (await controller.getPrescriptionByID('12345678', mockRequest))._id).toEqual('12345678')
+    expect( await controller.getPrescriptionByID('12345678', mockRequest) ).toEqual(mockPrescriptionService.getPrescriptionByID('12345678', user))
   })
 });
