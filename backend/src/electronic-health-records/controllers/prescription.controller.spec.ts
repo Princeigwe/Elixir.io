@@ -49,7 +49,7 @@ describe('PrescriptionController', () => {
         "patient_demographics": {
           "firstName" : aes.encrypt("John"),
           "lastName"  : aes.encrypt("Smith"),
-          "email"     : aes.encrypt("johnsmith@gmail.com"),
+          "email"     : aes.encrypt("testuser2@gmail"),
           "age"       : 24,
           "address"   : aes.encrypt("London, UK"),
           "telephone" : aes.encrypt("9090909090")
@@ -81,7 +81,49 @@ describe('PrescriptionController', () => {
       }
     } ),
 
-    getPrescriptionOfLoggedInPatient: jest.fn(  ),
+    getPrescriptionsOfLoggedInPatient: jest.fn( (user: User) => {
+      user = {email: "testuser2@gmail.com", password: "testpass123", role: Role.User, category: UserCategory.Patient}
+      return [
+        {
+          "_id": "63fa8b3947bf1cf1ad4efca1",
+          "medicalRecord": "63fa869bebcdd8ee03e886d0",
+          "patient_demographics": {
+            "firstName": "Amyyy",
+            "lastName": "Woodsss",
+            "email": user.email,
+            "age": 24,
+            "address": "Spain",
+            "telephone": "53950954"
+          },
+          "prescriber": {
+            "doctor_firstName": "Clark",
+            "doctor_lastName": "Peterson",
+            "doctor_department": "Cardiology",
+            "doctor_email": "testuser5@gmail.com",
+            "doctor_telephone": "12121212"
+          },
+          "medications": [
+            {
+              "name": "Paracetamol",
+              "dosage": "two tablets",
+              "duration": "5 days",
+              "frequency": "twice daily",
+              "routeOfAdministration": "Oral"
+            },
+            {
+              "name": "Ampliclox",
+              "dosage": "two tablets",
+              "duration": "2 years",
+              "frequency": "thrice weekly",
+              "routeOfAdministration": "Injection"
+            }
+          ],
+          "instructions": "Drink water and rest a lot. Have fun too",
+          "createdAt": "2023-02-25T22:27:05.365Z",
+          "__v": 1
+        }
+      ]
+    } ),
 
     getPrescriptionByID: jest.fn(  ),
 
@@ -135,5 +177,11 @@ describe('PrescriptionController', () => {
         instructions: instructions
       }, 
       mockRequest ) ).toEqual(mockPrescriptionService.addPrescriptionToMedicalRecord( '12345678', user, medications, instructions ))
+  })
+
+  it('should return prescriptions of logged in patient', async() => {
+    const user = {email: "testuser2@gmail.com", password: "testpass123", role: Role.User, category: UserCategory.Patient}
+    const mockRequest = { body: user } as Request
+    expect( await controller.getPrescriptionsOfLoggedInPatient(mockRequest) ).toEqual( mockPrescriptionService.getPrescriptionsOfLoggedInPatient(user) )
   })
 });
