@@ -23,7 +23,7 @@ export class PrescriptionController {
     @ApiBody({type: PrescriptionDto})
     @UseGuards(JwtAuthGuard)
     @Post(':medical_record_id')
-    async addPrescriptionToMedicalRecord( @Param('medical_record_id') medical_record_id: string, @Body() body: PrescriptionDto, @Request() request, medication: MedicationDto ) {
+    async addPrescriptionToMedicalRecord( @Param('medical_record_id') medical_record_id: string, @Body() body: PrescriptionDto, @Request() request ) {
         const user = request.user
         return await this.prescriptionService.addPrescriptionToMedicalRecord( medical_record_id, user, body.medications, body.instructions)
     }
