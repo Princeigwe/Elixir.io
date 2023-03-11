@@ -168,10 +168,6 @@ describe('PrescriptionController', () => {
       }
     } ),
 
-    filterPrescriptionsTiedToMedicalRecord: jest.fn(  ),
-
-    getPrescriptions: jest.fn(  ),
-
   }
 
   beforeEach(async () => {
