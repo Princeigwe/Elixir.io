@@ -6,6 +6,7 @@ import { User } from '../../users/users.schema';
 import {UserCategory} from '../../enums/user.category.enum'
 import {Role} from '../../enums/role.enum'
 import { Request } from 'express';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 const aes = new AesEncryption()
 aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
@@ -165,8 +166,7 @@ describe('ProgressNoteController', () => {
           "__v": 0
         }
       ]
-    } )
-
+    } ),
   }
 
   beforeEach(async () => {
@@ -207,9 +207,10 @@ describe('ProgressNoteController', () => {
   })
 
   it('should filter progress notes', async () => {
-    const mockRequest = { body: {email: "testadmin@gmail.com", password: "testpass123", role: Role.Admin, category: UserCategory.MedicalProvider} } as Request
-    const medical_record_id = "6405466ba1facf807b676ab2"
     const user = {email: "testadmin@gmail.com", password: "testpass123", role: Role.Admin, category: UserCategory.MedicalProvider}
+    const mockRequest = { body: user } as Request
+    const medical_record_id = "6405466ba1facf807b676ab2"
     expect(await controller.getAllProgressNotes(mockRequest, medical_record_id)).toEqual(mockProgressNoteService.filterProgressNotesTiedToMedicalRecord(medical_record_id, user))
   })
+
 });
