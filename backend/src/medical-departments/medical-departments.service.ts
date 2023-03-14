@@ -302,6 +302,11 @@ export class MedicalDepartmentsService {
 
     // this action will only be executed by the admin
     async deleteMedicalDepartments() {
+        const departments = [ MedicalDepartments.Cardiology, MedicalDepartments.Dermatology, MedicalDepartments.Urology, MedicalDepartments.IntensiveCareMedicine, MedicalDepartments.Neurology, MedicalDepartments.Surgery, MedicalDepartments.Radiology, MedicalDepartments.Pharmacy ]
+        for(let department of departments) {
+            const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
+            if(medicalDepartment.members.length) { throw new HttpException( `There are existing medical providers still attached to ${department} department`, HttpStatus.BAD_REQUEST ) }
+        }
         await this.medicalDepartmentModel.deleteMany()
         return {message: 'Medical departments Deleted successfully'}
     }
