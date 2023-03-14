@@ -311,6 +311,7 @@ export class MedicalDepartmentsService {
     async searchAndDeleteMedicalDepartmentByName(name: string) {
         const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': name}).exec()
         if (!medicalDepartment) {throw new NotFoundException('This department cannot be deleted because it does not exist')}
+        else if( medicalDepartment.members.length ) { throw new HttpException( "There are existing medical providers still attached to this department", HttpStatus.BAD_REQUEST ) }
         await this.medicalDepartmentModel.deleteOne({'name': name})
         return {message: 'Medical department deleted successfully'}
     }
