@@ -23,6 +23,10 @@ services:
       S3_BUCKET: ${S3_BUCKET}
       NODE_ENV: development
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      ELASTIC_EMAIL_USERNAME: ${ELASTIC_EMAIL_USERNAME}
+      ELASTIC_EMAIL_PASSWORD: ${ELASTIC_EMAIL_PASSWORD}
+      ELASTIC_EMAIL_SERVER_HOST: ${ELASTIC_EMAIL_SERVER_HOST}
+      ELASTIC_EMAIL_PORT: ${ELASTIC_EMAIL_PORT}
     volumes:
       - .:/usr/src/app/ # mounting the directory inside the container
       - /usr/src/app/backend/node_modules # mounting node_modules inside the backend container
