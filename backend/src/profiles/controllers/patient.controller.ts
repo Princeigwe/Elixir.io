@@ -156,7 +156,6 @@ export class PatientController {
         return await this.patientService.removeAssignedPatientFromDoctor(user, patientId, body.doctorFirstName, body.doctorLastName)
     }
 
-    // todo: add admin authorization for this action
     @ApiOperation({description: "DELETE all patients in the database"})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()

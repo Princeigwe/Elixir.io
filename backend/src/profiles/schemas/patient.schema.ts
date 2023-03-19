@@ -12,7 +12,6 @@ export type PatientDocument = Patient & Document
 @Schema()
 export class Patient {
     
-    // todo: this will be the url string of profile image
     @Prop()
     imageUrl: string
     
