@@ -31,6 +31,29 @@ export class MedicalDepartmentsService {
         private doctorService: DoctorService
     ) {}
 
+
+    // defining the email data that will sent to an email when the user is assigned to a department with whatever hierarchy
+    async emailAssignedToDepartment(firstName: string, lastName: string, email: string, department: string) {
+        const emailAssignedData = {
+            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+            to: [email,],
+            subject: 'Medical Department Notification',
+            text: `Dear ${firstName} ${lastName}, this email is to notify you that you have now been assigned to the ${department} department of Elixir.`
+        }
+        return emailAssignedData
+    }
+
+    // defining the email data that will sent to an email when the user cannot be assigned to a department with whatever hierarchy
+    async emailNoVacancyToDepartmentWithHierarchy(firstName: string, lastName: string, email: string, department: string, hierarchy: DoctorHierarchy){
+        const emailNoVacancyData = {
+            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+            to: [email,],
+            subject: 'Medical Department Notification',
+            text: `Dear ${firstName} ${lastName}, this email is to notify you that there is no available space to add a new ${hierarchy} to the ${department} department of Elixir.`
+        }
+        return emailNoVacancyData
+    }
+
     // this action will only be executed by the admin
     async createMedicalDepartment(name: string) {
 
@@ -151,21 +174,6 @@ export class MedicalDepartmentsService {
         let doctorNames = `${firstName} ${lastName}`    
         let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
         let lengthOfLastAssociateSpecialistsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['associateSpecialists'])  // getting the length of the last associateSpecialists array in the last group with lodash
-
-        const emailAssignedData = {
-            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
-            to: [email,],
-            subject: 'Medical Department Notification',
-            text: `Dear ${firstName} ${lastName}, this email is to notify you that you have now been assigned to the ${department} department of Elixir.`
-        }
-
-        const emailNoHierarchyData = {
-            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
-            to: [email,],
-            subject: 'Medical Department Notification',
-            text: `Dear ${firstName} ${lastName}, this email is to notify you that there is no available space to add a new Associate Specialist to the ${department} department of Elixir.`
-        }
-
         
         /*
             if the roles for associate specialists in a department are filled up,
@@ -175,7 +183,7 @@ export class MedicalDepartmentsService {
         if(lengthOfLastAssociateSpecialistsArrayInLastGroup == 2) { // 2 here is the maximum number of items the associateSpecialists array can take
             let hierarchy = DoctorHierarchy.AssociateSpecialist
             // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
-            await emailSender.sendMail(emailNoHierarchyData)
+            await emailSender.sendMail(await this.emailNoVacancyToDepartmentWithHierarchy(firstName, lastName, email, department, hierarchy))
             await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy)
         }
         
@@ -190,7 +198,7 @@ export class MedicalDepartmentsService {
 
             // add to members array of department
             await this.addToMembersOfDepartment(department, doctorNames)
-            await emailSender.sendMail(emailAssignedData)
+            await emailSender.sendMail(await this.emailAssignedToDepartment(firstName, lastName, email, department))
         }
     }
 
