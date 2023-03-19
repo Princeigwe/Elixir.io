@@ -224,9 +224,8 @@ export class MedicalDepartmentsService {
         if(lengthOfLastJuniorDoctorsArrayInLastGroup == 4) { // 4 here is the maximum number of items the juniorDoctors array can take
             let hierarchy = DoctorHierarchy.JuniorDoctor
             // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
+            await emailSender.sendMail(await this.emailNoVacancyToDepartmentWithHierarchy(firstName, lastName, email, department, hierarchy))
             await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy)
-            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
-            console.log("No available space to add a new junior doctor")
         }
 
         else{
@@ -240,6 +239,7 @@ export class MedicalDepartmentsService {
 
             // add to members array of department
             await this.addToMembersOfDepartment(department, doctorNames)
+            await emailSender.sendMail(await this.emailAssignedToDepartment(firstName, lastName, email, department))
         }
     }
 
@@ -264,9 +264,8 @@ export class MedicalDepartmentsService {
         if(lengthOfLastMedicalStudentsArrayInLastGroup == 8) { // 8 here is the maximum number of items the medicalStudents array can take
             let hierarchy = DoctorHierarchy.MedicalStudent
             // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
+            await emailSender.sendMail(await this.emailNoVacancyToDepartmentWithHierarchy(firstName, lastName, email, department, hierarchy))
             await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy)
-            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
-            console.log("No available space to add a new medical student")
         }
 
         else { 
@@ -280,6 +279,7 @@ export class MedicalDepartmentsService {
 
             // add to members array of department
             await this.addToMembersOfDepartment(department, doctorNames)
+            await emailSender.sendMail(await this.emailAssignedToDepartment(firstName, lastName, email, department))
         }
     }
 
