@@ -10,6 +10,7 @@ import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGr
 import * as _ from 'lodash'
 import {DoctorService} from '../profiles/services/doctor.service'
 import { RemoveDoctorEvent } from '../events/removeDoctorFromDepartment.event';
+import { EmailSender } from '../email/transporter';
 
 // AVAILABLE DEPARTMENTS = 
 // - Cardiology
@@ -20,6 +21,8 @@ import { RemoveDoctorEvent } from '../events/removeDoctorFromDepartment.event';
 // - Surgery
 // - Radiology
 // - Pharmacy
+
+const emailSender = new EmailSender()
 
 @Injectable()
 export class MedicalDepartmentsService {
@@ -136,7 +139,7 @@ export class MedicalDepartmentsService {
 
 
     // function to add an associate specialist to a group in a specified department
-    async addAssociateSpecialistToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+    async addAssociateSpecialistToADepartmentGroup(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         /**
          * this function gets the department the doctor specified during registration.
          * it checks if there is a group available in that department.
@@ -148,6 +151,21 @@ export class MedicalDepartmentsService {
         let doctorNames = `${firstName} ${lastName}`    
         let lastGroupOfDepartmentGroups = doctorDepartment['groups'][doctorDepartment['groups'].length - 1] // getting the last group item of groups
         let lengthOfLastAssociateSpecialistsArrayInLastGroup = _.size(lastGroupOfDepartmentGroups['associateSpecialists'])  // getting the length of the last associateSpecialists array in the last group with lodash
+
+        const emailAssignedData = {
+            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+            to: [email,],
+            subject: 'Medical Department Notification',
+            text: `Dear ${firstName} ${lastName}, this email is to notify you that you have now been assigned to the ${department} department of Elixir.`
+        }
+
+        const emailNoHierarchyData = {
+            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+            to: [email,],
+            subject: 'Medical Department Notification',
+            text: `Dear ${firstName} ${lastName}, this email is to notify you that there is no available space to add a new Associate Specialist to the ${department} department of Elixir.`
+        }
+
         
         /*
             if the roles for associate specialists in a department are filled up,
@@ -157,9 +175,8 @@ export class MedicalDepartmentsService {
         if(lengthOfLastAssociateSpecialistsArrayInLastGroup == 2) { // 2 here is the maximum number of items the associateSpecialists array can take
             let hierarchy = DoctorHierarchy.AssociateSpecialist
             // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
-            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
-            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
-            console.log("No available space to add a new associate specialist")
+            await emailSender.sendMail(emailNoHierarchyData)
+            await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy)
         }
         
         else{
@@ -173,12 +190,13 @@ export class MedicalDepartmentsService {
 
             // add to members array of department
             await this.addToMembersOfDepartment(department, doctorNames)
+            await emailSender.sendMail(emailAssignedData)
         }
     }
 
 
     // function to add a junior doctor to a group in a specified department
-    async addJuniorDoctorToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+    async addJuniorDoctorToADepartmentGroup(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         /**
          * this function gets the department the doctor specified during registration.
          * it checks if there is a group available in that department.
@@ -198,7 +216,7 @@ export class MedicalDepartmentsService {
         if(lengthOfLastJuniorDoctorsArrayInLastGroup == 4) { // 4 here is the maximum number of items the juniorDoctors array can take
             let hierarchy = DoctorHierarchy.JuniorDoctor
             // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
-            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
+            await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new junior doctor")
         }
@@ -218,7 +236,7 @@ export class MedicalDepartmentsService {
     }
 
 
-    async addMedicalStudentToADepartmentGroup(firstName: string, lastName: string, department: MedicalDepartments) {
+    async addMedicalStudentToADepartmentGroup(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         /**
          * this function gets the department the doctor specified during registration.
          * it checks if there is a group available in that department.
@@ -238,7 +256,7 @@ export class MedicalDepartmentsService {
         if(lengthOfLastMedicalStudentsArrayInLastGroup == 8) { // 8 here is the maximum number of items the medicalStudents array can take
             let hierarchy = DoctorHierarchy.MedicalStudent
             // await this.doctorService.deleteUserLinkedToDoctorProfile(firstName, lastName, department, hierarchy)
-            await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy)
+            await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy)
             //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
             console.log("No available space to add a new medical student")
         }
@@ -265,7 +283,7 @@ export class MedicalDepartmentsService {
         const lastName = payload.lastName
         const department = payload.department
         let hierarchy = payload.hierarchy // ** hierarchy may be undefined if not specified according to 'registerDoctorToADepartment()' of auth.controller.ts **
-
+        let email = payload.email
         if (hierarchy == undefined) {
             hierarchy = DoctorHierarchy.AssociateSpecialist
         }
@@ -275,26 +293,33 @@ export class MedicalDepartmentsService {
 
         let doctorNames = `${firstName} ${lastName}`
 
-        console.log(`New doctor added with ${doctorNames}, ${department}, ${hierarchy}`)
+        console.log(`New doctor ${doctorNames}, signed up to the department of ${department}, as a(n) ${hierarchy}`)
         // console.log(departmentGroups)
 
+        /* The above code is checking if the departmentGroups array is empty. If it is empty, it will
+        wait for 2 minutes before sending an email to the related parties. */
         if(departmentGroups["groups"].length == 0) {
             const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
-            await sleep(120000) // sleep for 2 minutes before notifying the related parties
+            await sleep(120000)
 
-            //todo: this should be replaced with an email service, Nodemailer or AWS email service, notifying the admin officers and the user that just registered
-            console.log(`A(n) ${hierarchy} can no longer be accepted as of this time.`)
+            const emailNoVacancyData = {
+                from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+                to: [email,],
+                subject: 'Medical Department Notification',
+                text: `Dear ${firstName} ${lastName}, this email is to notify you that a(n) ${hierarchy} can no longer be accepted as of this time..`
+            }
+            await emailSender.sendMail(emailNoVacancyData)
         }
 
         if(hierarchy == DoctorHierarchy.AssociateSpecialist) {
-            await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
+            await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, email, department)
         }
         else if(hierarchy == DoctorHierarchy.JuniorDoctor) {
-            await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
+            await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, email,  department)
         }
 
         else if(hierarchy == DoctorHierarchy.MedicalStudent) { 
-            await this.addMedicalStudentToADepartmentGroup(firstName, lastName, department)
+            await this.addMedicalStudentToADepartmentGroup(firstName, lastName, email, department)
         }
 
     }
@@ -302,6 +327,15 @@ export class MedicalDepartmentsService {
 
     // this action will only be executed by the admin
     async deleteMedicalDepartments() {
+        const emailData = {
+            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+            to: ['Rob4Lifewire@mailinator.com',],
+            subject: 'Test Email',
+            text: 'Hello World!'
+        }
+        await emailSender.sendMail(emailData)
+        console.log('email ish')
+        
         const departments = [ MedicalDepartments.Cardiology, MedicalDepartments.Dermatology, MedicalDepartments.Urology, MedicalDepartments.IntensiveCareMedicine, MedicalDepartments.Neurology, MedicalDepartments.Surgery, MedicalDepartments.Radiology, MedicalDepartments.Pharmacy ]
         for(let department of departments) {
             const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
@@ -436,15 +470,15 @@ export class MedicalDepartmentsService {
 
     //** medical department hierarchy promotion methods, they move doctor names up to higher ranks in the department */
 
-    async promoteMedicalStudentToJuniorDoctorInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+    async promoteMedicalStudentToJuniorDoctorInDepartment(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         await this.removeExistingMedicalStudentFromAGroup(firstName, lastName, department)
-        await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
+        await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, email, department)
     }
 
 
-    async promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+    async promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         await this.removeExistingJuniorDoctorFromAGroup(firstName, lastName, department)
-        await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
+        await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, email, department)
     }
 
 
@@ -456,21 +490,21 @@ export class MedicalDepartmentsService {
 
     //** medical department hierarchy demotion methods, they move doctor names down to lower ranks in the department */
 
-    async demoteConsultantToAssociateSpecialistInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+    async demoteConsultantToAssociateSpecialistInDepartment(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         await this.removeExistingConsultantFromAGroup(firstName, lastName, department)
-        await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, department)
+        await this.addAssociateSpecialistToADepartmentGroup(firstName, lastName, email, department)
     }
 
 
-    async demoteAssociateSpecialistToJuniorDoctorInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+    async demoteAssociateSpecialistToJuniorDoctorInDepartment(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         await this.removeExistingAssociateSpecialistFromAGroup(firstName, lastName, department)
-        await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, department)
+        await this.addJuniorDoctorToADepartmentGroup(firstName, lastName, email, department)
     }
 
 
-    async demoteJuniorDoctorToMedicalStudentInDepartment(firstName: string, lastName: string, department: MedicalDepartments) {
+    async demoteJuniorDoctorToMedicalStudentInDepartment(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         await this.removeExistingJuniorDoctorFromAGroup(firstName, lastName, department)
-        await this.addMedicalStudentToADepartmentGroup(firstName, lastName, department)
+        await this.addMedicalStudentToADepartmentGroup(firstName, lastName, email,  department)
     }
 
 
