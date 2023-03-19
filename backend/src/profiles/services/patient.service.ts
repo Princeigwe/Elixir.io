@@ -156,8 +156,6 @@ export class PatientService {
             )
         )
 
-        //todo: send an email to both patient and doctor notifying them of the changes to their profiles
-
         return updatedPatientProfile
     }
 

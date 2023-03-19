@@ -248,10 +248,10 @@ export class DoctorService {
 
 
     // this will be used in the medical department service when a doctor cannot be added to a department
-    async deleteDoctorByNamesDepartmentAndHierarchy(firstName: string, lastName: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
+    async deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName: string, lastName: string, email: string, department: MedicalDepartments, hierarchy: DoctorHierarchy) {
 
         // this deletes the user model tied to the doctor profile
-        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+        const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'email': email, 'department': department, 'hierarchy': hierarchy})
         const doctorUserObjectID = doctor['user']
         console.log(doctorUserObjectID)
         await this.usersService.deleteUserByID(doctorUserObjectID)
@@ -267,26 +267,26 @@ export class DoctorService {
         }
 
         // deletes doctor profile
-        await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'department': department, 'hierarchy': hierarchy})
+        await this.doctorModel.deleteOne({'firstName': firstName, 'lastName': lastName, 'email': email, 'department': department, 'hierarchy': hierarchy})
     }
 
 
     // this action will only be executed by an admin
-    async promoteDoctorHierarchy(firstName: string, lastName: string, department: MedicalDepartments) {
+    async promoteDoctorHierarchy(firstName: string, lastName: string, email: string,  department: MedicalDepartments) {
         const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'department': department }).exec() 
         if(!doctor) {throw new NotFoundException("Doctor Not Found")}
 
         else if(doctor.hierarchy == DoctorHierarchy.MedicalStudent) {
             await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
-            await this.medicalDepartmentsService.promoteMedicalStudentToJuniorDoctorInDepartment(firstName, lastName, department)
-            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            await this.medicalDepartmentsService.promoteMedicalStudentToJuniorDoctorInDepartment(firstName, lastName, email, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'email': { "$regex": email, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
         else if(doctor.hierarchy == DoctorHierarchy.JuniorDoctor) {
             await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
-            await this.medicalDepartmentsService.promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName, lastName, department)
-            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            await this.medicalDepartmentsService.promoteJuniorDoctorToAssociateSpecialistInDepartment(firstName, lastName, email, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'email': { "$regex": email, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
@@ -304,28 +304,28 @@ export class DoctorService {
 
 
     // this action will be executed by the admin, in case of an error in promotion
-    async demoteDoctorHierarchy(firstName: string, lastName: string, department: MedicalDepartments) {
+    async demoteDoctorHierarchy(firstName: string, lastName: string, email: string, department: MedicalDepartments) {
         const doctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec() 
         if(!doctor) {throw new NotFoundException("Doctor Not Found")}
 
         else if(doctor.hierarchy == DoctorHierarchy.Consultant) {
             await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.AssociateSpecialist}})
-            await this.medicalDepartmentsService.demoteConsultantToAssociateSpecialistInDepartment(firstName, lastName, department)
-            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            await this.medicalDepartmentsService.demoteConsultantToAssociateSpecialistInDepartment(firstName, lastName, email, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'email': { "$regex": email, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
         else if(doctor.hierarchy == DoctorHierarchy.AssociateSpecialist) {
             await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department}, {$set: {'hierarchy': DoctorHierarchy.JuniorDoctor}})
-            await this.medicalDepartmentsService.demoteAssociateSpecialistToJuniorDoctorInDepartment(firstName, lastName, department)
-            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            await this.medicalDepartmentsService.demoteAssociateSpecialistToJuniorDoctorInDepartment(firstName, lastName, email, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'email': { "$regex": email, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 
         else if(doctor.hierarchy == DoctorHierarchy.JuniorDoctor) {
             await this.doctorModel.updateOne({'firstName': firstName, 'lastName': lastName, 'department': department }, {$set: {'hierarchy': DoctorHierarchy.MedicalStudent}})
-            await this.medicalDepartmentsService.demoteJuniorDoctorToMedicalStudentInDepartment(firstName, lastName, department)
-            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
+            await this.medicalDepartmentsService.demoteJuniorDoctorToMedicalStudentInDepartment(firstName, lastName, email, department)
+            let updatedDoctor = await this.doctorModel.findOne({'firstName': { "$regex": firstName, "$options": 'i' }, 'lastName': { "$regex": lastName, "$options": 'i' }, 'email': { "$regex": email, "$options": 'i' }, 'department': { "$regex": department, "$options": 'i' } }).exec()
             return updatedDoctor
         }
 

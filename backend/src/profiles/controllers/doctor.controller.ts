@@ -145,13 +145,14 @@ export class DoctorController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete(':firstName/:lastName/:department/:hierarchy')
     @Roles(Role.Admin)
-    async deleteDoctorByNamesDepartmentAndHierarchy(
+    async deleteDoctorByNamesEmailDepartmentAndHierarchy(
         @Param('firstName') firstName: string, 
         @Param('lastName') lastName: string, 
+        @Param('email') email: string,
         @Param('department') department: MedicalDepartments, 
         @Param('hierarchy') hierarchy: DoctorHierarchy) {
 
-        await this.doctorService.deleteDoctorByNamesDepartmentAndHierarchy(firstName, lastName, department, hierarchy);
+        await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy);
         throw new HttpException("Doctor Profile Deleted", HttpStatus.NO_CONTENT) 
     }
 
@@ -170,14 +171,15 @@ export class DoctorController {
     })
     @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required"})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Patch('promote-doctor-hierarchy/:firstName/:lastName/:department')
+    @Patch('promote-doctor-hierarchy/:firstName/:lastName/:email/:department')
     @Roles(Role.Admin) 
     async promoteDoctorHierarchy(
         @Param('firstName') firstName: string, 
         @Param('lastName') lastName: string, 
+        @Param('email') email: string,
         @Param('department') department: MedicalDepartments,) 
     {
-        return this.doctorService.promoteDoctorHierarchy(firstName, lastName, department)
+        return this.doctorService.promoteDoctorHierarchy(firstName, lastName, email, department)
     }
 
 
@@ -196,14 +198,15 @@ export class DoctorController {
     })
     @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required"})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Patch('demote-doctor-hierarchy/:firstName/:lastName/:department')
+    @Patch('demote-doctor-hierarchy/:firstName/:lastName/:email/:department')
     @Roles(Role.Admin) 
     async demoteDoctorHierarchy(
         @Param('firstName') firstName: string, 
         @Param('lastName') lastName: string, 
+        @Param('email') email: string,
         @Param('department') department: MedicalDepartments,
     ) {
-        return this.doctorService.demoteDoctorHierarchy(firstName, lastName, department)
+        return this.doctorService.demoteDoctorHierarchy(firstName, lastName, email, department)
     }
 
 }

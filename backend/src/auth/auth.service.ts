@@ -208,7 +208,7 @@ export class AuthService {
         }
 
         const doctor = await this.registerUserMedicalProvider(email, firstName, lastName, password, hierarchy, department, telephone, address)
-        this.eventEmitter.emit('new.doctor', new NewMedicalDepartmentDoctorEvent(firstName, lastName, department, hierarchy))
+        this.eventEmitter.emit('new.doctor', new NewMedicalDepartmentDoctorEvent(firstName, lastName, department, hierarchy, email))
         return doctor
     }
 
