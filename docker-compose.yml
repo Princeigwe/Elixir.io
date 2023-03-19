@@ -27,6 +27,7 @@ services:
       ELASTIC_EMAIL_PASSWORD: ${ELASTIC_EMAIL_PASSWORD}
       ELASTIC_EMAIL_SERVER_HOST: ${ELASTIC_EMAIL_SERVER_HOST}
       ELASTIC_EMAIL_PORT: ${ELASTIC_EMAIL_PORT}
+      ELASTIC_EMAIL_FROM_EMAIL: ${ELASTIC_EMAIL_FROM_EMAIL}
     volumes:
       - .:/usr/src/app/ # mounting the directory inside the container
       - /usr/src/app/backend/node_modules # mounting node_modules inside the backend container
