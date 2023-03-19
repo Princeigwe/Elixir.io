@@ -6,6 +6,7 @@ export class NewMedicalDepartmentDoctorEvent {
         public firstName: string,
         public lastName: string,
         public department: MedicalDepartments,
-        public hierarchy: DoctorHierarchy
+        public hierarchy: DoctorHierarchy,
+        public email: string
     ) {}
 }
