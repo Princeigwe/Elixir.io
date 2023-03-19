@@ -335,15 +335,6 @@ export class MedicalDepartmentsService {
 
     // this action will only be executed by the admin
     async deleteMedicalDepartments() {
-        const emailData = {
-            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
-            to: ['Rob4Lifewire@mailinator.com',],
-            subject: 'Test Email',
-            text: 'Hello World!'
-        }
-        await emailSender.sendMail(emailData)
-        console.log('email ish')
-        
         const departments = [ MedicalDepartments.Cardiology, MedicalDepartments.Dermatology, MedicalDepartments.Urology, MedicalDepartments.IntensiveCareMedicine, MedicalDepartments.Neurology, MedicalDepartments.Surgery, MedicalDepartments.Radiology, MedicalDepartments.Pharmacy ]
         for(let department of departments) {
             const medicalDepartment = await this.medicalDepartmentModel.findOne({'name': department}).exec()
