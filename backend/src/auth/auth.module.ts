@@ -24,6 +24,7 @@ import {MedicalDepartmentsModule} from '../medical-departments/medical-departmen
     })
   ], 
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [AuthService]
 })
 export class AuthModule {}
