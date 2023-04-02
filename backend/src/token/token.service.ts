@@ -68,6 +68,9 @@ export class TokenService {
 
         const encryptedToken = aes.encrypt(token)
         const resetToken = await this.resetTokenModel.findOne({ token: encryptedToken})
+        if(!resetToken) {
+            throw new HttpException("This token is invalid. Please request another and try again", HttpStatus.BAD_REQUEST)
+        }
 
         //* configuring expiration time of token
 
@@ -91,6 +94,9 @@ export class TokenService {
 
         const decryptedResetTokenEmail = aes.decrypt(resetToken.email)
         await this.authService.changePassword(decryptedResetTokenEmail, password, confirmPassword)
+        
+        // deleting the token the token so that it cannot be used again under two minutes
+        await this.resetTokenModel.deleteOne({token: encryptedToken})
 
         // dummy
         return {message: "password updated"}
