@@ -22,6 +22,7 @@ export class TokenService {
         private authService: AuthService
     ) {}
 
+
     /**
      * It generates a random string of 64 hexadecimal characters
      */
@@ -62,11 +63,32 @@ export class TokenService {
 
     async confirmPasswordReset(token: string, password: string, confirmPassword: string) { 
 
-        //* check expiration of token before doing anything else.
+        const now = new Date()
+        const currentMinute = now.getMinutes()
 
         const encryptedToken = aes.encrypt(token)
-
         const resetToken = await this.resetTokenModel.findOne({ token: encryptedToken})
+
+        //* configuring expiration time of token
+
+        //getting the minute the token was issued
+        const tokenIssuedTime = resetToken['createdAt']
+        const date = new Date(tokenIssuedTime)
+        const tokenIssuedMinute = date.getMinutes()
+
+        // setting the expiration time to 2 minutes
+        const tokenExpirationTime = tokenIssuedMinute + 2
+
+        /* 
+            if the tokenExpirationTime(minute) is less than the current timeMinute when the function is called,
+            or if token was issued on the 58th minute, delete it when this function is called in the first minute of the next hour
+            the token becomes invalid. delete token and respond with "invalid token message"
+         */
+        if( tokenExpirationTime < currentMinute || tokenExpirationTime - currentMinute == 59 ) {
+            await this.resetTokenModel.deleteOne({token: encryptedToken}).exec()
+            throw new HttpException('This token is expired. Please request a new one and try again', HttpStatus.BAD_REQUEST)
+        }
+
         const decryptedResetTokenEmail = aes.decrypt(resetToken.email)
         await this.authService.changePassword(decryptedResetTokenEmail, password, confirmPassword)
 
