@@ -55,12 +55,15 @@ export class TokenService {
     }
 
 
-    async confirmPasswordReset( password: string, confirmPassword: string, token: string) { 
+    async confirmPasswordReset(token: string, password: string, confirmPassword: string) { 
 
         //* check expiration of token before doing anything else.
 
         const resetToken = await this.resetTokenModel.findOne({ token: token})
         await this.authService.changePassword(resetToken.email, password, confirmPassword)
+
+        // dummy
+        return {message: "password updated"}
 
     }
 }
