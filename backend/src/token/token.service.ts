@@ -98,8 +98,7 @@ export class TokenService {
         // deleting the token the token so that it cannot be used again under two minutes
         await this.resetTokenModel.deleteOne({token: encryptedToken})
 
-        // dummy
-        return {message: "password updated"}
+        return {message: "Success. Your password has been reset. You can now log in to your account using your new password."}
 
     }
 }
