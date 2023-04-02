@@ -30,16 +30,16 @@ export class TokenService {
 
     async sendForgotPasswordEmail(email: string) {
         // check for existing reset token linked to email address, and delete if any
-        const existingResetToken = await this.resetTokenModel.findOne({'email': email}).exec()
+        const encryptedEmail = aes.encrypt(email)
+        const existingResetToken = await this.resetTokenModel.findOne({'email': encryptedEmail}).exec()
         if (existingResetToken) {
-            await this.resetTokenModel.deleteOne({'email': email}).exec()
+            await this.resetTokenModel.deleteOne({'email': encryptedEmail}).exec()
         }
 
         //* placing the token creation logic in the if statement. This way, tokens are not created for emails addresses that don't exist in the database
         const existingUser = await this.usersService.getUserByEmailForPasswordResetAndChange(email)
         if(existingUser) {
             const token = await this.generateRandomTokenString()
-            const encryptedEmail = aes.encrypt(email)
             const encryptedToken = aes.encrypt(token)
 
             // storing encrypted email and token in database for security risk
