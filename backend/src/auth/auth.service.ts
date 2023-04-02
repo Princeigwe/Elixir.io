@@ -250,4 +250,20 @@ export class AuthService {
         const token = this.jwtService.sign(payload)
         return `Authentication=${token}; HttpOnly; Path=/; Max-Age=86400`;
     }
+
+
+
+
+    async changePassword(email: string, password: string, confirmPassword: string) {
+        if(password != confirmPassword) {
+            throw new HttpException( 'Passwords do not match.', HttpStatus.BAD_REQUEST )
+        }
+
+        const user = await this.userService.getUserByEmailForPasswordResetAndChange(email)
+        if (user) {
+            const salt = await bcrypt.genSalt(10) // generate salt
+            const hashedPassword = await bcrypt.hash(confirmPassword, salt) //hashing user password to salt
+            await this.userService.updateUserCredentials(user.email, hashedPassword)
+        }
+    }
 }

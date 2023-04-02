@@ -12,6 +12,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { DataBackupModule } from './data-backup/data-backup.module';
 import { DataRestoreModule } from './data-restore/data-restore.module';
 import { ElectronicHealthRecordsModule } from './electronic-health-records/electronic-health-records.module';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { ElectronicHealthRecordsModule } from './electronic-health-records/elect
     ScheduleModule.forRoot(),
     DataBackupModule,
     DataRestoreModule,
-    ElectronicHealthRecordsModule
+    ElectronicHealthRecordsModule,
+    TokenModule
   ],
   // controllers: [AppController],
   // providers: [AppService],
