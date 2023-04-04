@@ -12,9 +12,6 @@ export class ResetToken {
     @Prop()
     token: string
 
-    @Prop({type: Boolean, default: false})
-    isExpired: boolean
-
 }
 
 export const ResetTokenSchema = SchemaFactory.createForClass(ResetToken)
