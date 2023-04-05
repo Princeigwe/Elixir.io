@@ -100,6 +100,11 @@ export class UsersService {
         return user
     }
 
+    async getUserByEmailForPasswordResetAndChange(email: string) {
+        const user = await this.userModel.findOne({"email": email}).exec()
+        return user
+    }
+
     /**
      * It returns a user object if the user exists, otherwise it throws an error
      * @param {any} _id - any
@@ -141,5 +146,7 @@ export class UsersService {
     }
 
     // this method will be used to change or reset the user's password'
-    async updateUser(password: string) {}
+    async updateUserCredentials(email: string, password: string) {
+        await this.userModel.updateOne({email: email}, { $set: { password: password }}).exec()
+    }
 }

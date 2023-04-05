@@ -4,6 +4,8 @@ import {RegisterUserAdminDto} from './dtos/registerUser.dto'
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import {RegisterUserConsultantDto, RegisterUserDoctorDto} from './dtos/registerMedic.dto'
 import {ApiBody, ApiTags, ApiResponse, ApiOperation} from '@nestjs/swagger'
+import { ChangePasswordDto } from './dtos/change.password.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 
 @ApiTags('Auth')
@@ -128,5 +130,12 @@ export class AuthController {
     @Get('doctor-form-submitted')
     async doctorRegistrationFormSubmitted() {
         return { message: "Form submitted successfully" }
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('change-password')
+    async changePassword( @Body() body: ChangePasswordDto, @Request() request) {
+        const user = request.user
+        return await this.authService.changePassword(user.email, body.password, body.confirmPassword)
     }
 }
