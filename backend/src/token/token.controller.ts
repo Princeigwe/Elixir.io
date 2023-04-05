@@ -22,12 +22,14 @@ export class TokenController {
     @Render('resetPassword')
     async getPasswordResetToken( @Query('token') token: string, @Request() request ?: Request) { 
 
+        // if this endpoint is called from the browser
         if(typeof window !== 'undefined') { 
             const urlSearchParams = new URLSearchParams(window.location.search);
             token = urlSearchParams.get('token');
             return {token: token}
         }
 
+        // if this endpoint is called from an API client like Postman or Insomnia
         else { 
             const queryObject = url.parse(request.url, true).query;
             token = queryObject.token;
