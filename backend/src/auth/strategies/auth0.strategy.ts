@@ -5,7 +5,7 @@ import { Strategy, VerifyCallback } from 'passport-auth0'
 
 
 @Injectable()
-export class Auth0GoogleStrategy extends PassportStrategy(Strategy, 'auth0-google') { // setting Passport to use auth0 strategy
+export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') { // setting Passport to use auth0 strategy
     constructor() {
         // calling the parameters of auth0 strategy
         super({

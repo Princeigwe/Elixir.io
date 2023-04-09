@@ -6,7 +6,7 @@ import {RegisterUserConsultantDto, RegisterUserDoctorDto} from './dtos/registerM
 import {ApiBody, ApiTags, ApiResponse, ApiOperation} from '@nestjs/swagger'
 import { ChangePasswordDto } from './dtos/change.password.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import {Auth0GoogleAuthGuard} from '../auth/guards/auth0-google-auth.guard'
+import {Auth0GoogleAuthGuard} from './guards/auth0-auth.guard'
 
 
 @ApiTags('Auth')
@@ -143,7 +143,7 @@ export class AuthController {
 
 
     @UseGuards(Auth0GoogleAuthGuard)
-    @Get('patient/auth0-google')
+    @Get('patient/auth0')
     async loginPatientWithGoogle() {}
 
 
@@ -157,12 +157,4 @@ export class AuthController {
         return response.send(elixirIOUser)
     }
 
-
-    //* THESE OTHER ENDPOINTS ARE FROM NEXT-AUTH
-
-    @Post('patient/signin/auth0')
-    auth0SignIn() {}
-
-    @Get('patient/csrf')
-    async csrf() {}
 }
