@@ -6,7 +6,7 @@ import {RegisterUserConsultantDto, RegisterUserDoctorDto} from './dtos/registerM
 import {ApiBody, ApiTags, ApiResponse, ApiOperation} from '@nestjs/swagger'
 import { ChangePasswordDto } from './dtos/change.password.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import {Auth0GoogleAuthGuard} from './guards/auth0-auth.guard'
+import {Auth0AuthGuard} from './guards/auth0-auth.guard'
 
 
 @ApiTags('Auth')
@@ -142,12 +142,12 @@ export class AuthController {
 
 
 
-    @UseGuards(Auth0GoogleAuthGuard)
+    @UseGuards(Auth0AuthGuard)
     @Get('patient/auth0')
     async loginPatientWithGoogle() {}
 
 
-    @UseGuards(Auth0GoogleAuthGuard)
+    @UseGuards(Auth0AuthGuard)
     @Get('patient/callback/auth0')
     async auth0GoogleCallback( @Request() request, @Response() response ) {
         const user =  request.user
