@@ -6,6 +6,7 @@ import {RegisterUserConsultantDto, RegisterUserDoctorDto} from './dtos/registerM
 import {ApiBody, ApiTags, ApiResponse, ApiOperation} from '@nestjs/swagger'
 import { ChangePasswordDto } from './dtos/change.password.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {Auth0GoogleAuthGuard} from '../auth/guards/auth0-google-auth.guard'
 
 
 @ApiTags('Auth')
@@ -138,4 +139,29 @@ export class AuthController {
         const user = request.user
         return await this.authService.changePassword(user.email, body.password, body.confirmPassword)
     }
+
+
+
+    @UseGuards(Auth0GoogleAuthGuard)
+    @Get('patient/auth0-google')
+    async loginPatientWithGoogle() {}
+
+
+    @UseGuards(Auth0GoogleAuthGuard)
+    @Get('patient/callback/auth0')
+    async auth0GoogleCallback( @Request() request, @Response() response ) {
+        const user =  request.user
+        const cookie =  await this.authService.createOrValidateUserAfterAuth0Flow(user.email)
+        response.setHeader('Set-Cookie', cookie)
+        return response.send(user)
+    }
+
+
+    //* THESE OTHER ENDPOINTS ARE FROM NEXT-AUTH
+
+    @Post('patient/signin/auth0')
+    auth0SignIn() {}
+
+    @Get('patient/csrf')
+    async csrf() {}
 }

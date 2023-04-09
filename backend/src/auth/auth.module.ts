@@ -9,6 +9,7 @@ import { jwtConstants } from './constants';
 import {JwtStrategy} from './strategies/jwt.strategy'
 import { ProfilesModule } from 'src/profiles/profiles.module';
 import {MedicalDepartmentsModule} from '../medical-departments/medical-departments.module'
+import {Auth0GoogleStrategy} from './strategies/auth0-google.strategy'
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import {MedicalDepartmentsModule} from '../medical-departments/medical-departmen
       },
     })
   ], 
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, Auth0GoogleStrategy ],
   controllers: [AuthController],
   exports: [AuthService]
 })

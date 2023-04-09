@@ -21,13 +21,10 @@ export class Auth0GoogleStrategy extends PassportStrategy(Strategy, 'auth0-googl
 
     // extracting user profile after validating access token
     async validate(accessToken: string, refreshToken: string, profile, done: VerifyCallback) { 
-        // const { name, picture, email } = profile // destructuring profile that will be user gotten after oauth process
-        // console.log('profile: ' + profile)
-        // return { name, picture, email }
-
-        done(null, profile);
-        const name = profile.displayName
-        console.log( profile)
-        return name
+        // console.log(profile)
+        // getting just the email value of the provided profile
+        const user = {email: profile.emails[0].value}
+        // console.log(user)
+        return done(null, user)
     }
 }

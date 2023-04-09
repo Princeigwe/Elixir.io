@@ -10,6 +10,7 @@ import {EventEmitter2} from '@nestjs/event-emitter'
 import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGroup.event'
 import {MedicalDepartmentsService} from '../medical-departments/medical-departments.service'
 import {DoctorService} from '../profiles/services/doctor.service'
+const crypto = require('crypto')
 
 
 // AVAILABLE DEPARTMENTS = 
@@ -265,6 +266,19 @@ export class AuthService {
             const hashedPassword = await bcrypt.hash(confirmPassword, salt) //hashing user password to salt
             await this.userService.updateUserCredentials(user.email, hashedPassword)
             return { message: 'Your password has been updated successfully' }
+        }
+    }
+
+
+    async createOrValidateUserAfterAuth0Flow(email: string) {
+        const existingUser = await this.userService.getUserAfterOAuthFlow(email)
+        // generate a random 16 character password
+        const password = crypto.randomBytes(8).toString('hex')
+        if(!existingUser) {
+            const salt = await bcrypt.genSalt(10) // generate salt
+            const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
+            const user = await this.userService.createUser(email, hashedPassword)
+            return await this.putJwtInCookieOnLogin(user.id)
         }
     }
 }
