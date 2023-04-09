@@ -67,7 +67,7 @@ export class UsersService {
         return user.save();
     }
 
-    async createUserAndPatientProfileIfNotInExistenceAfterOAuthFlow(email: string){
+    async createOrGetUserAndCreatePatientProfileIfNotInExistenceAfterOAuthFlow(email: string){
         const existingUser = await this.userModel.findOne({email: email}).exec();
         if(!existingUser) { 
             const password = crypto.randomBytes(8).toString('hex')
@@ -75,7 +75,10 @@ export class UsersService {
             const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
             const user = new this.userModel({email: email, password: hashedPassword});
             this.eventEmitter.emit('new.user', new NewUserEvent(user, email)) // event to create patient profile
-            user.save();
+            return user.save();
+        }
+        else{
+            return existingUser
         }
     }
 

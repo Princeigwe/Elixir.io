@@ -271,7 +271,7 @@ export class AuthService {
 
 
     async registerUserPatientAfterOauthFlowIfNotInExistence(email: string) {
-        await this.userService.createUserAndPatientProfileIfNotInExistenceAfterOAuthFlow(email)
+        return await this.userService.createOrGetUserAndCreatePatientProfileIfNotInExistenceAfterOAuthFlow(email)
     }
 
 }
