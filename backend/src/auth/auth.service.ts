@@ -270,15 +270,8 @@ export class AuthService {
     }
 
 
-    async createOrValidateUserAfterAuth0Flow(email: string) {
-        const existingUser = await this.userService.getUserAfterOAuthFlow(email)
-        // generate a random 16 character password
-        const password = crypto.randomBytes(8).toString('hex')
-        if(!existingUser) {
-            const salt = await bcrypt.genSalt(10) // generate salt
-            const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
-            const user = await this.userService.createUser(email, hashedPassword)
-            return await this.putJwtInCookieOnLogin(user.id)
-        }
+    async registerUserPatientAfterOauthFlowIfNotInExistence(email: string) {
+        await this.userService.createUserAndPatientProfileIfNotInExistenceAfterOAuthFlow(email)
     }
+
 }
