@@ -149,4 +149,11 @@ export class UsersService {
     async updateUserCredentials(email: string, password: string) {
         await this.userModel.updateOne({email: email}, { $set: { password: password }}).exec()
     }
+
+
+    // this method will be used to check if the user exists after being authenticated with oauth flow
+    async getUserAfterOAuthFlow(email: string) {
+        const user = await this.userModel.findOne({"email": email}).exec()
+        return user
+    }
 }
