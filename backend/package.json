@@ -43,6 +43,7 @@
     "nestjs-mongoose-exclude": "^1.0.5",
     "nodemailer": "^6.9.1",
     "passport": "^0.6.0",
+    "passport-auth0": "^1.4.3",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",

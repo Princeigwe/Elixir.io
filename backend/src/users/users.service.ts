@@ -8,6 +8,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import {NewUserEvent} from '../events/createProfileByUser.event'
 import {NewMedicalProviderEvent} from '../events/createMedicalProviderProfile.event'
 import {DoctorHierarchy} from '../enums/doctor.hierarchy.enum'
+const crypto = require('crypto')
+import * as bcrypt from 'bcrypt';
 
 import {MedicalDepartments} from '../enums/medical.department.enum'
 import { SanitizeMongooseModelInterceptor } from 'nestjs-mongoose-exclude';
@@ -63,6 +65,21 @@ export class UsersService {
         const user = new this.userModel({email: email, password: password});
         this.eventEmitter.emit('new.user', new NewUserEvent(user, email)) // event to create patient profile
         return user.save();
+    }
+
+    async createOrGetUserAndCreatePatientProfileIfNotInExistenceAfterOAuthFlow(email: string){
+        const existingUser = await this.userModel.findOne({email: email}).exec();
+        if(!existingUser) { 
+            const password = crypto.randomBytes(8).toString('hex')
+            const salt = await bcrypt.genSalt(10) // generate salt
+            const hashedPassword = await bcrypt.hash(password, salt) //hashing user password to salt
+            const user = new this.userModel({email: email, password: hashedPassword});
+            this.eventEmitter.emit('new.user', new NewUserEvent(user, email)) // event to create patient profile
+            return user.save();
+        }
+        else{
+            return existingUser
+        }
     }
 
 
@@ -148,5 +165,12 @@ export class UsersService {
     // this method will be used to change or reset the user's password'
     async updateUserCredentials(email: string, password: string) {
         await this.userModel.updateOne({email: email}, { $set: { password: password }}).exec()
+    }
+
+
+    // this method will be used to check if the user exists after being authenticated with oauth flow
+    async getUserAfterOAuthFlow(email: string) {
+        const user = await this.userModel.findOne({"email": email}).exec()
+        return user
     }
 }

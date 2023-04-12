@@ -10,6 +10,7 @@ import {EventEmitter2} from '@nestjs/event-emitter'
 import {NewMedicalDepartmentDoctorEvent} from '../events/addDoctorToDepartmentGroup.event'
 import {MedicalDepartmentsService} from '../medical-departments/medical-departments.service'
 import {DoctorService} from '../profiles/services/doctor.service'
+const crypto = require('crypto')
 
 
 // AVAILABLE DEPARTMENTS = 
@@ -267,4 +268,10 @@ export class AuthService {
             return { message: 'Your password has been updated successfully' }
         }
     }
+
+
+    async registerUserPatientAfterOauthFlowIfNotInExistence(email: string) {
+        return await this.userService.createOrGetUserAndCreatePatientProfileIfNotInExistenceAfterOAuthFlow(email)
+    }
+
 }

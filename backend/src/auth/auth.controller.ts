@@ -6,6 +6,7 @@ import {RegisterUserConsultantDto, RegisterUserDoctorDto} from './dtos/registerM
 import {ApiBody, ApiTags, ApiResponse, ApiOperation} from '@nestjs/swagger'
 import { ChangePasswordDto } from './dtos/change.password.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {Auth0AuthGuard} from './guards/auth0-auth.guard'
 
 
 @ApiTags('Auth')
@@ -138,4 +139,22 @@ export class AuthController {
         const user = request.user
         return await this.authService.changePassword(user.email, body.password, body.confirmPassword)
     }
+
+
+
+    @UseGuards(Auth0AuthGuard)
+    @Get('patient/auth0')
+    async loginPatientWithGoogle() {}
+
+
+    @UseGuards(Auth0AuthGuard)
+    @Get('patient/callback/auth0')
+    async auth0GoogleCallback( @Request() request, @Response() response ) {
+        const user =  request.user
+        const elixirIOUser = await this.authService.registerUserPatientAfterOauthFlowIfNotInExistence(user.email)
+        const cookie = await this.authService.putJwtInCookieOnLogin(user.id)
+        response.setHeader('Set-Cookie', cookie)
+        return response.send(elixirIOUser)
+    }
+
 }
