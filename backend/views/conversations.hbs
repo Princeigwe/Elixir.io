@@ -1,0 +1,129 @@
+{{!-- <!DOCTYPE html>
+<html>
+    <head>
+        <title>Socket.io Chat Example</title>
+        <link rel="stylesheet" href="/css/conversations.css" />
+    </head>
+    <body>
+        <div id="chat-container">
+        <div id="chat-messages"></div>
+        <div id="chat-input">
+            <input type="text" id="message-input" />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        </div>
+
+        <script src="/js/conversations.js"></script>
+    </body>
+</html> --}}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Socket.IO Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .chat-container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-box {
+      width: 400px;
+      height: 500px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      overflow-y: scroll;
+    }
+
+    .chat-message {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .chat-input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-top: 1px solid #ccc;
+      resize: none;
+    }
+
+    .chat-btn {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .chat-btn:active {
+      background-color: #0062cc;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-box" id="chat-box"></div>
+    <textarea class="chat-input" id="chat-input" placeholder="Type a message..."></textarea>
+    <button class="chat-btn" id="chat-btn">Send</button>
+  </div>
+
+  <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+  <script>
+    const socket = io('http://localhost:3000');
+    const chatBox = document.getElementById('chat-box');
+    const chatInput = document.getElementById('chat-input');
+    const chatBtn = document.getElementById('chat-btn');
+
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+
+    socket.on('message', (data) => {
+      console.log('Received message:', data);
+      const message = document.createElement('div');
+      message.classList.add('chat-message');
+      message.innerText = data;
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    chatBtn.addEventListener('click', () => {
+      const message = chatInput.value.trim();
+      if (message) {
+        socket.emit('message', message);
+        chatInput.value = '';
+      }
+    });
+
+    chatInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        const message = chatInput.value.trim();
+        if (message) {
+          socket.emit('message', message);
+          chatInput.value = '';
+        }
+      }
+    });
+  </script>
+</body>
+</html>
