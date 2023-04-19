@@ -44,4 +44,11 @@ export class RoomService {
             throw new NotFoundException("No room is assigned to administrative user")
         }
     }
+
+    
+    // will be used to load messages attached to the respective room
+    async getConversationRoomByName(name:string) {
+        const room = await this.roomModel.findOne({ name:name})
+        return room
+    }
 }
