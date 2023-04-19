@@ -158,7 +158,8 @@ export class PatientService {
         )
 
         // emit an event that will be used to create a chat room (patient_email + doctor_email) once a doctor has been assigned to the patient
-        const conversationRoomName = `${updatedPatientProfile.email}+${assigneeDoctor.email}`
+        let conversationRoomName = `${updatedPatientProfile.email}+${assigneeDoctor.email}`
+        conversationRoomName = conversationRoomName.replace(/[@]/g, "") // removing the "@" characters because there is an issue with using it in socket client room
         this.eventEmitter.emit('new.conversation.room', new ConversationRoomEvent(
             conversationRoomName,
             updatedPatientProfile.email,
