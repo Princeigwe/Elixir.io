@@ -3,6 +3,7 @@ import {Message, MessageDocument} from '../schemas/message.schema'
 import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {RoomService} from '../services/room.service'
+import {Room} from '../schemas/room.schema'
 
 @Injectable()
 export class MessageService {
@@ -14,14 +15,14 @@ export class MessageService {
 
     async saveConversationRoomMessage( content: any, conversationRoomName: string, sender?: string ) {
         const conversationRoom = await this.roomService.getConversationRoomByName(conversationRoomName)
-        const message = await this.messageModel.create({ content: content, sender: sender, conversationRoomName: conversationRoom})
+        const message = await this.messageModel.create({ content: content, sender: sender, conversationRoom: conversationRoom})
         message.save()
     }
 
 
     async loadConversationRoomMessages(conversationRoomName: string) {
         const conversationRoom = await this.roomService.getConversationRoomByName(conversationRoomName)
-        const messages = await this.messageModel.find({conversationRoomName: conversationRoom})
+        const messages = await this.messageModel.find({conversationRoom: conversationRoom._id})
         return messages
     }
 }

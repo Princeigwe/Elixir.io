@@ -15,7 +15,7 @@ export class Message {
     @Prop()
     sender: string;
 
-    @Prop({type: Room})
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Room'})
     conversationRoom: Room
 }
 
