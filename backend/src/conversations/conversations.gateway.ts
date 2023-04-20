@@ -20,8 +20,8 @@ export class ConversationsGateway implements OnGatewayConnection {
     socket.join(conversationRoom)
 
     // load messages of the conversation room
-    const messages = await this.messageService.loadConversationRoomMessages(conversationRoom.toString())
-    socket.to(conversationRoom).emit('message', messages) // emitting messages to the client just joining the room
+    const messages = this.messageService.loadConversationRoomMessages(conversationRoom.toString())
+    socket.emit('message', []) // emitting messages to the client just joining the room
     console.log(`Socket client ${socket.id} joined ${conversationRoom} room. Messages loaded`)
   }
 
