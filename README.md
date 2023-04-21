@@ -10,5 +10,6 @@
 - Nest.Js / Node.Js
 - MongoDB
 - CircleCI
+- Socket.io [events: "message", "error"]
 
 Proper documentation is currently in development.
