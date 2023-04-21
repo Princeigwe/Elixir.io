@@ -25,14 +25,29 @@ export class ConversationsGateway implements OnGatewayConnection {
   //** the socket.io client connection url will have to contain a query parameter called "room"
   async handleConnection(socket: Socket){
     const conversationRoom = socket.handshake.query.room 
+    const jwt = socket.handshake.headers.authorization.split(' ')[1] // getting the bearer token from the authorization header
     socket.join(conversationRoom)
 
-    // load messages of the conversation room
-    const messages = await this.messageService.loadConversationRoomMessages(conversationRoom.toString())
-    socket.emit('message', messages) // emitting messages to the client just joining the room
-    console.log(`Socket client ${socket.id} joined ${conversationRoom} room. Messages loaded`)
+    const decodedPayload = await this.jwtService.decode(jwt)
+
+    // checking if jwt is expired
+    if (decodedPayload['exp'] < Date.now() / 1000) {
+      socket.emit('error', "Invalid Credentials: Unauthorized to read room conversations as authorization header token is expired.")
+    }
+
+    else {
+      // load messages of the conversation room
+      const messages = await this.messageService.loadConversationRoomMessages(conversationRoom.toString())
+      socket.emit('message', messages) // emitting messages to the client just joining the room
+      console.log(`Socket client ${socket.id} joined ${conversationRoom} room. Messages loaded`)
+    }
+
   }
 
+
+  /* on this method, 
+  the socket.io server will emit a client's message to every other client in the room, 
+  if only the authorization header token of that client is valid */
   @SubscribeMessage('message') // listening for 'message' event from client to server
   async handleMessage( @MessageBody() data: string, @ConnectedSocket() socket: Socket) {
     console.log(`client data: ${data}`)
@@ -40,6 +55,8 @@ export class ConversationsGateway implements OnGatewayConnection {
     const jwt = socket.handshake.headers.authorization.split(' ')[1] // getting the bearer token from the authorization header
 
     const decodedPayload = await this.jwtService.decode(jwt)
+
+    // checking if jwt is expired
     if (decodedPayload['exp'] < Date.now() / 1000) {
       socket.emit('error', "Invalid Credentials: Authorization header token expired")
 
