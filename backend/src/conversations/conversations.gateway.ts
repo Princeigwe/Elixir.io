@@ -33,6 +33,7 @@ export class ConversationsGateway implements OnGatewayConnection {
     // checking if jwt is expired
     if (decodedPayload['exp'] < Date.now() / 1000) {
       socket.emit('error', "Invalid Credentials: Unauthorized to read room conversations as authorization header token is expired.")
+      socket.disconnect(true)
     }
 
     else {
