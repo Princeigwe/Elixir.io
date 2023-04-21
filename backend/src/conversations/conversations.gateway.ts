@@ -31,8 +31,16 @@ export class ConversationsGateway implements OnGatewayConnection {
     const decodedPayload = await this.jwtService.decode(jwt)
 
     // checking if jwt is expired
-    if (decodedPayload['exp'] < Date.now() / 1000) {
-      socket.emit('error', "Invalid Credentials: Unauthorized to read room conversations as authorization header token is expired.")
+    // if (decodedPayload['exp'] < Date.now() / 1000) {
+    //   socket.emit('error', "Invalid Credentials: Unauthorized to read room conversations as authorization header token is expired.")
+    //   socket.disconnect(true)
+    // }
+
+    const socketPresenceValidity = await this.conversationsService.checkIfUserBelongsToConversationRoom(jwt, conversationRoom.toString())
+
+    // checking if socket client belongs to the conversation room
+    if(socketPresenceValidity === false) {
+      socket.emit('error', "Unauthorized access: Authorization header token is expired, or client is not authorized to read room conversations.")
       socket.disconnect(true)
     }
 
