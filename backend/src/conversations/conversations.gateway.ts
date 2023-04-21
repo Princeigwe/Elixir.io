@@ -27,15 +27,7 @@ export class ConversationsGateway implements OnGatewayConnection {
     const conversationRoom = socket.handshake.query.room 
     const jwt = socket.handshake.headers.authorization.split(' ')[1] // getting the bearer token from the authorization header
     socket.join(conversationRoom)
-
-    const decodedPayload = await this.jwtService.decode(jwt)
-
-    // checking if jwt is expired
-    // if (decodedPayload['exp'] < Date.now() / 1000) {
-    //   socket.emit('error', "Invalid Credentials: Unauthorized to read room conversations as authorization header token is expired.")
-    //   socket.disconnect(true)
-    // }
-
+    
     const socketPresenceValidity = await this.conversationsService.checkIfUserBelongsToConversationRoom(jwt, conversationRoom.toString())
 
     // checking if socket client belongs to the conversation room
