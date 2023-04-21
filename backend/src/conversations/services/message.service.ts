@@ -13,7 +13,7 @@ export class MessageService {
     ) {}
 
 
-    async saveConversationRoomMessage( content: any, conversationRoomName: string, sender?: string ) {
+    async saveConversationRoomMessage( content: any, conversationRoomName: string, sender: string ) {
         const conversationRoom = await this.roomService.getConversationRoomByName(conversationRoomName)
         const message = await this.messageModel.create({ content: content, sender: sender, conversationRoom: conversationRoom})
         message.save()
