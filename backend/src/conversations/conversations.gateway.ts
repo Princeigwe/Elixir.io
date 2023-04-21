@@ -63,23 +63,10 @@ export class ConversationsGateway implements OnGatewayConnection {
     const conversationRoom = socket.handshake.query.room
     const jwt = socket.handshake.headers.authorization.split(' ')[1] // getting the bearer token from the authorization header
 
-    const decodedPayload = await this.jwtService.decode(jwt)
+    const user = await this.conversationsService.getUserDetailsAfterWebsocketHandShake(jwt)
+    const messageSender = user.email
 
-    // checking if jwt is expired
-    if (decodedPayload['exp'] < Date.now() / 1000) {
-      socket.emit('error', "Invalid Credentials: Authorization header token expired")
-
-      // I'm not really sure where this exception is throwing. I can't see an exception in Postman. Hopefully the socket error message helps the consumer
-      throw new WsException('Invalid Credentials: Authorization header token expired') 
-    }
-
-    else {
-      const user = await this.conversationsService.getUserDetailsAfterWebsocketHandShake(jwt)
-      const messageSender = user.email
-
-      this.server.to(conversationRoom).emit('message', data) // emitting message event from server to client
-      await this.messageService.saveConversationRoomMessage(data, conversationRoom.toString(), messageSender)
-    }
-
+    this.server.to(conversationRoom).emit('message', data) // emitting message event from server to client
+    await this.messageService.saveConversationRoomMessage(data, conversationRoom.toString(), messageSender)
   }
 }
