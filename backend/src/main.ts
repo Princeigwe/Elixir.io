@@ -5,6 +5,7 @@ import * as cookieParser from 'cookie-parser';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { RedisIoAdapter } from './conversations/redis.adapter';
 
 import {config as AWS_CONFIG} from 'aws-sdk'
 
@@ -12,6 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(cookieParser())
   app.enableCors();
+  app.useWebSocketAdapter(new RedisIoAdapter(app))
 
   app.useGlobalPipes(
     new ValidationPipe({

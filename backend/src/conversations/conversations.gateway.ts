@@ -2,9 +2,6 @@ import { SubscribeMessage, WebSocketGateway, ConnectedSocket, OnGatewayConnectio
 import {Server, Socket} from 'socket.io'
 import {MessageService} from './services/message.service'
 import { ConversationsService } from './services/conversations.service';
-import { WsException } from '@nestjs/websockets';
-import {TokenExpiredError} from 'jsonwebtoken'
-import { JwtService } from '@nestjs/jwt';
 
 
 @WebSocketGateway({
@@ -14,7 +11,6 @@ export class ConversationsGateway implements OnGatewayConnection {
   constructor(
     private messageService: MessageService,
     private conversationsService: ConversationsService,
-    private jwtService: JwtService,
 
   ) {}
 
@@ -51,6 +47,7 @@ export class ConversationsGateway implements OnGatewayConnection {
   if only the authorization header token of that client is valid */
   @SubscribeMessage('message') // listening for 'message' event from client to server
   async handleMessage( @MessageBody() data: string, @ConnectedSocket() socket: Socket) {
+
     console.log(`client data: ${data}`)
     const conversationRoom = socket.handshake.query.room
     const jwt = socket.handshake.headers.authorization.split(' ')[1] // getting the bearer token from the authorization header
