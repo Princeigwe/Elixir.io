@@ -31,6 +31,7 @@ services:
       AUTH0_DOMAIN: ${AUTH0_DOMAIN}
       AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
       AUTH0_CLIENT_SECRET: ${AUTH0_CLIENT_SECRET}
+      REDIS_SERVER_URL: ${REDIS_SERVER_URL}
     volumes:
       - .:/usr/src/app/ # mounting the directory inside the container
       - /usr/src/app/backend/node_modules # mounting node_modules inside the backend container
