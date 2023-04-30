@@ -34,6 +34,13 @@ export class MessageService {
     }
 
 
+    /**
+     * This function loads and decrypts messages from a conversation room.
+     * @param {string} conversationRoomName - The name of the conversation room for which we want to
+     * load messages.
+     * @returns The function `loadConversationRoomMessages` returns an array of decrypted messages
+     * belonging to a conversation room specified by its name.
+     */
     async loadConversationRoomMessages(conversationRoomName: string) {
         const conversationRoom = await this.roomService.getConversationRoomByName(conversationRoomName)
         const messages = await this.messageModel.find({conversationRoom: conversationRoom._id})
