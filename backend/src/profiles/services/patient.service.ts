@@ -16,6 +16,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor.event'
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
+import { ConversationRoomEvent } from '../../events/createConversationRoom.event'
 
 
 
@@ -155,6 +156,24 @@ export class PatientService {
                 updatedPatientProfile.pharmacyTelephone
             )
         )
+
+        // emit an event that will be used to create a chat room (patient_email + doctor_email) once a doctor has been assigned to the patient
+        let conversationRoomName = `${updatedPatientProfile.email}+${assigneeDoctor.email}`
+        conversationRoomName = conversationRoomName.replace(/[@]/g, "") // removing the "@" characters because there is an issue with using it in socket client room
+        this.eventEmitter.emit('new.conversation.room', new ConversationRoomEvent(
+            conversationRoomName,
+            updatedPatientProfile.email,
+            assigneeDoctor.email
+        ))
+
+        // create a conversation room between the logged in consultant and the patient. the room service will check if the room already exists before creating one. if not
+        let consultantConversationRoomName = `${updatedPatientProfile.email}+${user.email}`
+        consultantConversationRoomName = consultantConversationRoomName.replace(/[@]/g, "")
+        this.eventEmitter.emit('new.consultant.conversation.room', new ConversationRoomEvent(
+            consultantConversationRoomName,
+            updatedPatientProfile.email,
+            user.email
+        ))
 
         return updatedPatientProfile
     }

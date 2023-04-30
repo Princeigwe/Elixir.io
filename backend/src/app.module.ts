@@ -13,6 +13,7 @@ import { DataBackupModule } from './data-backup/data-backup.module';
 import { DataRestoreModule } from './data-restore/data-restore.module';
 import { ElectronicHealthRecordsModule } from './electronic-health-records/electronic-health-records.module';
 import { TokenModule } from './token/token.module';
+import { ConversationsModule } from './conversations/conversations.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { TokenModule } from './token/token.module';
     DataBackupModule,
     DataRestoreModule,
     ElectronicHealthRecordsModule,
-    TokenModule
+    TokenModule,
+    ConversationsModule
   ],
   // controllers: [AppController],
   // providers: [AppService],
