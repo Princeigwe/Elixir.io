@@ -142,11 +142,13 @@ export class AuthController {
 
 
 
+    @ApiOperation({description: "Patient OAuth with Auth0 provider"})
     @UseGuards(Auth0AuthGuard)
     @Get('patient/auth0')
     async loginPatientWithGoogle() {}
 
 
+    @ApiOperation({description: "Patient OAuth callback url"})
     @UseGuards(Auth0AuthGuard)
     @Get('patient/callback/auth0')
     async auth0GoogleCallback( @Request() request, @Response() response ) {
