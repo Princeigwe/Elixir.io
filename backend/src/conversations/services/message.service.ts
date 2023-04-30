@@ -3,7 +3,6 @@ import {Message, MessageDocument} from '../schemas/message.schema'
 import {Model} from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
 import {RoomService} from '../services/room.service'
-import {Room} from '../schemas/room.schema'
 
 @Injectable()
 export class MessageService {
