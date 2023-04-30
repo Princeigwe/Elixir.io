@@ -18,7 +18,7 @@ export class MessageService {
 
 
     /**
-     * This function saves an encrypted message with the sender and conversation room name.
+     * This function saves an encrypted message with the sender.
      * @param {any} content - The message content that needs to be saved in the database. It can be of
      * any data type, as it is passed as an "any" type in the function signature.
      * @param {string} conversationRoomName - The name of the conversation room where the message will
@@ -26,7 +26,7 @@ export class MessageService {
      * @param {string} sender - The sender parameter is a string that represents the name or identifier
      * of the user who is sending the message in the conversation room.
      */
-    //todo: add encryption to conversation room properties
+    //todo: encrypt conversation room properties
     async saveConversationRoomMessage( content: any, conversationRoomName: string, sender: string ) {
         const conversationRoom = await this.roomService.getConversationRoomByName(conversationRoomName)
         const message = await this.messageModel.create({ content: aes.encrypt(content), sender: aes.encrypt(sender), conversationRoom: conversationRoom})
@@ -37,6 +37,15 @@ export class MessageService {
     async loadConversationRoomMessages(conversationRoomName: string) {
         const conversationRoom = await this.roomService.getConversationRoomByName(conversationRoomName)
         const messages = await this.messageModel.find({conversationRoom: conversationRoom._id})
-        return messages
+        const decryptedMessages = messages.map( message => {
+            const decryptedData = {
+                content:  aes.decrypt(message['content']),
+                sender:   aes.decrypt(message['sender']),
+                conversationRoom: message.conversationRoom
+            }
+
+            return decryptedData
+        })
+        return decryptedMessages
     }
 }
