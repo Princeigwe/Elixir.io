@@ -54,8 +54,9 @@ export class ConversationsGateway implements OnGatewayConnection {
 
     const user = await this.conversationsService.getUserDetailsAfterWebsocketHandShake(jwt)
     const messageSender = user.email
+    const message = { content: data, sender: messageSender}
 
-    this.server.to(conversationRoom).emit('message', data) // emitting message event from server to client
+    this.server.to(conversationRoom).emit('message', message) // emitting message event from server to client
     await this.messageService.saveConversationRoomMessage(data, conversationRoom.toString(), messageSender)
   }
 }
