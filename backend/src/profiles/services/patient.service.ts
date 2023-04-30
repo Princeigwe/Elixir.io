@@ -166,6 +166,15 @@ export class PatientService {
             assigneeDoctor.email
         ))
 
+        // create a conversation room between the logged in consultant and the patient. the room service will check if the room already exists before creating one. if not
+        let consultantConversationRoomName = `${updatedPatientProfile.email}+${user.email}`
+        consultantConversationRoomName = consultantConversationRoomName.replace(/[@]/g, "")
+        this.eventEmitter.emit('new.consultant.conversation.room', new ConversationRoomEvent(
+            consultantConversationRoomName,
+            updatedPatientProfile.email,
+            user.email
+        ))
+
         return updatedPatientProfile
     }
 

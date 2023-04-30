@@ -20,8 +20,20 @@ export class RoomService {
 
     @OnEvent('new.conversation.room')
     async createConversationRoom(payload: ConversationRoomEvent) {
-        const room = new this.roomModel({name: payload.name, patientEmail: payload.patientEmail, medicalProviderEmail: payload.medicalProviderEmail})
-        room.save()
+        const existingRoom = await this.roomModel.findOne({name: payload.name}).exec()
+        if(!existingRoom) {
+            const room = new this.roomModel({name: payload.name, patientEmail: payload.patientEmail, medicalProviderEmail: payload.medicalProviderEmail})
+            room.save()
+        }
+    }
+
+    @OnEvent('new.consultant.conversation.room')
+    async createConsultantConversationRoom(payload: ConversationRoomEvent) {
+        const existingRoom = await this.roomModel.findOne({name: payload.name}).exec()
+        if(!existingRoom) {
+            const room = new this.roomModel({name: payload.name, patientEmail: payload.patientEmail, medicalProviderEmail: payload.medicalProviderEmail})
+            room.save()
+        }
     }
 
     async getConversationRoomsOfLoggedInPatientOrMedicalProvider(user: User) {
