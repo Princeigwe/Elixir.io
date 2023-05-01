@@ -89,7 +89,7 @@ export class RoomService {
     
     // will be used to load messages attached to the respective room
     async getConversationRoomByName(name:string) {
-        const room = await this.roomModel.findOne({ name:name})
+        const room = await this.roomModel.findOne({ name:aes.encrypt(name)})
         return room
     }
 }

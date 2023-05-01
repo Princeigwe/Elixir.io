@@ -4,6 +4,11 @@ import { UsersService } from '../../users/users.service';
 import { WsException } from '@nestjs/websockets';
 import {TokenExpiredError} from 'jsonwebtoken'
 import { RoomService } from './room.service';
+import * as AesEncryption from 'aes-encryption'
+
+
+const aes = new AesEncryption()
+aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
 
 @Injectable()
 export class ConversationsService {
@@ -39,7 +44,7 @@ export class ConversationsService {
 
         // checking if jwt is not expired
         if( decodedPayload['exp'] > Date.now() / 1000 ) {
-            if(user.email == room.patientEmail || user.email == room.medicalProviderEmail) {
+            if(user.email == aes.decrypt(room.patientEmail) || user.email == aes.decrypt(room.medicalProviderEmail)) {
                 return true
             }
             else {
