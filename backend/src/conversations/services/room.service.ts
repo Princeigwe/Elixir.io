@@ -6,8 +6,11 @@ import { Model } from 'mongoose';
 import { ConversationRoomEvent } from '../../events/createConversationRoom.event'
 import {User} from '../../users/users.schema'
 import {UserCategory} from '../../enums/user.category.enum'
+import * as AesEncryption from 'aes-encryption'
 
 
+const aes = new AesEncryption()
+aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
 
 
 
@@ -22,7 +25,7 @@ export class RoomService {
     async createConversationRoom(payload: ConversationRoomEvent) {
         const existingRoom = await this.roomModel.findOne({name: payload.name}).exec()
         if(!existingRoom) {
-            const room = new this.roomModel({name: payload.name, patientEmail: payload.patientEmail, medicalProviderEmail: payload.medicalProviderEmail})
+            const room = new this.roomModel({name: aes.encrypt(payload.name), patientEmail: aes.encrypt(payload.patientEmail), medicalProviderEmail: aes.encrypt(payload.medicalProviderEmail)})
             room.save()
         }
     }
@@ -31,7 +34,7 @@ export class RoomService {
     async createConsultantConversationRoom(payload: ConversationRoomEvent) {
         const existingRoom = await this.roomModel.findOne({name: payload.name}).exec()
         if(!existingRoom) {
-            const room = new this.roomModel({name: payload.name, patientEmail: payload.patientEmail, medicalProviderEmail: payload.medicalProviderEmail})
+            const room = new this.roomModel({name: aes.encrypt(payload.name), patientEmail: aes.encrypt(payload.patientEmail), medicalProviderEmail: aes.encrypt(payload.medicalProviderEmail)})
             room.save()
         }
     }
