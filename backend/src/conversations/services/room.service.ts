@@ -41,18 +41,44 @@ export class RoomService {
 
     async getConversationRoomsOfLoggedInPatientOrMedicalProvider(user: User) {
         if(user.category == UserCategory.Patient) {
-            const conversationRooms = await this.roomModel.find({patientEmail: user.email})
+            const conversationRooms = await this.roomModel.find({patientEmail: aes.encrypt(user.email)})
             if(!conversationRooms.length){
                 throw new NotFoundException("No conversation rooms found")
             }
-            return conversationRooms
+            const decryptedConversationRooms = conversationRooms.map( conversationRoom => {
+                const decryptedConversationRoomData = {
+                    _id: conversationRoom._id.toString(),
+                    name: aes.decrypt(conversationRoom.name),
+                    patientEmail: aes.decrypt(conversationRoom.patientEmail),
+                    medicalProviderEmail: aes.decrypt(conversationRoom.medicalProviderEmail),
+                    __v: conversationRoom.__v 
+                }
+
+                return decryptedConversationRoomData
+            } )
+
+            return decryptedConversationRooms
+            // return conversationRooms
         }
         else if( user.category == UserCategory.MedicalProvider) {
-            const conversationRooms = await this.roomModel.find({medicalProviderEmail: user.email})
+            const conversationRooms = await this.roomModel.find({medicalProviderEmail: aes.encrypt(user.email)})
             if(!conversationRooms.length){
                 throw new NotFoundException("No conversation rooms found")
             }
-            return conversationRooms
+            const decryptedConversationRooms = conversationRooms.map( conversationRoom => {
+                const decryptedConversationRoomData = {
+                    _id: conversationRoom._id.toString(),
+                    name: aes.decrypt(conversationRoom.name),
+                    patientEmail: aes.decrypt(conversationRoom.patientEmail),
+                    medicalProviderEmail: aes.decrypt(conversationRoom.medicalProviderEmail),
+                    __v: conversationRoom.__v 
+                }
+
+                return decryptedConversationRoomData
+            } )
+
+            return decryptedConversationRooms
+            // return conversationRooms
         }
 
         else{
