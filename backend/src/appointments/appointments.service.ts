@@ -4,20 +4,25 @@ import { Model } from 'mongoose';
 import { Appointment, AppointmentDocument } from './appointment.schema';
 import { User } from '../users/users.schema';
 import { PatientService } from '../profiles/services/patient.service';
+import { DoctorService } from '../profiles/services/doctor.service';
 import {AppointmentType} from '../enums/appointment.type.enum'
+import { VonageSMS } from './vonage/appointment.sms';
 
-
+const vonageSMS = new VonageSMS()
 @Injectable()
 export class AppointmentsService {
     constructor(
         @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
-        private patientService: PatientService
+        private patientService: PatientService,
+        private doctorService: DoctorService,
     ) {}
 
 
     // this will be done by the patient, to schedule appointment with their assigned medical provider
     async scheduleAppointment(user: User, date: Date, duration: string, description?: string, type?: AppointmentType) {
         const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(patientProfile.assignedDoctor.email)
+
         if(!patientProfile) {
             throw new HttpException('This user is not registered as a patient', HttpStatus.NOT_FOUND)
         }
@@ -39,6 +44,9 @@ export class AppointmentsService {
             description: description, 
             type: type
         })
+
+        const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
+        await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
         return appointment.save()
     }
 
