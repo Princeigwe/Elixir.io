@@ -52,8 +52,9 @@ export class PatientService {
     }
 
 
-    async getPatientProfileByEmail(email: string) {
-        const patient = await this.patientModel.findOne({'email': email}).exec()
+
+    async getPatientProfileByEmail(user: User) {
+        const patient = await this.patientModel.findOne({'email': user.email}).exec()
         if (!patient) {throw new NotFoundException("Patient Not Found")}
         return patient
     }
@@ -91,6 +92,20 @@ export class PatientService {
         const ability = this.caslAbilityFactory.createForUser(user)
 
         const patient = await this.getPatientProfileById(_id)
+        if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
+            Object.assign(patient, attrs)
+            return patient.save()
+        }
+        else {
+            throw new HttpException('Forbidden action', HttpStatus.BAD_REQUEST)
+        }
+    }
+
+
+    async editBasicPatientProfileOfLoggedInUser(attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>, user: User) {
+        const ability = this.caslAbilityFactory.createForUser(user)
+
+        const patient = await this.getPatientProfileByEmail(user)
         if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
             Object.assign(patient, attrs)
             return patient.save()

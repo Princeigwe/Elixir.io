@@ -35,16 +35,24 @@ export class PatientController {
         return await this.patientService.getPatientProfiles()
     }
 
+    // @ApiOperation({description: "Edit any of the patient attributes. Reference: EditPatientDto"})
+    // @ApiParam({ 
+    //     name: '_id',
+    //     required: true,
+    // })
+    // @UseGuards(JwtAuthGuard)
+    // @Patch(':_id')
+    // async editBasicPatientProfileById(@Param('_id') _id: string, @Body() body: EditPatientDto, @Request() request) {
+    //     const user = request.user
+    //     return await this.patientService.editBasicPatientProfileById(_id, body, user)
+    // }
+
     @ApiOperation({description: "Edit any of the patient attributes. Reference: EditPatientDto"})
-    @ApiParam({ 
-        name: '_id',
-        required: true,
-    })
     @UseGuards(JwtAuthGuard)
-    @Patch(':_id')
-    async editBasicPatientProfileById(@Param('_id') _id: string, @Body() body: EditPatientDto, @Request() request) {
-        const user = request.user
-        return await this.patientService.editBasicPatientProfileById(_id, body, user)
+    @Patch('edit-my-profile')
+    async editBasicPatientProfileOfLoggedInUser(@Body() body: EditPatientDto, @Request() request) {
+        const user = request.user;
+        return await this.patientService.editBasicPatientProfileOfLoggedInUser(body, user)
     }
 
 
