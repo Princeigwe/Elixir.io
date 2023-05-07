@@ -242,6 +242,24 @@ export class DoctorService {
     }
 
 
+    async editBasicDoctorProfileOfLoggedInUser(attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >, user: User) {
+        const ability = this.caslAbilityFactory.createForUser(user)
+
+        const doctor = await this.getDoctorProfileByEmail(user.email)
+        // const doctor = await this.doctorModel.findOne({'_id': _id})
+
+        console.log(ability.can(Action.Update, doctor))
+
+        if( ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all') ) {
+            Object.assign(doctor, attrs)
+            return doctor.save()
+        }
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.BAD_REQUEST)
+        }
+    }
+
+
     async deleteDoctorsProfiles() {
         await this.doctorModel.deleteMany().exec()
     }

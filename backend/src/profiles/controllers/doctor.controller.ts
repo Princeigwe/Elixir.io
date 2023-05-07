@@ -117,16 +117,25 @@ export class DoctorController {
         return await this.doctorService.editDoctorProfileAvatar(_id, file.buffer, file.originalname, user)
     }
 
+    // @ApiOperation({description: "Edit any of the doctor attributes. JWT authentication required. Reference: EditDoctorDto"})
+    // @ApiParam({ 
+    //     name: '_id',
+    //     required: true,
+    // })
+    // @UseGuards(JwtAuthGuard)
+    // @Patch(':_id')
+    // async editBasicDoctorProfileById(@Param('_id') _id: string, @Body() body: EditDoctorDto, @Request() request) {
+    //     const user = request.user
+    //     return await this.doctorService.editBasicDoctorProfileById(_id, body, user)
+    // }
+
+
     @ApiOperation({description: "Edit any of the doctor attributes. JWT authentication required. Reference: EditDoctorDto"})
-    @ApiParam({ 
-        name: '_id',
-        required: true,
-    })
     @UseGuards(JwtAuthGuard)
-    @Patch(':_id')
-    async editBasicDoctorProfileById(@Param('_id') _id: string, @Body() body: EditDoctorDto, @Request() request) {
+    @Patch('edit-my-profile')
+    async editBasicDoctorProfileOfLoggedInUser(@Body() body: EditDoctorDto, @Request() request) {
         const user = request.user
-        return await this.doctorService.editBasicDoctorProfileById(_id, body, user)
+        return await this.doctorService.editBasicDoctorProfileOfLoggedInUser(body, user)
     }
 
 
