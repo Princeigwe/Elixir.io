@@ -17,6 +17,7 @@ import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
 import { ConversationRoomEvent } from '../../events/createConversationRoom.event'
+import {UpdateTelephoneToConcernedProfilesEvent} from '../../events/updateTelephoneDataToConcernedProfiles.event'
 
 
 
@@ -55,6 +56,13 @@ export class PatientService {
 
     async getPatientProfileByEmail(user: User) {
         const patient = await this.patientModel.findOne({'email': user.email}).exec()
+        if (!patient) {throw new NotFoundException("Patient Not Found")}
+        return patient
+    }
+
+    // this will be used in the appointment module
+    async getPatientByEmailForAppointment(email: string) {
+        const patient = await this.patientModel.findOne({'email': email}).exec()
         if (!patient) {throw new NotFoundException("Patient Not Found")}
         return patient
     }
@@ -282,4 +290,17 @@ export class PatientService {
         throw new HttpException('Patients profiles Deleted', HttpStatus.NO_CONTENT) 
     }
 
+
+    // this method will update the telephone property of assigned doctor for a patients, then their doctor updates their telephone data
+    @OnEvent('updated.doctor.telephone')
+    async updateAssignedDoctorTelephoneInAllPatientsProfile(payload: UpdateTelephoneToConcernedProfilesEvent) {
+        await this.patientModel.updateMany(
+            {
+                'assignedDoctor.email': payload.email
+            },
+            {$set: {
+                'assignedDoctor.telephone': payload.telephone
+            }}
+        )
+    }
 }

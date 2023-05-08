@@ -17,6 +17,7 @@ import {User} from '../../users/users.schema'
 import {Action} from '../../enums/action.enum'
 import { S3BucketOperations } from '../../aws/s3.bucket.operations';
 import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor.event'
+import {UpdateTelephoneToConcernedProfilesEvent} from '../../events/updateTelephoneDataToConcernedProfiles.event'
 
 
 const s3BucketOperations = new S3BucketOperations()
@@ -252,6 +253,7 @@ export class DoctorService {
 
         if( ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all') ) {
             Object.assign(doctor, attrs)
+            await this.eventEmitter.emit('updated.doctor.telephone', new UpdateTelephoneToConcernedProfilesEvent(doctor.email, doctor.telephone))
             return doctor.save()
         }
         else {
