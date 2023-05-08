@@ -18,13 +18,20 @@ import {AssignDoctorToPatientDto} from '../dtos/assign.doctor.toPatient.dto'
 export class PatientController {
     constructor(private patientService: PatientService) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Get("/my-profile")
+    async getPatientProfileOfLoggedInUser(@Request() request) {
+        const user = request.user
+        return await this.patientService.getPatientProfileByEmail(user)
+    }
+
     @ApiOperation({description: "Get a patient by ObjectId"})
     @ApiParam({
         name: '_id',
         required: false,
         description: "GET patient by ObjectId"
     })
-    @Get(':_id')
+    @Get('/:_id')
     async getPatientProfileById(@Param('_id') _id: string) {
         return await this.patientService.getPatientProfileById(_id)
     }
@@ -34,6 +41,7 @@ export class PatientController {
     async getPatientProfiles() {
         return await this.patientService.getPatientProfiles()
     }
+
 
     // @ApiOperation({description: "Edit any of the patient attributes. Reference: EditPatientDto"})
     // @ApiParam({ 
