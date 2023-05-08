@@ -253,7 +253,7 @@ export class DoctorService {
 
         if( ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all') ) {
             Object.assign(doctor, attrs)
-            await this.eventEmitter.emit('updated.doctor.telephone', new UpdateTelephoneToConcernedProfilesEvent(doctor.email, doctor.telephone))
+            this.eventEmitter.emit('updated.doctor.telephone', new UpdateTelephoneToConcernedProfilesEvent(doctor.email, doctor.telephone))
             return doctor.save()
         }
         else {
@@ -354,4 +354,9 @@ export class DoctorService {
         }
     }
 
+
+    @OnEvent('updated.patient.telephone')
+    async updatePatientTelephonePatientsArrayOfDoctorProfile(payload: UpdateTelephoneToConcernedProfilesEvent) {
+
+    }
 }

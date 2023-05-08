@@ -116,6 +116,7 @@ export class PatientService {
         const patient = await this.getPatientProfileByEmail(user)
         if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
             Object.assign(patient, attrs)
+            this.eventEmitter.emit('updated.patient.telephone', new UpdateTelephoneToConcernedProfilesEvent(patient.email, patient.telephone))
             return patient.save()
         }
         else {
