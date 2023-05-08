@@ -7,6 +7,8 @@ import { PatientService } from '../profiles/services/patient.service';
 import { DoctorService } from '../profiles/services/doctor.service';
 import {AppointmentType} from '../enums/appointment.type.enum'
 import { VonageSMS } from './vonage/appointment.sms';
+import {UserCategory} from '../enums/user.category.enum'
+
 
 const vonageSMS = new VonageSMS()
 @Injectable()
@@ -25,6 +27,9 @@ export class AppointmentsService {
 
         if(!patientProfile) {
             throw new HttpException('This user is not registered as a patient', HttpStatus.NOT_FOUND)
+        }
+        if(!patientProfile.telephone) {
+            throw new HttpException('To schedule appointment with medical provider, please provide your telephone number in your profile', HttpStatus.BAD_REQUEST)
         }
         else if(!patientProfile.assignedDoctor.name) {
             throw new HttpException('Patient is not assigned to a medical provider', HttpStatus.BAD_REQUEST)
@@ -46,12 +51,57 @@ export class AppointmentsService {
         })
 
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
+
+        // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
         await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
+
         return appointment.save()
     }
 
     // this will be done by the medical provider and patient
-    async rescheduleAppointment() {}
+    async rescheduleAppointmentByPatient(appointment_id: string, user: User, date: Date) {
+        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const appointment = await this.appointmentModel.findById(appointment_id).exec()
+
+        if(!patientProfile) {
+            throw new HttpException('Patient profile with this email address does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(!appointment) {
+            throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        await this.appointmentModel.updateOne({_id: appointment_id}, {date: date})
+        const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
+
+        // send sms notification to the patient assigned doctor, notifying them of the rescheduled appointment
+        await vonageSMS.sendRescheduleMessageByPatient(patientProfile.assignedDoctor.telephone, patientName, date)
+
+        return {message: 'Appointment updated successfully'}
+    }
+
+
+    async rescheduleAppointmentByMedicalProvider(appointment_id: string, user: User, date: Date) {
+        const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
+        const appointment = await this.appointmentModel.findById(appointment_id).exec()
+        const patient = await this.patientService.getPatientByEmailForAppointment(appointment.patient.email)
+
+        if(!assignedDoctorProfile) {
+            throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(!appointment) {
+            throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        await this.appointmentModel.updateOne({_id: appointment_id}, {date: date})
+
+        const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
+
+        // send sms notification to the patient, notifying them of the rescheduled appointment
+        await vonageSMS.sendRescheduleMessageByMedicalProvider(patient.telephone, doctorName, date)
+        return {message: 'Appointment updated successfully'}
+    }
 
     // this will be done by the medical provider, to confirm appointment that has been scheduled by the patient
     async confirmAppointment() {}
