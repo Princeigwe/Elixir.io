@@ -5,12 +5,13 @@
 ## Description: A health care wellbeing API.
 
 
-## Estimated Technologies:
+## Technologies:
 - TypeScript
 - Nest.Js / Node.Js
 - MongoDB
 - CircleCI
 - Socket.io [events: "message", "error"]
 - Redis
+- Vonage
 
 Proper documentation is currently in development.
