@@ -9,6 +9,8 @@ import {AppointmentType} from '../enums/appointment.type.enum'
 import { VonageSMS } from './vonage/appointment.sms';
 import {UserCategory} from '../enums/user.category.enum'
 import {AppointmentStatus} from '../enums/appointment.status.enum'
+import {Role} from '../enums/role.enum'
+
 
 
 const vonageSMS = new VonageSMS()
@@ -60,6 +62,7 @@ export class AppointmentsService {
         return appointment.save()
     }
 
+
     // this will be done by the medical provider and patient
     async rescheduleAppointmentByPatient(appointment_id: string, user: User, date: Date) {
         const patientProfile = await this.patientService.getPatientProfileByEmail(user)
@@ -71,6 +74,10 @@ export class AppointmentsService {
 
         else if(!appointment) {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(appointment.isValid == false) {
+            throw new HttpException('This appointment is now invalid.', HttpStatus.BAD_REQUEST)
         }
 
         await this.appointmentModel.updateOne({_id: appointment_id}, {date: date, status: AppointmentStatus.Rescheduled})
@@ -97,6 +104,10 @@ export class AppointmentsService {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
         }
 
+        else if(appointment.isValid == false) {
+            throw new HttpException('This appointment is now invalid.', HttpStatus.BAD_REQUEST)
+        }
+
         await this.appointmentModel.updateOne({_id: appointment_id}, {date: date, status: AppointmentStatus.Rescheduled})
 
         const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
@@ -108,21 +119,119 @@ export class AppointmentsService {
         return updatedAppointment
     }
 
+
     // this will be done by the medical provider, to confirm appointment that has been scheduled by the patient
-    async confirmAppointment() {}
+    async confirmAppointment(appointment_id: string, user: User) {
+        const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
+        const appointment = await this.appointmentModel.findById(appointment_id).exec()
+        const patient = await this.patientService.getPatientByEmailForAppointment(appointment.patient.email)
 
-    // this will be done by the medical provider and patient, to cancel appointment that has been scheduled by the patient
-    async cancelAppointment() {}
+        if(!assignedDoctorProfile) {
+            throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
+        }
 
-    // to change appointment status from cancelled to scheduled by the medical provider
-    async reinstateAppointment() {}
+        else if(!appointment) {
+            throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(appointment.isValid == false) {
+            throw new HttpException('This appointment is now invalid.', HttpStatus.BAD_REQUEST)
+        }
+
+        await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Confirmed})
+        const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
+        
+        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+
+        // send sms notification to the patient, notifying them of the confirmed appointment
+        await vonageSMS.sendAppointmentConfirmationMessage(patient.telephone, doctorName, updatedAppointment.date)
+        return updatedAppointment
+    }
+
+
+    // this will be done by the patient, to cancel appointment that has been scheduled
+    async cancelAppointmentByPatient(appointment_id: string, user: User) {
+        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const appointment = await this.appointmentModel.findById(appointment_id).exec()
+
+        if(!patientProfile) {
+            throw new HttpException('Patient profile with this email address does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(!appointment) {
+            throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Canceled, isValid: false})
+        const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
+
+        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+
+        // send sms notification to the patient assigned doctor, notifying them of the cancelled appointment
+        await vonageSMS.sendCancellationMessageByPatient(patientProfile.assignedDoctor.telephone, patientName, updatedAppointment.date)
+        return updatedAppointment
+    }
+
+
+    async cancelAppointmentByMedicalProvider(appointment_id: string, user: User) {
+        const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
+        const appointment = await this.appointmentModel.findById(appointment_id).exec()
+        const patient = await this.patientService.getPatientByEmailForAppointment(appointment.patient.email)
+
+        if(!assignedDoctorProfile) {
+            throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(!appointment) {
+            throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Canceled, isValid: false})
+        const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
+        
+        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+
+        // send sms notification to the patient, notifying them of the cancelled appointment
+        await vonageSMS.sendCancellationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
+        return updatedAppointment
+    }
+
 
     // by both patient and medical provider, and admin
-    async getAppointments() {}
+    async getAppointments(user: User) {
+        if(user.role == Role.Admin) {
+            const appointments = await this.appointmentModel.find().exec()
+            return appointments
+        }
+        else {
+
+            // get appointments of user regardless of being patient or medical provider
+            const myAppointments = await this.appointmentModel.find({ $or: [ { 'doctor.email': user.email }, { 'patient.email': user.email } ] }).exec()
+            return myAppointments
+        }
+    }
 
     // by both patient and medical provider
-    async getScheduledAppointments() {}
+    async getAppointmentById(appointment_id: string, user: User) {
+        if(user.role == Role.Admin) {
+            const appointment = await this.appointmentModel.findById(appointment_id).exec()
+            if(!appointment) {
+                throw new HttpException("This appointment does not exist", HttpStatus.NOT_FOUND)
+            }
+            return appointment
+        }
+        else{
+            const myAppointment = await this.appointmentModel.find({ $or: [ { 'doctor.email': user.email, '_id': appointment_id }, { 'patient.email': user.email, '_id': appointment_id } ] }).exec()
+            if(!myAppointment) {
+                throw new HttpException("This appointment does not exist", HttpStatus.NOT_FOUND)
+            }
+            return myAppointment
+        }
+    }
 
     // by admin
-    async clearAppointments() {}
+    async clearAppointments() {
+        await this.appointmentModel.deleteMany()
+        throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
+    }
 }

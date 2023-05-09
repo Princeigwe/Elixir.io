@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Request, UseGuards, Param, Patch } from '@nestjs/common';
+import { Controller, Body, Post, Request, UseGuards, Param, Patch, Get, Delete } from '@nestjs/common';
 import { ScheduleAppointmentDto } from './dtos/schedule.appointment.dto';
 import { RescheduleAppointmentDto } from './dtos/reschedule.appointment.dto';
 import { AppointmentsService } from './appointments.service';
@@ -11,6 +11,23 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @Controller('appointments')
 export class AppointmentsController {
     constructor( private appointmentsService: AppointmentsService) {}
+
+
+    @UseGuards(JwtAuthGuard)
+    @Get()
+    async getAppointments(@Request() request) {
+        const user = request.user
+        return await this.appointmentsService.getAppointments(user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/:appointment_id')
+    async getAppointmentById(@Request() request, @Param('appointment_id') appointment_id: string) {
+        const user = request.user
+        return await this.appointmentsService.getAppointmentById(appointment_id, user)
+    }
+
 
     @UseGuards(JwtAuthGuard)
     @Post('schedule-appointment')
@@ -33,5 +50,37 @@ export class AppointmentsController {
     async rescheduleAppointmentByMedicalProvider(@Request() request, @Param('appointment_id') appointment_id: string, @Body() body: RescheduleAppointmentDto) {
         const user = request.user
         return await this.appointmentsService.rescheduleAppointmentByMedicalProvider(appointment_id, user, body.date)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('confirm-appointment/:appointment_id')
+    async confirmAppointment(@Request() request, @Param('appointment_id') appointment_id: string) {
+        const user = request.user
+        return await this.appointmentsService.confirmAppointment(appointment_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('cancel-appointment-by-patient/:appointment_id')
+    async cancelAppointmentByPatient(@Request() request, @Param('appointment_id') appointment_id: string) {
+        const user = request.user
+        return await this.appointmentsService.cancelAppointmentByPatient(appointment_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('cancel-appointment-by-medical-provider/:appointment_id')
+    async cancelAppointmentByMedicalProvider(@Request() request, @Param('appointment_id') appointment_id: string) {
+        const user = request.user
+        return await this.appointmentsService.cancelAppointmentByMedicalProvider(appointment_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete()
+    @Roles(Role.Admin)
+    async clearAppointments() {
+        return await this.appointmentsService.clearAppointments()
     }
 }

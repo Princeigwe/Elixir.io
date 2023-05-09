@@ -36,6 +36,9 @@ export class Appointment {
 
     @Prop()
     duration: string
+
+    @Prop({ default: true })
+    isValid: boolean;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment)
