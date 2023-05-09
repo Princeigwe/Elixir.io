@@ -26,4 +26,12 @@ export class AppointmentsController {
         const user = request.user
         return await this.appointmentsService.rescheduleAppointmentByPatient(appointment_id, user, body.date)
     }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('reschedule-appointment-by-medical-provider/:appointment_id')
+    async rescheduleAppointmentByMedicalProvider(@Request() request, @Param('appointment_id') appointment_id: string, @Body() body: RescheduleAppointmentDto) {
+        const user = request.user
+        return await this.appointmentsService.rescheduleAppointmentByMedicalProvider(appointment_id, user, body.date)
+    }
 }

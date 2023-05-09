@@ -8,6 +8,7 @@ import { DoctorService } from '../profiles/services/doctor.service';
 import {AppointmentType} from '../enums/appointment.type.enum'
 import { VonageSMS } from './vonage/appointment.sms';
 import {UserCategory} from '../enums/user.category.enum'
+import {AppointmentStatus} from '../enums/appointment.status.enum'
 
 
 const vonageSMS = new VonageSMS()
@@ -23,7 +24,6 @@ export class AppointmentsService {
     // this will be done by the patient, to schedule appointment with their assigned medical provider
     async scheduleAppointment(user: User, date: Date, duration: string, description?: string, type?: AppointmentType) {
         const patientProfile = await this.patientService.getPatientProfileByEmail(user)
-        const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(patientProfile.assignedDoctor.email)
 
         if(!patientProfile) {
             throw new HttpException('This user is not registered as a patient', HttpStatus.NOT_FOUND)
@@ -34,6 +34,8 @@ export class AppointmentsService {
         else if(!patientProfile.assignedDoctor.name) {
             throw new HttpException('Patient is not assigned to a medical provider', HttpStatus.BAD_REQUEST)
         }
+
+        const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(patientProfile.assignedDoctor.email)
         const appointment = await this.appointmentModel.create({ 
             patient: {
                 firstName: patientProfile.firstName, 
@@ -71,13 +73,14 @@ export class AppointmentsService {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
         }
 
-        await this.appointmentModel.updateOne({_id: appointment_id}, {date: date})
+        await this.appointmentModel.updateOne({_id: appointment_id}, {date: date, status: AppointmentStatus.Rescheduled})
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
         // send sms notification to the patient assigned doctor, notifying them of the rescheduled appointment
         await vonageSMS.sendRescheduleMessageByPatient(patientProfile.assignedDoctor.telephone, patientName, date)
 
-        return {message: 'Appointment updated successfully'}
+        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+        return updatedAppointment
     }
 
 
@@ -94,13 +97,15 @@ export class AppointmentsService {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
         }
 
-        await this.appointmentModel.updateOne({_id: appointment_id}, {date: date})
+        await this.appointmentModel.updateOne({_id: appointment_id}, {date: date, status: AppointmentStatus.Rescheduled})
 
         const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
 
         // send sms notification to the patient, notifying them of the rescheduled appointment
         await vonageSMS.sendRescheduleMessageByMedicalProvider(patient.telephone, doctorName, date)
-        return {message: 'Appointment updated successfully'}
+        
+        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+        return updatedAppointment
     }
 
     // this will be done by the medical provider, to confirm appointment that has been scheduled by the patient
