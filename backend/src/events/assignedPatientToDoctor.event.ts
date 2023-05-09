@@ -11,6 +11,7 @@ export class AssignedPatientToDoctorEvent {
         public imageUrl ?: string,
         public firstName ?: string,
         public lastName ?: string,
+        public email ?: string,
         public age ?: number,
         public address ?: string,
         public telephone ?: string,

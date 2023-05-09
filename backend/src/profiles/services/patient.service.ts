@@ -18,7 +18,7 @@ import {MedicalDepartments} from '../../enums/medical.department.enum'
 import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
 import { ConversationRoomEvent } from '../../events/createConversationRoom.event'
 import {UpdateTelephoneToConcernedProfilesEvent} from '../../events/updateTelephoneDataToConcernedProfiles.event'
-
+import {UpdatedPatientProfileEvent} from '../../events/updatedPatientProfile.event'
 
 
 const s3BucketOperations = new S3BucketOperations()
@@ -116,7 +116,8 @@ export class PatientService {
         const patient = await this.getPatientProfileByEmail(user)
         if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
             Object.assign(patient, attrs)
-            this.eventEmitter.emit('updated.patient.telephone', new UpdateTelephoneToConcernedProfilesEvent(patient.email, patient.telephone))
+            // emit the patient's data, so that it can reflect in the assigned doctor's profile
+            this.eventEmitter.emit('updated.patient.profile', new UpdatedPatientProfileEvent(patient.firstName, patient.lastName, patient.email, patient.age, patient.address, patient.telephone, patient.occupation, patient.maritalStatus))
             return patient.save()
         }
         else {
@@ -172,6 +173,7 @@ export class PatientService {
                 updatedPatientProfile.imageUrl,
                 updatedPatientProfile.firstName,
                 updatedPatientProfile.lastName,
+                updatedPatientProfile.email,
                 updatedPatientProfile.age,
                 updatedPatientProfile.address,
                 updatedPatientProfile.telephone,
@@ -270,6 +272,7 @@ export class PatientService {
                 updatedPatientProfile.imageUrl,
                 updatedPatientProfile.firstName,
                 updatedPatientProfile.lastName,
+                updatedPatientProfile.email,
                 updatedPatientProfile.age,
                 updatedPatientProfile.address,
                 updatedPatientProfile.telephone,
