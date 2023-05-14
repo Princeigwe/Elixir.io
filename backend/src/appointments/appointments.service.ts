@@ -10,6 +10,7 @@ import { VonageSMS } from './vonage/appointment.sms';
 import {UserCategory} from '../enums/user.category.enum'
 import {AppointmentStatus} from '../enums/appointment.status.enum'
 import {Role} from '../enums/role.enum'
+import {StreamCallService} from '../stream-call/stream-call.service'
 
 
 
@@ -20,6 +21,7 @@ export class AppointmentsService {
         @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
         private patientService: PatientService,
         private doctorService: DoctorService,
+        private streamCallService: StreamCallService
     ) {}
 
 
@@ -58,6 +60,9 @@ export class AppointmentsService {
 
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
         await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
+
+        // create stream call session
+        await this.streamCallService.createSession(user.email, appointment.doctor.email)
 
         return appointment.save()
     }

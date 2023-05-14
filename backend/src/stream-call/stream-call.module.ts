@@ -11,6 +11,7 @@ import { StreamCallController } from './stream-call.controller';
         ])
     ],
     providers: [StreamCallService],
+    exports: [StreamCallService],
     controllers: [StreamCallController]
 })
 export class StreamCallModule {}
