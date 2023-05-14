@@ -15,6 +15,7 @@ import { ElectronicHealthRecordsModule } from './electronic-health-records/elect
 import { TokenModule } from './token/token.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { StreamCallModule } from './stream-call/stream-call.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { AppointmentsModule } from './appointments/appointments.module';
     ElectronicHealthRecordsModule,
     TokenModule,
     ConversationsModule,
-    AppointmentsModule
+    AppointmentsModule,
+    StreamCallModule
   ],
   // controllers: [AppController],
   // providers: [AppService],
