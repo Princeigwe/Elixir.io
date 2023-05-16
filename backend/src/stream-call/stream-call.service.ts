@@ -29,6 +29,10 @@ export class StreamCallService {
      * @returns A Promise that resolves to a SessionDocument object.
      */
     async createSession(patientEmail: string, doctorEmail: string): Promise<SessionDocument> {
+        const session = await this.sessionModel.findOne({patientEmail: patientEmail, doctorEmail: doctorEmail}).exec()
+        if(session) {
+            await this.sessionModel.deleteOne({patientEmail: patientEmail, doctorEmail: doctorEmail})
+        }
         return new Promise<SessionDocument>((resolve, reject) => {
             opentok.createSession({ mediaMode: "routed" }, async (error, session) => {
                 if (error) {
