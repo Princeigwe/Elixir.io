@@ -1,7 +1,11 @@
-var apiKey = "47713311";
-var sessionId = "1_MX40NzcxMzMxMX5-MTY4NDA3NzY2NTg4OX5GendoUTZqakhsSDViK1dLcWQ5VUdiMlp-fn4";
-var token = "T1==cGFydG5lcl9pZD00NzcxMzMxMSZzaWc9MWJjZmJlZjhhNTU0ODJjMDYyOGYxM2JlNTllZGMyMGRjNzFjYmZiMjpzZXNzaW9uX2lkPTFfTVg0ME56Y3hNek14TVg1LU1UWTROREEzTnpZMk5UZzRPWDVHZW5kb1VUWnFha2hzU0RWaUsxZExjV1E1VlVkaU1scC1mbjQmY3JlYXRlX3RpbWU9MTY4NDA3NzY4NSZub25jZT0wLjg0MDg3NzE2NzU1Njc3MzImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTY4NDE2NDA4NCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==";
 
+const path = window.location.pathname; // <domain/api/v1/stream-call/cipher/key/code>
+const parts = path.split('/');
+const apiKey = parts[4]; // The cipher value
+const sessionId = parts[5]; // The key value
+const token = parts[6]; // The code value
+
+console.log(token)
 
 // Handling all of our errors here by alerting them
 function handleError(error) {

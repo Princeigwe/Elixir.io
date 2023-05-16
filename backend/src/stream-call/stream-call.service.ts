@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Session, SessionDocument } from './session.schema';
+import { User } from '../users/users.schema';
+import {PatientService} from '../profiles/services/patient.service'
 
 
 const OpenTok = require("opentok");
@@ -12,7 +14,8 @@ const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY, process.env.VONAGE
 @Injectable()
 export class StreamCallService {
     constructor(
-        @InjectModel(Session.name) private sessionModel: Model<SessionDocument>
+        @InjectModel(Session.name) private sessionModel: Model<SessionDocument>,
+        private patientService: PatientService
     ) {}
 
 
@@ -48,9 +51,35 @@ export class StreamCallService {
     }
 
 
-    async generateToken(patientEmail: string, doctorEmail: string) {
-        const sessionRoom = await this.createSession(patientEmail, doctorEmail);
-        const token = opentok.generate(sessionRoom.sessionID);
+    // async getSessionDataAsPatient() {}
+
+
+    async getSessionRoomAsPatient(user: User) {
+        const sessionRoom = await this.sessionModel.findOne({'patientEmail': user.email})
+        if(!sessionRoom) {
+            throw new HttpException('Stream call session does not exist.', HttpStatus.NOT_FOUND)
+        }
+        return sessionRoom
+    }
+
+
+    async joinStreamCallAsPatient(user: User) {
+        const patient = await this.patientService.getPatientProfileByEmail(user)
+        const sessionRoom = await this.getSessionRoomAsPatient(user)
+        const token = opentok.generateToken(sessionRoom.sessionID, {expireTime: new Date().getTime() / 1000 + 7 * 24 * 60 * 60});
+        console.log(token)
+        return {"sessionID": sessionRoom.sessionID, "token": token }
+    }
+
+
+    // async generateToken(patientEmail: string, doctorEmail: string) {
+    //     const sessionRoom = await this.createSession(patientEmail, doctorEmail);
+    //     const token = opentok.generateToken(sessionRoom.sessionID);
+    //     return token
+    // }
+
+    async generateToken(sessionID: string) {
+        const token = opentok.generateToken(sessionID);
         return token
     }
 

@@ -11,6 +11,10 @@ import {UserCategory} from '../enums/user.category.enum'
 import {AppointmentStatus} from '../enums/appointment.status.enum'
 import {Role} from '../enums/role.enum'
 import {StreamCallService} from '../stream-call/stream-call.service'
+import { EmailSender } from '../email/transporter';
+
+const emailSender = new EmailSender()
+
 
 
 
@@ -59,10 +63,7 @@ export class AppointmentsService {
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
-        await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
-
-        // create stream call session
-        await this.streamCallService.createSession(user.email, appointment.doctor.email)
+        // await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
         return appointment.save()
     }
@@ -149,10 +150,51 @@ export class AppointmentsService {
         const updatedAppointment = await this.appointmentModel.findById(appointment_id)
 
         // send sms notification to the patient, notifying them of the confirmed appointment
-        await vonageSMS.sendAppointmentConfirmationMessage(patient.telephone, doctorName, updatedAppointment.date)
+        // await vonageSMS.sendAppointmentConfirmationMessage(patient.telephone, doctorName, updatedAppointment.date)
+
+        await this.createStreamCallSessionAndNotifyPartiesInvolved(appointment.patient.email, user.email)
+
         return updatedAppointment
     }
 
+
+    async createStreamCallSessionAndNotifyPartiesInvolved(patientEmail: string, doctorEmail: string) {
+        const patient = await this.patientService.getPatientByEmailForAppointment(patientEmail)
+        const doctorName = `${patient.assignedDoctor.firstName} ${patient.assignedDoctor.lastName}`
+        const patientName = `${patient.firstName} ${patient.lastName}`
+
+        // create a stream call session
+        const session = await this.streamCallService.createSession(patientEmail, doctorEmail)
+
+        // create a token for the doctor of the stream call session
+        const doctorToken = await this.streamCallService.generateToken(session.sessionID)
+
+        // create a token for the patient of the stream call session
+        const patientToken = await this.streamCallService.generateToken(session.sessionID)
+
+        // patient stream call data
+        const patientSessionData = {
+            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+            to: [patientEmail,],
+            subject: `Stream Call with ${doctorName}`,
+            html: `Dear ${patient.firstName} ${patient.lastName},
+            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${patientToken}">link</a> grants you access to a video meeting, where important matters can be discussed privately with your doctor. 
+            To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
+        }
+
+        // doctor stream call data
+        const doctorSessionData = {
+            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
+            to: [patient.assignedDoctor.email,],
+            subject: `Stream Call with ${patientName}`,
+            html: `Dear ${doctorName},
+            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${doctorToken}">link</a> grants you access to a video meeting, where important matters can be discussed privately with your doctor. 
+            To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
+        }
+
+        await emailSender.sendMail(patientSessionData)
+        await emailSender.sendMail(doctorSessionData)
+    }
 
     // this will be done by the patient, to cancel appointment that has been scheduled
     async cancelAppointmentByPatient(appointment_id: string, user: User) {
