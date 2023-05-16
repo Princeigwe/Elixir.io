@@ -160,7 +160,7 @@ export class AppointmentsService {
 
     async createStreamCallSessionAndNotifyPartiesInvolved(patientEmail: string, doctorEmail: string) {
         const patient = await this.patientService.getPatientByEmailForAppointment(patientEmail)
-        const doctorName = `${patient.assignedDoctor.firstName} ${patient.assignedDoctor.lastName}`
+        const doctorName = `${patient.assignedDoctor.name}`
         const patientName = `${patient.firstName} ${patient.lastName}`
 
         // create a stream call session
@@ -188,7 +188,7 @@ export class AppointmentsService {
             to: [patient.assignedDoctor.email,],
             subject: `Stream Call with ${patientName}`,
             html: `Dear ${doctorName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${doctorToken}">link</a> grants you access to a video meeting, where important matters can be discussed privately with your doctor. 
+            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${doctorToken}">link</a> grants you access to a video meeting, where important matters can be discussed privately with your patient. 
             To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
         }
 
