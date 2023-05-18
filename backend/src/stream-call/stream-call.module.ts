@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { StreamCallService } from './stream-call.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import {Session, SessionSchema } from './session.schema'
