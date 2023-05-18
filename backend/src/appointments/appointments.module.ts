@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Appointment, AppointmentSchema } from './appointment.schema';
@@ -15,6 +15,7 @@ import {StreamCallModule } from '../stream-call/stream-call.module';
     ])
   ],
   providers: [AppointmentsService],
+  exports: [AppointmentsService],
   controllers: [AppointmentsController]
 })
 export class AppointmentsModule {}
