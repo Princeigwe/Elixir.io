@@ -22,7 +22,7 @@ export class VonageSMS {
     async sendRescheduleMessageByPatient(doctorTelephone: string, patientName: string, date: Date) {
         const from = process.env.VONAGE_BRAND_NAME
         const to = doctorTelephone
-        const text = `The appointment with ${patientName} is now rescheduled to ${date}. Please confirm if you are able to keep this appointment`
+        const text = `The appointment with ${patientName} is now rescheduled to ${date}. Please confirm if you are able to keep this appointment.`
 
         await vonage.sms.send({to, from, text})
         .then(resp => { console.log('Message sent successfully'); console.log(resp); })
@@ -33,7 +33,7 @@ export class VonageSMS {
     async sendRescheduleMessageByMedicalProvider(patientTelephone: string, doctorName: string, date: Date) {
         const from = process.env.VONAGE_BRAND_NAME
         const to = patientTelephone
-        const text = `The appointment with your doctor, ${doctorName}, has been rescheduled to ${date}.`
+        const text = `The appointment with your doctor, ${doctorName}, has been rescheduled to ${date}.Please confirm if you are able to keep this appointment.`
 
         await vonage.sms.send({to, from, text})
         .then(resp => { console.log('Message sent successfully'); console.log(resp); })
@@ -41,10 +41,20 @@ export class VonageSMS {
     }
 
 
-    async sendAppointmentConfirmationMessage(patientTelephone: string, doctorName: string, date: Date) {
+    async sendAppointmentConfirmationMessageByMedicalProvider(patientTelephone: string, doctorName: string, date: Date) {
         const from = process.env.VONAGE_BRAND_NAME
         const to = patientTelephone
         const text = `The appointment with your doctor, ${doctorName}, on ${date}, has been confirmed.`
+
+        await vonage.sms.send({to, from, text})
+        .then(resp => { console.log('Message sent successfully'); console.log(resp); })
+        .catch(err => { console.log('There was an error sending the messages.'); console.error(err); });
+    }
+
+    async sendAppointmentConfirmationMessageByPatient(doctorTelephone: string, patientName: string, date: Date) {
+        const from = process.env.VONAGE_BRAND_NAME
+        const to = doctorTelephone
+        const text = `The appointment with your patient, ${patientName}, on ${date}, has been confirmed.`
 
         await vonage.sms.send({to, from, text})
         .then(resp => { console.log('Message sent successfully'); console.log(resp); })

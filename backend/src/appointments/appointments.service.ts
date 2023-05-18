@@ -118,9 +118,10 @@ export class AppointmentsService {
         await this.appointmentModel.updateOne({_id: appointment_id}, {date: date, status: AppointmentStatus.Rescheduled})
 
         const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
-
+        
+        //todo: uncomment this when done with writing stream call code
         // send sms notification to the patient, notifying them of the rescheduled appointment
-        await vonageSMS.sendRescheduleMessageByMedicalProvider(patient.telephone, doctorName, date)
+        // await vonageSMS.sendRescheduleMessageByMedicalProvider(patient.telephone, doctorName, date)
         
         const updatedAppointment = await this.appointmentModel.findById(appointment_id)
         return updatedAppointment
@@ -128,7 +129,7 @@ export class AppointmentsService {
 
 
     // this will be done by the medical provider, to confirm appointment that has been scheduled by the patient
-    async confirmAppointment(appointment_id: string, user: User) {
+    async confirmAppointmentByMedicalProvider(appointment_id: string, user: User) {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const patient = await this.patientService.getPatientByEmailForAppointment(appointment.patient.email)
@@ -152,9 +153,41 @@ export class AppointmentsService {
 
         //todo: uncomment this when done with writing stream call code
         // send sms notification to the patient, notifying them of the confirmed appointment
-        // await vonageSMS.sendAppointmentConfirmationMessage(patient.telephone, doctorName, updatedAppointment.date)
+        // await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
         await this.createStreamCallSessionAndNotifyPartiesInvolved(appointment.patient.email, user.email, appointment._id)
+
+        return updatedAppointment
+    }
+
+
+    async confirmAppointmentByPatient(appointment_id: string, user: User) {
+        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
+        const appointment = await this.appointmentModel.findById(appointment_id).exec()
+        const assignedDoctor = await this.doctorService.getDoctorProfileByEmail(appointment.doctor.email)
+
+        if(!patientProfile) {
+            throw new HttpException('Patient profile with this email address does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(!appointment) {
+            throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(appointment.isValid == false) {
+            throw new HttpException('This appointment is now invalid.', HttpStatus.BAD_REQUEST)
+        }
+
+        await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Confirmed})
+        const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
+
+        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+
+        //todo: uncomment this when done with writing stream call code
+        // send sms notification to the doctor, notifying them of the confirmed appointment
+        // await vonageSMS.sendAppointmentConfirmationMessageByPatient(assignedDoctor.telephone, patientName, updatedAppointment.date)
+
+        await this.createStreamCallSessionAndNotifyPartiesInvolved(user.email, appointment.doctor.email, appointment._id)
 
         return updatedAppointment
     }

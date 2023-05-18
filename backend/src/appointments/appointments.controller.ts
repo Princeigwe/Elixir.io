@@ -54,10 +54,18 @@ export class AppointmentsController {
 
 
     @UseGuards(JwtAuthGuard)
-    @Patch('confirm-appointment/:appointment_id')
-    async confirmAppointment(@Request() request, @Param('appointment_id') appointment_id: string) {
+    @Patch('confirm-appointment-by-medical-provider/:appointment_id')
+    async confirmAppointmentByMedicalProvider(@Request() request, @Param('appointment_id') appointment_id: string) {
         const user = request.user
-        return await this.appointmentsService.confirmAppointment(appointment_id, user)
+        return await this.appointmentsService.confirmAppointmentByMedicalProvider(appointment_id, user)
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('confirm-appointment-by-patient/:appointment_id')
+    async confirmAppointmentByPatient(@Request() request, @Param('appointment_id') appointment_id: string) {
+        const user = request.user
+        return await this.appointmentsService.confirmAppointmentByPatient(appointment_id, user)
     }
 
 
