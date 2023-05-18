@@ -15,15 +15,10 @@ export class StreamCallController {
     @Render('stream_call')
     async streamCall( ) {}
 
-    @Post()
-    async createSession(@Body() body: CreateSessionDto) {
-        return await this.streamCallService.createSession(body.patientEmail, body.doctorEmail)
-    }
 
-
-    @Get('/:sessionID')
-    async generateToken( @Param('sessionID') sessionID: string ){
-        return await this.streamCallService.generateToken(sessionID)
-    }
+    // @Get('/:sessionID')
+    // async generateToken( @Param('sessionID') sessionID: string ){
+    //     return await this.streamCallService.generateToken(sessionID)
+    // }
 
 }
