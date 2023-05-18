@@ -62,9 +62,8 @@ export class AppointmentsService {
 
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
-        //todo: uncomment this when done with writing stream call code
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
-        // await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
+        await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
         return appointment.save()
     }
@@ -119,9 +118,8 @@ export class AppointmentsService {
 
         const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
         
-        //todo: uncomment this when done with writing stream call code
         // send sms notification to the patient, notifying them of the rescheduled appointment
-        // await vonageSMS.sendRescheduleMessageByMedicalProvider(patient.telephone, doctorName, date)
+        await vonageSMS.sendRescheduleMessageByMedicalProvider(patient.telephone, doctorName, date)
         
         const updatedAppointment = await this.appointmentModel.findById(appointment_id)
         return updatedAppointment
@@ -151,9 +149,8 @@ export class AppointmentsService {
         
         const updatedAppointment = await this.appointmentModel.findById(appointment_id)
 
-        //todo: uncomment this when done with writing stream call code
         // send sms notification to the patient, notifying them of the confirmed appointment
-        // await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
+        await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
         await this.createStreamCallSessionAndNotifyPartiesInvolved(appointment.patient.email, user.email, appointment._id)
 
