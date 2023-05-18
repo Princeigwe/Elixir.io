@@ -17,8 +17,7 @@ const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY, process.env.VONAGE
 @Injectable()
 export class StreamCallService {
     constructor(
-        @InjectModel(Session.name) private sessionModel: Model<SessionDocument>,
-        @Inject( forwardRef( () => AppointmentsService ) ) private appointmentsService: AppointmentsService
+        @InjectModel(Session.name) private sessionModel: Model<SessionDocument>
     ) {}
 
 
