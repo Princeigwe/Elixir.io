@@ -46,4 +46,30 @@ function initializeSession() {
         session.publish(publisher, handleError);
     }
     });
+
+
+    const disconnectButton = document.getElementById('disconnectButton');
+
+    // Add a click event listener to the disconnect button
+    disconnectButton.addEventListener('click', disconnectFromSession);
+
+    // Function to handle the session disconnection
+    function disconnectFromSession() {
+        session.disconnect(); 
+    }
+
 }
+
+
+// const disconnectButton = document.getElementById('disconnectButton');
+
+// // click event listener to the disconnect button
+// disconnectButton.addEventListener('click', disconnectFromSession);
+
+// // Function to handle the disconnection
+// function disconnectFromSession() {
+//     var session = OT.initSession(apiKey, sessionId);
+
+//     // Add your disconnection logic here
+//     session.disconnect(); // Assuming "session" is your OpenTok session object
+// }
