@@ -30,3 +30,33 @@ body, html {
     border: 3px solid white;
     border-radius: 3px;
 }
+
+
+
+#disconnectButton {
+    background-color: #e74c3c; /* Set the background color of the button */
+    color: #ffffff; /* Set the text color of the button */
+    padding: 10px 20px; /* Add some padding around the button text */
+    border: none; /* Remove the button border */
+    border-radius: 4px; /* Add rounded corners to the button */
+    cursor: pointer; /* Change the mouse cursor to a pointer on hover */
+    font-size: 14px; /* Adjust the font size of the button text */
+    margin-bottom: 20px;
+}
+
+  /* Optionally, you can add some hover and active styles to enhance the button interaction */
+#disconnectButton:hover {
+    background-color: #c0392b; /* Change the background color on hover */
+}
+
+#disconnectButton:active {
+    background-color: #d35400; /* Change the background color on active/pressed state */
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 5vh;
+}
