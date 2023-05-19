@@ -34,13 +34,14 @@ body, html {
 
 
 #disconnectButton {
-    background-color: #e74c3c; /* Set the background color of the button */
-    color: #ffffff; /* Set the text color of the button */
-    padding: 10px 20px; /* Add some padding around the button text */
-    border: none; /* Remove the button border */
-    border-radius: 4px; /* Add rounded corners to the button */
-    cursor: pointer; /* Change the mouse cursor to a pointer on hover */
-    font-size: 14px; /* Adjust the font size of the button text */
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: #e74c3c;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
     margin-bottom: 20px;
 }
 
