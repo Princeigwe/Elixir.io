@@ -83,6 +83,10 @@ export class AppointmentsService {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
         }
 
+        else if(appointment.status == AppointmentStatus.Confirmed) {
+            throw new HttpException('This appointment cannot be rescheduled further. If the set time is not fit for you, please schedule another.', HttpStatus.BAD_REQUEST)
+        }
+
         else if(appointment.isValid == false) {
             throw new HttpException('This appointment is now invalid.', HttpStatus.BAD_REQUEST)
         }
@@ -109,6 +113,10 @@ export class AppointmentsService {
 
         else if(!appointment) {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(appointment.status == AppointmentStatus.Confirmed) {
+            throw new HttpException('This appointment cannot be rescheduled further. If the set time is not fit for you, please schedule another.', HttpStatus.BAD_REQUEST)
         }
 
         else if(appointment.isValid == false) {
@@ -139,6 +147,10 @@ export class AppointmentsService {
 
         else if(!appointment) {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(appointment.status == AppointmentStatus.Confirmed) {
+            throw new HttpException('This appointment is already confirmed.', HttpStatus.OK)
         }
 
         else if(appointment.isValid == false) {
@@ -173,6 +185,10 @@ export class AppointmentsService {
 
         else if(!appointment) {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(appointment.status == AppointmentStatus.Confirmed) {
+            throw new HttpException('This appointment is already confirmed.', HttpStatus.OK)
         }
 
         else if(appointment.isValid == false) {
@@ -216,7 +232,7 @@ export class AppointmentsService {
             to: [patientEmail,],
             subject: `Stream Call with ${doctorName}`,
             html: `Dear ${patient.firstName} ${patient.lastName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${patientToken}">link</a> grants you access to a video meeting, where important matters can be discussed privately with your doctor. 
+            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${patientToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your doctor. 
             To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
         }
 
@@ -226,7 +242,7 @@ export class AppointmentsService {
             to: [patient.assignedDoctor.email,],
             subject: `Stream Call with ${patientName}`,
             html: `Dear ${doctorName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${doctorToken}">link</a> grants you access to a video meeting, where important matters can be discussed privately with your patient. 
+            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${doctorToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your patient. 
             To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
         }
 
