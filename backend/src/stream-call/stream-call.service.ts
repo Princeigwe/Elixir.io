@@ -1,16 +1,20 @@
-import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Session, SessionDocument } from './session.schema';
 import { User } from '../users/users.schema';
-import {PatientService} from '../profiles/services/patient.service'
-import {AppointmentsService} from '../appointments/appointments.service'
-import { parse } from 'path';
-import { min } from 'class-validator';
 
 
+/* These lines of code are importing the `opentok` library and creating an instance of the `OpenTok`
+class with the provided API key, secret, and options. The `opentok` instance is then used to create
+sessions and generate tokens for stream calls. 
+
+The timeout option is set to 60000 milliseconds, which is equivalent to 60 seconds. 
+This means that if an API request takes longer than 60 seconds to receive a response from the OpenTok server, 
+the request will be aborted and considered as timed out.
+*/
 const OpenTok = require("opentok");
-const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY, process.env.VONAGE_VIDEO_SECRET, { timeout: 60000});
+const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY || "12345", process.env.VONAGE_VIDEO_SECRET || "12345", { timeout: 60000});
 
 
 
