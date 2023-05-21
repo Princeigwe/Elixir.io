@@ -7,7 +7,7 @@ import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 export class StreamCallController {
 
     constructor(
-        private streamCallService: StreamCallService
+        // private streamCallService: StreamCallService
     ) {}
 
 
