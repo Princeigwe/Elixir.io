@@ -221,7 +221,8 @@ export class AppointmentsService {
     async confirmAppointmentByPatient(appointment_id: string, user: User) {
         const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
-        const assignedDoctor = await this.doctorService.getDoctorProfileByEmail(appointment.doctor.email)
+        const decryptedDoctorEmail = aes.decrypt(appointment.doctor.email)
+        const assignedDoctor = await this.doctorService.getDoctorProfileByEmail(decryptedDoctorEmail)
 
         if(!patientProfile) {
             throw new HttpException('Patient profile with this email address does not exist.', HttpStatus.NOT_FOUND)
@@ -242,7 +243,7 @@ export class AppointmentsService {
         await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Confirmed})
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
-        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+        var updatedAppointment = await this.appointmentModel.findById(appointment_id)
 
         // send sms notification to the doctor, notifying them of the confirmed appointment
         await vonageSMS.sendAppointmentConfirmationMessageByPatient(assignedDoctor.telephone, patientName, updatedAppointment.date)
@@ -250,6 +251,25 @@ export class AppointmentsService {
         if(updatedAppointment.type == AppointmentType.Virtual) {
             await this.createStreamCallSessionAndNotifyPartiesInvolved(user.email, appointment.doctor.email, appointment._id)
         }
+
+        const decryptedDetails = {
+            patient: {
+                firstName: aes.decrypt(updatedAppointment.patient.firstName), 
+                lastName:  aes.decrypt(updatedAppointment.patient.lastName),
+                email:     aes.decrypt(updatedAppointment.patient.email)
+            },
+            doctor: {
+                name:  aes.decrypt(updatedAppointment.doctor.name),
+                email: aes.decrypt(updatedAppointment.doctor.email)
+            },
+
+            description: updatedAppointment.description == undefined ? null : aes.decrypt(updatedAppointment.description), 
+
+        }
+
+        updatedAppointment.patient = decryptedDetails.patient
+        updatedAppointment.doctor = decryptedDetails.doctor
+        updatedAppointment.description = decryptedDetails.description
 
         return updatedAppointment
     }
