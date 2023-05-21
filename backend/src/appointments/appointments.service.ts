@@ -35,7 +35,20 @@ export class AppointmentsService {
     ) {}
 
 
-    // this will be done by the patient, to schedule appointment with their assigned medical provider
+    /**
+     * This function schedules an appointment for a patient with their assigned doctor and sends a
+     * notification to the doctor via SMS.
+     * @param {User} user - The user parameter is an instance of the User class, which likely contains
+     * information about the patient scheduling the appointment, such as their name and email address.
+     * @param {Date} date - The date for the scheduled appointment.
+     * @param {string} duration - The duration parameter is a string that represents the length of the
+     * appointment. It could be in minutes or hours, depending on the implementation.
+     * @param {string} [description] - An optional string parameter that describes the appointment. If
+     * not provided, it will be set to null.
+     * @param {AppointmentType} [type] - The type of appointment, which is an optional parameter. If
+     * provided, it should be of type AppointmentType.
+     * @returns a Promise that resolves to the saved appointment object.
+     */
     async scheduleAppointment(user: User, date: Date, duration: string, description?: string, type?: AppointmentType) {
         const patientProfile = await this.patientService.getPatientProfileByEmail(user)
         const currentTimeInSeconds = new Date().getTime() / 1000
@@ -76,13 +89,22 @@ export class AppointmentsService {
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
-        // await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
+        await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
         return appointment.save()
     }
 
 
-    // this will be done by the medical provider and patient
+    /**
+     * This function reschedules an appointment for a patient and sends an SMS notification to the
+     * assigned doctor.
+     * @param {string} appointment_id - The ID of the appointment that needs to be rescheduled.
+     * @param {User} user - The user parameter is an object of type User, which contains information
+     * about the patient who is rescheduling the appointment.
+     * @param {Date} date - The new date for the appointment to be rescheduled to.
+     * @returns An object containing a message indicating that the appointment with the doctor has been
+     * successfully rescheduled.
+     */
     async rescheduleAppointmentByPatient(appointment_id: string, user: User, date: Date) {
         const patientProfile = await this.patientService.getPatientProfileByEmail(user)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
@@ -120,6 +142,17 @@ export class AppointmentsService {
     }
 
 
+    /**
+     * This function reschedules an appointment by a medical provider and sends an SMS notification to
+     * the patient.
+     * @param {string} appointment_id - The ID of the appointment that needs to be rescheduled.
+     * @param {User} user - The `user` parameter is an object of type `User` which contains information
+     * about the medical provider who is rescheduling the appointment.
+     * @param {Date} date - The date parameter is a Date object representing the new date and time for
+     * the appointment to be rescheduled to.
+     * @returns An object containing a message indicating that the appointment with the patient has
+     * been successfully rescheduled.
+     */
     async rescheduleAppointmentByMedicalProvider(appointment_id: string, user: User, date: Date) {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
@@ -160,7 +193,14 @@ export class AppointmentsService {
     }
 
 
-    // this will be done by the medical provider, to confirm appointment that has been scheduled by the patient
+    /**
+     * This function confirms a medical appointment and sends a notification to the patient, while also
+     * updating the appointment details.
+     * @param {string} appointment_id - The ID of the appointment being confirmed.
+     * @param {User} user - The `user` parameter is an object of type `User` which contains information
+     * about the medical provider who is confirming the appointment.
+     * @returns the updated appointment object with decrypted patient and doctor details.
+     */
     async confirmAppointmentByMedicalProvider(appointment_id: string, user: User) {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
@@ -189,11 +229,11 @@ export class AppointmentsService {
         var updatedAppointment = await this.appointmentModel.findById(appointment_id)
 
         // send sms notification to the patient, notifying them of the confirmed appointment
-        // await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
+        await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
-        // if(updatedAppointment.type == AppointmentType.Virtual) {
-        //     await this.createStreamCallSessionAndNotifyPartiesInvolved(decryptedPatientEmail, user.email, appointment._id)
-        // }
+        if(updatedAppointment.type == AppointmentType.Virtual) {
+            await this.createStreamCallSessionAndNotifyPartiesInvolved(decryptedPatientEmail, user.email, appointment._id)
+        }
 
         const decryptedDetails = {
             patient: {
@@ -218,6 +258,16 @@ export class AppointmentsService {
     }
 
 
+    /**
+    * This function confirms an appointment by a patient, updates the appointment status, sends an SMS
+    * notification to the assigned doctor, creates a stream call session if the appointment is virtual,
+    * and returns the updated appointment details.
+    * @param {string} appointment_id - a string representing the ID of the appointment being confirmed
+    * @param {User} user - The `user` parameter is an object of type `User` which contains information
+    * about the patient who is confirming the appointment.
+    * @returns the updated appointment object with decrypted patient and doctor details and confirmed
+    * status.
+    */
     async confirmAppointmentByPatient(appointment_id: string, user: User) {
         const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
@@ -313,7 +363,16 @@ export class AppointmentsService {
         await emailSender.sendMail(doctorSessionData)
     }
 
-    // this will be done by the patient, to cancel appointment that has been scheduled
+
+    /**
+     * This function cancels an appointment for a patient and sends a notification to the assigned
+     * doctor.
+     * @param {string} appointment_id - The ID of the appointment that the patient wants to cancel.
+     * @param {User} user - The `user` parameter is an object of type `User` which represents the
+     * patient who is cancelling the appointment. It is used to retrieve the patient's profile
+     * information, including their assigned doctor's telephone number.
+     * @returns The updated appointment is being returned.
+     */
     async cancelAppointmentByPatient(appointment_id: string, user: User) {
         const patientProfile = await this.patientService.getPatientProfileByEmail(user)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
@@ -337,10 +396,20 @@ export class AppointmentsService {
     }
 
 
+    /**
+     * This function cancels an appointment by a medical provider and sends an SMS notification to the
+     * patient.
+     * @param {string} appointment_id - a string representing the unique identifier of the appointment
+     * being cancelled.
+     * @param {User} user - The `user` parameter is an object of type `User` which contains information
+     * about the medical provider who is cancelling the appointment.
+     * @returns The updated appointment is being returned.
+     */
     async cancelAppointmentByMedicalProvider(appointment_id: string, user: User) {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
-        const patient = await this.patientService.getPatientByEmailForAppointment(appointment.patient.email)
+        const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
+        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
 
         if(!assignedDoctorProfile) {
             throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
@@ -361,7 +430,18 @@ export class AppointmentsService {
     }
 
 
-    // by both patient and medical provider, and admin
+
+    /**
+     * This function retrieves appointments from a database and decrypts sensitive information for
+     * authorized users.
+     * @param {User} user - The `user` parameter is an object of type `User` which contains information
+     * about the user making the request. The function `getAppointments` uses this information to
+     * determine whether the user is an admin or a regular user, and returns the appropriate
+     * appointments based on their role.
+     * @returns The function `getAppointments` returns either all appointments (if the user is an
+     * admin) or appointments associated with the user (if the user is not an admin) after decrypting
+     * certain fields. The returned value is an array of appointment objects.
+     */
     async getAppointments(user: User) {
         if(user.role == Role.Admin) {
             var appointments = await this.appointmentModel.find().exec()
@@ -376,41 +456,70 @@ export class AppointmentsService {
             return appointments
         }
         else {
-
+            const encryptedUserEmail = aes.encrypt(user.email)
             // get appointments of user regardless of being patient or medical provider
-            const myAppointments = await this.appointmentModel.find({ $or: [ { 'doctor.email': user.email }, { 'patient.email': user.email } ] }).exec()
+            var myAppointments = await this.appointmentModel.find({ $or: [ { 'doctor.email': encryptedUserEmail }, { 'patient.email': encryptedUserEmail } ] }).exec()
+            for(let appointment of myAppointments) {
+                appointment.patient.firstName = aes.decrypt(appointment.patient.firstName)
+                appointment.patient.lastName = aes.decrypt(appointment.patient.lastName)
+                appointment.patient.email = aes.decrypt(appointment.patient.email)
+                appointment.doctor.name = aes.decrypt(appointment.doctor.name)
+                appointment.doctor.email = aes.decrypt(appointment.doctor.email)
+                appointment.description = appointment.description == undefined ? null : aes.decrypt(appointment.description)
+            }
             return myAppointments
         }
     }
 
-    // by both patient and medical provider
+    /**
+     * This function retrieves an appointment by ID and decrypts certain fields based on the user's
+     * role.
+     * @param {string} appointment_id - The ID of the appointment that needs to be retrieved.
+     * @param {User} user - The `user` parameter is an object of type `User` that represents the user
+     * making the request. It is used to determine whether the user is an admin or a patient/doctor,
+     * and to encrypt/decrypt sensitive information in the appointment object.
+     * @returns The function `getAppointmentById` returns either an appointment object or throws an
+     * HttpException with a "This appointment does not exist" message and a NOT_FOUND status code. The
+     * appointment object returned is either the appointment with the given `appointment_id` if the
+     * user is an admin, or the appointment with the given `appointment_id` and where the user's email
+     * matches either the doctor's or patient's
+     */
     async getAppointmentById(appointment_id: string, user: User) {
         if(user.role == Role.Admin) {
             const appointment = await this.appointmentModel.findById(appointment_id).exec()
             if(!appointment) {
                 throw new HttpException("This appointment does not exist", HttpStatus.NOT_FOUND)
             }
+            appointment.patient.firstName = aes.decrypt(appointment.patient.firstName)
+            appointment.patient.lastName = aes.decrypt(appointment.patient.lastName)
+            appointment.patient.email = aes.decrypt(appointment.patient.email)
+            appointment.doctor.name = aes.decrypt(appointment.doctor.name)
+            appointment.doctor.email = aes.decrypt(appointment.doctor.email)
+            appointment.description = appointment.description == undefined ? null : aes.decrypt(appointment.description)
             return appointment
         }
         else{
-            const myAppointment = await this.appointmentModel.find({ $or: [ { 'doctor.email': user.email, '_id': appointment_id }, { 'patient.email': user.email, '_id': appointment_id } ] }).exec()
+            const encryptedUserEmail = aes.encrypt(user.email)
+            var myAppointment = await this.appointmentModel.findOne({ $or: [ { 'doctor.email': encryptedUserEmail, '_id': appointment_id }, { 'patient.email': encryptedUserEmail, '_id': appointment_id } ] }).exec()
             if(!myAppointment) {
                 throw new HttpException("This appointment does not exist", HttpStatus.NOT_FOUND)
             }
+            myAppointment.patient.firstName = aes.decrypt(myAppointment.patient.firstName)
+            myAppointment.patient.lastName = aes.decrypt(myAppointment.patient.lastName)
+            myAppointment.patient.email = aes.decrypt(myAppointment.patient.email)
+            myAppointment.doctor.name = aes.decrypt(myAppointment.doctor.name)
+            myAppointment.doctor.email = aes.decrypt(myAppointment.doctor.email)
+            myAppointment.description = myAppointment.description == undefined ? null : aes.decrypt(myAppointment.description)
             return myAppointment
         }
     }
 
 
-    // async getAppointmentForStreamCallTokenGeneration(appointment_id: string) {
-    //     const appointment = await this.appointmentModel.findById(appointment_id).exec()
-    //         if(!appointment) {
-    //             throw new HttpException("This appointment does not exist", HttpStatus.NOT_FOUND)
-    //         }
-    //         return appointment
-    // }
-
     // by admin
+    /**
+     * This function clears all appointments and throws an HTTP exception with a message indicating
+     * that the records have been deleted.
+     */
     async clearAppointments() {
         await this.appointmentModel.deleteMany()
         throw new HttpException( "Records Deleted", HttpStatus.NO_CONTENT)
