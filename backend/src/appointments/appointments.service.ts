@@ -76,7 +76,7 @@ export class AppointmentsService {
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
-        await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
+        // await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
         return appointment.save()
     }
@@ -189,11 +189,11 @@ export class AppointmentsService {
         var updatedAppointment = await this.appointmentModel.findById(appointment_id)
 
         // send sms notification to the patient, notifying them of the confirmed appointment
-        await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
+        // await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
-        if(updatedAppointment.type == AppointmentType.Virtual) {
-            await this.createStreamCallSessionAndNotifyPartiesInvolved(decryptedPatientEmail, user.email, appointment._id)
-        }
+        // if(updatedAppointment.type == AppointmentType.Virtual) {
+        //     await this.createStreamCallSessionAndNotifyPartiesInvolved(decryptedPatientEmail, user.email, appointment._id)
+        // }
 
         const decryptedDetails = {
             patient: {
@@ -364,7 +364,15 @@ export class AppointmentsService {
     // by both patient and medical provider, and admin
     async getAppointments(user: User) {
         if(user.role == Role.Admin) {
-            const appointments = await this.appointmentModel.find().exec()
+            var appointments = await this.appointmentModel.find().exec()
+            for(let appointment of appointments) {
+                appointment.patient.firstName = aes.decrypt(appointment.patient.firstName)
+                appointment.patient.lastName = aes.decrypt(appointment.patient.lastName)
+                appointment.patient.email = aes.decrypt(appointment.patient.email)
+                appointment.doctor.name = aes.decrypt(appointment.doctor.name)
+                appointment.doctor.email = aes.decrypt(appointment.doctor.email)
+                appointment.description = appointment.description == undefined ? null : aes.decrypt(appointment.description)
+            }
             return appointments
         }
         else {
