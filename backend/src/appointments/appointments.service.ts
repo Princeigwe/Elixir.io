@@ -12,8 +12,14 @@ import {AppointmentStatus} from '../enums/appointment.status.enum'
 import {Role} from '../enums/role.enum'
 import {StreamCallService} from '../stream-call/stream-call.service'
 import { EmailSender } from '../email/transporter';
+import * as AesEncryption from 'aes-encryption'
+
 
 const emailSender = new EmailSender()
+
+const aes = new AesEncryption()
+aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
+
 
 
 
@@ -53,17 +59,17 @@ export class AppointmentsService {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(patientProfile.assignedDoctor.email)
         const appointment = await this.appointmentModel.create({ 
             patient: {
-                firstName: patientProfile.firstName, 
-                lastName:  patientProfile.lastName,
-                email:     patientProfile.email
+                firstName: aes.encrypt(patientProfile.firstName), 
+                lastName:  aes.encrypt(patientProfile.lastName),
+                email:     aes.encrypt(patientProfile.email)
             },
             doctor: {
-                name:  patientProfile.assignedDoctor.name,
-                email: patientProfile.assignedDoctor.email
+                name:  aes.encrypt(patientProfile.assignedDoctor.name),
+                email: aes.encrypt(patientProfile.assignedDoctor.email)
             },
             date: date,
             duration: duration,
-            description: description, 
+            description: description == undefined ? null : aes.encrypt(description), 
             type: type
         })
 
