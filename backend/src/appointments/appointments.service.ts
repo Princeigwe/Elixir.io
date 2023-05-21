@@ -192,7 +192,7 @@ export class AppointmentsService {
         await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
         if(updatedAppointment.type == AppointmentType.Virtual) {
-            await this.createStreamCallSessionAndNotifyPartiesInvolved(appointment.patient.email, user.email, appointment._id)
+            await this.createStreamCallSessionAndNotifyPartiesInvolved(decryptedPatientEmail, user.email, appointment._id)
         }
 
         const decryptedDetails = {
@@ -249,7 +249,7 @@ export class AppointmentsService {
         await vonageSMS.sendAppointmentConfirmationMessageByPatient(assignedDoctor.telephone, patientName, updatedAppointment.date)
 
         if(updatedAppointment.type == AppointmentType.Virtual) {
-            await this.createStreamCallSessionAndNotifyPartiesInvolved(user.email, appointment.doctor.email, appointment._id)
+            await this.createStreamCallSessionAndNotifyPartiesInvolved(user.email, decryptedDoctorEmail, appointment._id)
         }
 
         const decryptedDetails = {
