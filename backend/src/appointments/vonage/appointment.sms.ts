@@ -44,7 +44,7 @@ export class VonageSMS {
     async sendAppointmentConfirmationMessageByMedicalProvider(patientTelephone: string, doctorName: string, date: Date) {
         const from = process.env.VONAGE_BRAND_NAME
         const to = patientTelephone
-        const text = `The appointment with your doctor, ${doctorName}, on ${date}, has been confirmed.`
+        const text = `The appointment with your doctor, ${doctorName}, on ${date}, has been confirmed. If this a virtual appointment, please check your email for further instructions.`
 
         await vonage.sms.send({to, from, text})
         .then(resp => { console.log('Message sent successfully'); console.log(resp); })
@@ -54,7 +54,7 @@ export class VonageSMS {
     async sendAppointmentConfirmationMessageByPatient(doctorTelephone: string, patientName: string, date: Date) {
         const from = process.env.VONAGE_BRAND_NAME
         const to = doctorTelephone
-        const text = `The appointment with your patient, ${patientName}, on ${date}, has been confirmed.`
+        const text = `The appointment with your patient, ${patientName}, on ${date}, has been confirmed. If this a virtual appointment, please check your email for further instructions.`
 
         await vonage.sms.send({to, from, text})
         .then(resp => { console.log('Message sent successfully'); console.log(resp); })

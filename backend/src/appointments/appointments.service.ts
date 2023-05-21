@@ -53,7 +53,7 @@ export class AppointmentsService {
         }
 
         else if(timestampInSeconds < currentTimeInSeconds) {
-            throw new HttpException('Please select an appropriate date for your appointment', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Please select an appropriate time for your appointment', HttpStatus.BAD_REQUEST)
         }
 
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(patientProfile.assignedDoctor.email)
@@ -76,7 +76,7 @@ export class AppointmentsService {
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
-        // await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
+        await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
         return appointment.save()
     }
@@ -86,6 +86,9 @@ export class AppointmentsService {
     async rescheduleAppointmentByPatient(appointment_id: string, user: User, date: Date) {
         const patientProfile = await this.patientService.getPatientProfileByEmail(user)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
+        const currentTimeInSeconds = new Date().getTime() / 1000
+        const givenDate = new Date(date);
+        const timestampInSeconds = givenDate.getTime() / 1000
 
         if(!patientProfile) {
             throw new HttpException('Patient profile with this email address does not exist.', HttpStatus.NOT_FOUND)
@@ -103,21 +106,28 @@ export class AppointmentsService {
             throw new HttpException('This appointment is now invalid.', HttpStatus.BAD_REQUEST)
         }
 
+        else if(timestampInSeconds < currentTimeInSeconds) {
+            throw new HttpException('Please select an appropriate time for your appointment', HttpStatus.BAD_REQUEST)
+        }
+
         await this.appointmentModel.updateOne({_id: appointment_id}, {date: date, status: AppointmentStatus.Rescheduled})
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
         // send sms notification to the patient assigned doctor, notifying them of the rescheduled appointment
         await vonageSMS.sendRescheduleMessageByPatient(patientProfile.assignedDoctor.telephone, patientName, date)
-
-        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
-        return updatedAppointment
+        
+        return {message: "Appointment with your doctor has successfully been rescheduled."}
     }
 
 
     async rescheduleAppointmentByMedicalProvider(appointment_id: string, user: User, date: Date) {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
-        const patient = await this.patientService.getPatientByEmailForAppointment(appointment.patient.email)
+        const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
+        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
+        const currentTimeInSeconds = new Date().getTime() / 1000
+        const givenDate = new Date(date);
+        const timestampInSeconds = givenDate.getTime() / 1000
 
         if(!assignedDoctorProfile) {
             throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
@@ -135,15 +145,18 @@ export class AppointmentsService {
             throw new HttpException('This appointment is now invalid.', HttpStatus.BAD_REQUEST)
         }
 
+        else if(timestampInSeconds < currentTimeInSeconds) {
+            throw new HttpException('Please select an appropriate time for your appointment', HttpStatus.BAD_REQUEST)
+        }
+
         await this.appointmentModel.updateOne({_id: appointment_id}, {date: date, status: AppointmentStatus.Rescheduled})
 
         const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
         
         // send sms notification to the patient, notifying them of the rescheduled appointment
         await vonageSMS.sendRescheduleMessageByMedicalProvider(patient.telephone, doctorName, date)
-        
-        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
-        return updatedAppointment
+
+        return {message: "Appointment with your patient has successfully been rescheduled."}
     }
 
 
@@ -151,7 +164,8 @@ export class AppointmentsService {
     async confirmAppointmentByMedicalProvider(appointment_id: string, user: User) {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
-        const patient = await this.patientService.getPatientByEmailForAppointment(appointment.patient.email)
+        const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
+        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
 
         if(!assignedDoctorProfile) {
             throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
@@ -172,14 +186,33 @@ export class AppointmentsService {
         await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Confirmed})
         const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
         
-        const updatedAppointment = await this.appointmentModel.findById(appointment_id)
+        var updatedAppointment = await this.appointmentModel.findById(appointment_id)
 
         // send sms notification to the patient, notifying them of the confirmed appointment
-        // await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
+        await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
         if(updatedAppointment.type == AppointmentType.Virtual) {
             await this.createStreamCallSessionAndNotifyPartiesInvolved(appointment.patient.email, user.email, appointment._id)
         }
+
+        const decryptedDetails = {
+            patient: {
+                firstName: aes.decrypt(updatedAppointment.patient.firstName), 
+                lastName:  aes.decrypt(updatedAppointment.patient.lastName),
+                email:     aes.decrypt(updatedAppointment.patient.email)
+            },
+            doctor: {
+                name:  aes.decrypt(updatedAppointment.doctor.name),
+                email: aes.decrypt(updatedAppointment.doctor.email)
+            },
+
+            description: updatedAppointment.description == undefined ? null : aes.decrypt(updatedAppointment.description), 
+
+        }
+
+        updatedAppointment.patient = decryptedDetails.patient
+        updatedAppointment.doctor = decryptedDetails.doctor
+        updatedAppointment.description = decryptedDetails.description
 
         return updatedAppointment
     }
