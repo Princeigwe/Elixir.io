@@ -70,7 +70,7 @@ export class AppointmentsService {
         }
 
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(patientProfile.assignedDoctor.email)
-        const appointment = await this.appointmentModel.create({ 
+        var appointment = await this.appointmentModel.create({ 
             patient: {
                 firstName: aes.encrypt(patientProfile.firstName), 
                 lastName:  aes.encrypt(patientProfile.lastName),
@@ -91,7 +91,19 @@ export class AppointmentsService {
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
         await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
-        return appointment.save()
+        appointment.save()
+
+        const decryptedAppointment = await this.appointmentModel.findById(appointment._id).exec()
+        decryptedAppointment.patient.firstName = aes.decrypt(decryptedAppointment.patient.firstName)
+        decryptedAppointment.patient.lastName  = aes.decrypt(decryptedAppointment.patient.lastName)
+        decryptedAppointment.patient.email     = aes.decrypt(decryptedAppointment.patient.email)
+
+        decryptedAppointment.doctor.name  = aes.decrypt(decryptedAppointment.doctor.name)
+        decryptedAppointment.doctor.email = aes.decrypt(decryptedAppointment.doctor.email)
+        decryptedAppointment.description  = decryptedAppointment.description == undefined ? null : aes.decrypt(decryptedAppointment.description)
+
+        return decryptedAppointment
+
     }
 
 
