@@ -397,6 +397,10 @@ export class AppointmentsService {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
         }
 
+        else if(appointment.status == AppointmentStatus.Canceled) {
+            throw new HttpException('This appointment is already cancelled.', HttpStatus.BAD_REQUEST)
+        }
+
         await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Canceled, isValid: false})
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
@@ -429,6 +433,10 @@ export class AppointmentsService {
 
         else if(!appointment) {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
+        }
+
+        else if(appointment.status == AppointmentStatus.Canceled) {
+            throw new HttpException('This appointment is already cancelled.', HttpStatus.BAD_REQUEST)
         }
 
         await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Canceled, isValid: false})
