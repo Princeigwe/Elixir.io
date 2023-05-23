@@ -6,13 +6,17 @@ import {Roles} from '../roles.decorator'
 import {Role} from '../enums/role.enum'
 import { RolesGuard } from '../roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 
+@ApiTags('Appointments')
 @Controller('appointments')
 export class AppointmentsController {
     constructor( private appointmentsService: AppointmentsService) {}
 
 
+    @ApiOperation({description: "Gets all the appointments related to the user. Returns all if admin"})
+    @ApiResponse({status: 200, description: "This returns the appointments of logged in user"})
     @UseGuards(JwtAuthGuard)
     @Get()
     async getAppointments(@Request() request) {
