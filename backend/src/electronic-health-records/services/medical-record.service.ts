@@ -59,6 +59,21 @@ export class MedicalRecordService {
             // creating medicalRecord object, and encrypting some sections of it before saving to database
             // * the encrypted properties of the medical record are the patient's demographics data and the medical provider that created the record
             const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
+
+            let encryptedComplaints = []
+            let encryptedHistoryOfIllness = []
+            let encryptedVitalSigns = []
+            let encryptedMedicalALlergies = []
+            let encryptedHabits = []
+
+            if(complaints.length) { encryptedComplaints = complaints.map(complaint => aes.encrypt(complaint)) }
+            if(history_of_illness.length) { encryptedHistoryOfIllness = history_of_illness.map(illness => aes.encrypt(illness)) } 
+            if(vital_signs.length) {encryptedVitalSigns = vital_signs.map(vital_sign => aes.encrypt(vital_sign))}
+            if(medical_allergies.length) {encryptedMedicalALlergies = medical_allergies.map(allergy => aes.encrypt(allergy))}
+            if(habits.length) {encryptedHabits = habits.map(habit => aes.encrypt(habit))}
+
+
+            
             const medicalRecord = new this.medicalRecordModel({
                 patient_demographics: {
                     firstName: aes.encrypt(patient.firstName),
@@ -69,11 +84,11 @@ export class MedicalRecordService {
                     telephone: aes.encrypt(patient.telephone)
                 },
                 treatment_history: {
-                    complaints: complaints,
-                    history_of_illness: history_of_illness,
-                    vital_signs: vital_signs,
-                    medical_allergies: medical_allergies,
-                    habits: habits
+                    complaints: encryptedComplaints,
+                    history_of_illness: encryptedHistoryOfIllness,
+                    vital_signs: encryptedVitalSigns,
+                    medical_allergies: encryptedMedicalALlergies,
+                    habits: encryptedHabits
                 },
                 issued_by: {
                     doctor_firstName: aes.encrypt(loggedMedicalProvider.firstName),
