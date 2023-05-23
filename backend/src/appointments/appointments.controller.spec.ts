@@ -40,6 +40,14 @@ describe('AppointmentsController', () => {
       }
     } ),
 
+    rescheduleAppointmentByPatient: jest.fn( (appointment_id: string, user: User, date: Date) => {
+      appointment_id = "12212121212"
+      date = new Date("2023-05-22T20:40:00.000Z")
+
+      return {
+        "message": "Appointment with your doctor has successfully been rescheduled."
+      }
+    } ),
 
   }
 
@@ -72,4 +80,16 @@ describe('AppointmentsController', () => {
     }
     expect(await controller.scheduleAppointment(mockRequest, body)).toEqual(mockAppointmentsService.scheduleAppointment(user, date, "00:22"))
   })
+
+  it('should return a message after rescheduling', async() => {
+    const user = {email: "testuser3@mailinator.com", password: "testpass123", role: Role.User, category: UserCategory.Patient}
+    const mockRequest = { body: user } as Request
+    const appointment_id = "12212121212"
+    const date = new Date("2023-05-22T20:40:00.000Z")
+    const body = {
+      date: date
+    }
+    expect(await controller.rescheduleAppointmentByPatient(mockRequest, appointment_id, body)).toEqual(mockAppointmentsService.rescheduleAppointmentByPatient(appointment_id, user, date))
+  })
+
 });
