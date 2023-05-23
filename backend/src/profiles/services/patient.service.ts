@@ -17,7 +17,8 @@ import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor
 import {MedicalDepartments} from '../../enums/medical.department.enum'
 import { RemoveDoctorEvent } from '../../events/removeDoctorFromDepartment.event';
 import { ConversationRoomEvent } from '../../events/createConversationRoom.event'
-
+import {UpdateTelephoneToConcernedProfilesEvent} from '../../events/updateTelephoneDataToConcernedProfiles.event'
+import {UpdatedPatientProfileEvent} from '../../events/updatedPatientProfile.event'
 
 
 const s3BucketOperations = new S3BucketOperations()
@@ -52,7 +53,15 @@ export class PatientService {
     }
 
 
-    async getPatientProfileByEmail(email: string) {
+
+    async getPatientProfileByEmail(user: User) {
+        const patient = await this.patientModel.findOne({'email': user.email}).exec()
+        if (!patient) {throw new NotFoundException("Patient Not Found")}
+        return patient
+    }
+
+    // this will be used in the appointment module
+    async getPatientByEmailForAppointment(email: string) {
         const patient = await this.patientModel.findOne({'email': email}).exec()
         if (!patient) {throw new NotFoundException("Patient Not Found")}
         return patient
@@ -93,6 +102,22 @@ export class PatientService {
         const patient = await this.getPatientProfileById(_id)
         if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
             Object.assign(patient, attrs)
+            return patient.save()
+        }
+        else {
+            throw new HttpException('Forbidden action', HttpStatus.BAD_REQUEST)
+        }
+    }
+
+
+    async editBasicPatientProfileOfLoggedInUser(attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>, user: User) {
+        const ability = this.caslAbilityFactory.createForUser(user)
+
+        const patient = await this.getPatientProfileByEmail(user)
+        if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
+            Object.assign(patient, attrs)
+            // emit the patient's data, so that it can reflect in the assigned doctor's profile
+            this.eventEmitter.emit('updated.patient.profile', new UpdatedPatientProfileEvent(patient.firstName, patient.lastName, patient.email, patient.age, patient.address, patient.telephone, patient.occupation, patient.maritalStatus))
             return patient.save()
         }
         else {
@@ -148,6 +173,7 @@ export class PatientService {
                 updatedPatientProfile.imageUrl,
                 updatedPatientProfile.firstName,
                 updatedPatientProfile.lastName,
+                updatedPatientProfile.email,
                 updatedPatientProfile.age,
                 updatedPatientProfile.address,
                 updatedPatientProfile.telephone,
@@ -246,6 +272,7 @@ export class PatientService {
                 updatedPatientProfile.imageUrl,
                 updatedPatientProfile.firstName,
                 updatedPatientProfile.lastName,
+                updatedPatientProfile.email,
                 updatedPatientProfile.age,
                 updatedPatientProfile.address,
                 updatedPatientProfile.telephone,
@@ -267,4 +294,17 @@ export class PatientService {
         throw new HttpException('Patients profiles Deleted', HttpStatus.NO_CONTENT) 
     }
 
+
+    // this method will update the telephone property of assigned doctor for a patients, then their doctor updates their telephone data
+    @OnEvent('updated.doctor.telephone')
+    async updateAssignedDoctorTelephoneInAllPatientsProfile(payload: UpdateTelephoneToConcernedProfilesEvent) {
+        await this.patientModel.updateMany(
+            {
+                'assignedDoctor.email': payload.email
+            },
+            {$set: {
+                'assignedDoctor.telephone': payload.telephone
+            }}
+        )
+    }
 }

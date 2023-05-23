@@ -17,6 +17,8 @@ import {User} from '../../users/users.schema'
 import {Action} from '../../enums/action.enum'
 import { S3BucketOperations } from '../../aws/s3.bucket.operations';
 import {AssignedPatientToDoctorEvent} from '../../events/assignedPatientToDoctor.event'
+import {UpdateTelephoneToConcernedProfilesEvent} from '../../events/updateTelephoneDataToConcernedProfiles.event'
+import {UpdatedPatientProfileEvent} from '../../events/updatedPatientProfile.event'
 
 
 const s3BucketOperations = new S3BucketOperations()
@@ -177,6 +179,7 @@ export class DoctorService {
             imageUrl: payload.imageUrl,
             firstName: payload.firstName,
             lastName: payload.lastName,
+            email: payload.email,
             age: payload.age,
             address: payload.address,
             telephone: payload.telephone,
@@ -234,6 +237,26 @@ export class DoctorService {
 
         if( ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all') ) {
             Object.assign(doctor, attrs)
+            return doctor.save()
+        }
+        else {
+            throw new HttpException('Forbidden Resource', HttpStatus.BAD_REQUEST)
+        }
+    }
+
+
+    async editBasicDoctorProfileOfLoggedInUser(attrs: Pick<Doctor, 'age' | 'address' | 'telephone' | 'maritalStatus' | 'specialties' | 'certificates' | 'yearsOfExperience' | 'languages' >, user: User) {
+        const ability = this.caslAbilityFactory.createForUser(user)
+
+        const doctor = await this.getDoctorProfileByEmail(user.email)
+        // const doctor = await this.doctorModel.findOne({'_id': _id})
+
+        console.log(ability.can(Action.Update, doctor))
+
+        if( ability.can(Action.Update, doctor) || ability.can(Action.Manage, 'all') ) {
+            Object.assign(doctor, attrs)
+            // emit the doctor's data, so that it can reflect in the assigned patient's profile
+            this.eventEmitter.emit('updated.doctor.telephone', new UpdateTelephoneToConcernedProfilesEvent(doctor.email, doctor.telephone))
             return doctor.save()
         }
         else {
@@ -332,6 +355,25 @@ export class DoctorService {
         else {
             throw new HttpException('Medical Student hierarchy cannot be demoted any further', HttpStatus.BAD_REQUEST)
         }
+    }
+
+
+    @OnEvent('updated.patient.profile')
+    async updateDataOfAssignedPatientInDoctorProfile(payload: UpdatedPatientProfileEvent) {
+        const assignedDoctor = await this.doctorModel.updateOne(
+            {"assignedPatients.email": payload.email}, 
+            { $set: {
+                "assignedPatients.$.firstName": payload.firstName,
+				"assignedPatients.$.lastName": payload.lastName,
+				"assignedPatients.$.email": payload.email,
+				"assignedPatients.$.age": payload.age,
+				"assignedPatients.$.address": payload.address,
+				"assignedPatients.$.telephone": payload.telephone,
+				"assignedPatients.$.occupation": payload.occupation,
+				"assignedPatients.$.maritalStatus": payload.maritalStatus,
+            } 
+            }
+        )
     }
 
 }

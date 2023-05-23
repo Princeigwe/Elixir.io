@@ -14,6 +14,8 @@ import { DataRestoreModule } from './data-restore/data-restore.module';
 import { ElectronicHealthRecordsModule } from './electronic-health-records/electronic-health-records.module';
 import { TokenModule } from './token/token.module';
 import { ConversationsModule } from './conversations/conversations.module';
+import { AppointmentsModule } from './appointments/appointments.module';
+import { StreamCallModule } from './stream-call/stream-call.module';
 
 @Module({
   imports: [
@@ -29,7 +31,9 @@ import { ConversationsModule } from './conversations/conversations.module';
     DataRestoreModule,
     ElectronicHealthRecordsModule,
     TokenModule,
-    ConversationsModule
+    ConversationsModule,
+    AppointmentsModule,
+    StreamCallModule
   ],
   // controllers: [AppController],
   // providers: [AppService],

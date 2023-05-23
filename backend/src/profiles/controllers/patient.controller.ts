@@ -18,13 +18,20 @@ import {AssignDoctorToPatientDto} from '../dtos/assign.doctor.toPatient.dto'
 export class PatientController {
     constructor(private patientService: PatientService) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Get("/my-profile")
+    async getPatientProfileOfLoggedInUser(@Request() request) {
+        const user = request.user
+        return await this.patientService.getPatientProfileByEmail(user)
+    }
+
     @ApiOperation({description: "Get a patient by ObjectId"})
     @ApiParam({
         name: '_id',
         required: false,
         description: "GET patient by ObjectId"
     })
-    @Get(':_id')
+    @Get('/:_id')
     async getPatientProfileById(@Param('_id') _id: string) {
         return await this.patientService.getPatientProfileById(_id)
     }
@@ -35,16 +42,25 @@ export class PatientController {
         return await this.patientService.getPatientProfiles()
     }
 
+
+    // @ApiOperation({description: "Edit any of the patient attributes. Reference: EditPatientDto"})
+    // @ApiParam({ 
+    //     name: '_id',
+    //     required: true,
+    // })
+    // @UseGuards(JwtAuthGuard)
+    // @Patch(':_id')
+    // async editBasicPatientProfileById(@Param('_id') _id: string, @Body() body: EditPatientDto, @Request() request) {
+    //     const user = request.user
+    //     return await this.patientService.editBasicPatientProfileById(_id, body, user)
+    // }
+
     @ApiOperation({description: "Edit any of the patient attributes. Reference: EditPatientDto"})
-    @ApiParam({ 
-        name: '_id',
-        required: true,
-    })
     @UseGuards(JwtAuthGuard)
-    @Patch(':_id')
-    async editBasicPatientProfileById(@Param('_id') _id: string, @Body() body: EditPatientDto, @Request() request) {
-        const user = request.user
-        return await this.patientService.editBasicPatientProfileById(_id, body, user)
+    @Patch('edit-my-profile')
+    async editBasicPatientProfileOfLoggedInUser(@Body() body: EditPatientDto, @Request() request) {
+        const user = request.user;
+        return await this.patientService.editBasicPatientProfileOfLoggedInUser(body, user)
     }
 
 

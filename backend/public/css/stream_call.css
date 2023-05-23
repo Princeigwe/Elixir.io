@@ -1,0 +1,65 @@
+body, html {
+    background-color: rgb(24, 9, 9);
+    height: 100%;
+}
+
+#videos {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+#subscriber {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#publisher {
+    position: absolute;
+    width: 360px;
+    height: 240px;
+    bottom: 10px;
+    left: 10px;
+    z-index: 100;
+    border: 3px solid white;
+    border-radius: 3px;
+}
+
+
+
+#disconnectButton {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: #e74c3c;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    z-index: 2;
+}
+
+  /* Optionally, you can add some hover and active styles to enhance the button interaction */
+#disconnectButton:hover {
+    background-color: #c0392b; /* Change the background color on hover */
+}
+
+#disconnectButton:active {
+    background-color: #d35400; /* Change the background color on active/pressed state */
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 5vh;
+}

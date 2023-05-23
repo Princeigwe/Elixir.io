@@ -53,7 +53,6 @@ export class ProgressNoteController {
     @ApiResponse({status: 200,  description: "Returns progress notes"})
     @UseGuards(JwtAuthGuard)
     @Get('/auth-patient')
-    @Roles(Role.Admin)
     async getProgressNotesOfLoggedInPatient( @Request() request ) {
         const user = request.user
         return await this.progressNoteService.getProgressNotesOfLoggedInPatient(user)
