@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Inject, forwardRef, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Appointment, AppointmentDocument } from './appointment.schema';
@@ -397,6 +397,10 @@ export class AppointmentsService {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
         }
 
+        else if(appointment.status == AppointmentStatus.Canceled) {
+            throw new HttpException('This appointment is already cancelled.', HttpStatus.BAD_REQUEST)
+        }
+
         await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Canceled, isValid: false})
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
@@ -431,6 +435,10 @@ export class AppointmentsService {
             throw new HttpException('The queried appointment does not exist.', HttpStatus.NOT_FOUND)
         }
 
+        else if(appointment.status == AppointmentStatus.Canceled) {
+            throw new HttpException('This appointment is already cancelled.', HttpStatus.BAD_REQUEST)
+        }
+
         await this.appointmentModel.updateOne({_id: appointment_id}, {status: AppointmentStatus.Canceled, isValid: false})
         const doctorName = `${assignedDoctorProfile.firstName} ${assignedDoctorProfile.lastName}`
         
@@ -457,6 +465,9 @@ export class AppointmentsService {
     async getAppointments(user: User) {
         if(user.role == Role.Admin) {
             var appointments = await this.appointmentModel.find().exec()
+            if(!appointments.length) {
+                throw new NotFoundException("Appointments not found.")
+            }
             for(let appointment of appointments) {
                 appointment.patient.firstName = aes.decrypt(appointment.patient.firstName)
                 appointment.patient.lastName = aes.decrypt(appointment.patient.lastName)
@@ -471,6 +482,9 @@ export class AppointmentsService {
             const encryptedUserEmail = aes.encrypt(user.email)
             // get appointments of user regardless of being patient or medical provider
             var myAppointments = await this.appointmentModel.find({ $or: [ { 'doctor.email': encryptedUserEmail }, { 'patient.email': encryptedUserEmail } ] }).exec()
+            if(!myAppointments.length) {
+                throw new NotFoundException("Appointments not found.")
+            }
             for(let appointment of myAppointments) {
                 appointment.patient.firstName = aes.decrypt(appointment.patient.firstName)
                 appointment.patient.lastName = aes.decrypt(appointment.patient.lastName)
