@@ -45,9 +45,32 @@ describe('AppointmentsController', () => {
       date = new Date("2023-05-22T20:40:00.000Z")
 
       return {
-        "message": "Appointment with your doctor has successfully been rescheduled."
+        message: "Appointment with your doctor has successfully been rescheduled."
       }
     } ),
+
+    confirmAppointmentByMedicalProvider: jest.fn( (appointment_id: string, user: User) => {
+      appointment_id = "1212121212"
+      return {
+        "patient": {
+          "firstName": "Connor",
+          "lastName": "Williams",
+          "email": "testuser4@mailinator.com"
+        },
+        "doctor": {
+          "name": "Matthew Cage",
+          "email": "testuser3@mailinator.com"
+        },
+        "_id": appointment_id,
+        "date": "2023-05-22T13:40:00.000Z",
+        "status": "confirmed",
+        "description": "headache",
+        "type": "virtual",
+        "duration": "00:02",
+        "isValid": true,
+        "__v": 0
+      }
+    })
 
   }
 
@@ -90,6 +113,13 @@ describe('AppointmentsController', () => {
       date: date
     }
     expect(await controller.rescheduleAppointmentByPatient(mockRequest, appointment_id, body)).toEqual(mockAppointmentsService.rescheduleAppointmentByPatient(appointment_id, user, date))
+  })
+
+  it('should return appointment after confirmation by medical provider', async() => {
+    const user = {email: "testuser3@mailinator.com", password: "testpass123", role: Role.User, category: UserCategory.MedicalProvider}
+    const mockRequest = { body: user } as Request
+    const appointment_id = "12212121212"
+    expect(await controller.confirmAppointmentByMedicalProvider(mockRequest, appointment_id)).toEqual(mockAppointmentsService.confirmAppointmentByMedicalProvider(appointment_id, user))
   })
 
 });
