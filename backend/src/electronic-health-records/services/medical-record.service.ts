@@ -99,34 +99,7 @@ export class MedicalRecordService {
             })
 
             await medicalRecord.save()
-
-            let decryptedMedicalRecord = await this.medicalRecordModel.findById(medicalRecord._id).exec()
-
-            if(decryptedMedicalRecord.treatment_history.complaints.length) { decryptedMedicalRecord.treatment_history.complaints = decryptedMedicalRecord.treatment_history.complaints.map(complaint => aes.decrypt(complaint)) }
-
-            if(decryptedMedicalRecord.treatment_history.history_of_illness.length) { decryptedMedicalRecord.treatment_history.history_of_illness = decryptedMedicalRecord.treatment_history.history_of_illness.map(illness => aes.decrypt(illness)) } 
-
-            if(decryptedMedicalRecord.treatment_history.vital_signs.length) {decryptedMedicalRecord.treatment_history.vital_signs = decryptedMedicalRecord.treatment_history.vital_signs.map(vital_sign => aes.decrypt(vital_sign))}
-
-            if(decryptedMedicalRecord.treatment_history.medical_allergies.length) {decryptedMedicalRecord.treatment_history.medical_allergies = decryptedMedicalRecord.treatment_history.medical_allergies.map(allergy => aes.decrypt(allergy))}
-
-            if(decryptedMedicalRecord.treatment_history.habits.length) {decryptedMedicalRecord.treatment_history.habits = decryptedMedicalRecord.treatment_history.habits.map(habit => aes.decrypt(habit))}
-
-            decryptedMedicalRecord.patient_demographics.firstName = aes.decrypt(decryptedMedicalRecord.patient_demographics.firstName)
-            decryptedMedicalRecord.patient_demographics.lastName  = aes.decrypt(decryptedMedicalRecord.patient_demographics.lastName),
-            decryptedMedicalRecord.patient_demographics.email     = aes.decrypt(decryptedMedicalRecord.patient_demographics.email),
-            decryptedMedicalRecord.patient_demographics.address   = aes.decrypt(decryptedMedicalRecord.patient_demographics.address),
-            decryptedMedicalRecord.patient_demographics.telephone = aes.decrypt(decryptedMedicalRecord.patient_demographics.telephone)
-
-            decryptedMedicalRecord.issued_by['doctor_firstName']  = aes.decrypt(decryptedMedicalRecord.issued_by['doctor_firstName'])
-            decryptedMedicalRecord.issued_by['doctor_lastName']   = aes.decrypt(decryptedMedicalRecord.issued_by['doctor_lastName'])
-            decryptedMedicalRecord.issued_by['doctor_department'] = aes.decrypt(decryptedMedicalRecord.issued_by['doctor_department'])
-
-            decryptedMedicalRecord.updated_by['doctor_firstName']  = decryptedMedicalRecord.updated_by['doctor_firstName']  == undefined ? null:  aes.decrypt(decryptedMedicalRecord.updated_by['doctor_firstName'])
-            decryptedMedicalRecord.updated_by['doctor_lastName']   = decryptedMedicalRecord.updated_by['doctor_lastName']   == undefined ? null:  aes.decrypt(decryptedMedicalRecord.updated_by['doctor_lastName'])
-            decryptedMedicalRecord.updated_by['doctor_department'] = decryptedMedicalRecord.updated_by['doctor_department'] == undefined ? null:  aes.decrypt(decryptedMedicalRecord.updated_by['doctor_department'])
-
-            return decryptedMedicalRecord
+            return await this.getMedicalRecordByID(medicalRecord._id)
         }
         
         else {
