@@ -152,14 +152,17 @@ export class MedicalRecordService {
         // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
         const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
 
-        if(treatment_history__complaints && treatment_history__complaints.length){
-            treatment_history__complaints = treatment_history__complaints.map(complain => aes.encrypt(complain))
-        }
+        // if(treatment_history__complaints && treatment_history__complaints.length){
+        //     treatment_history__complaints = treatment_history__complaints.map(complain => aes.encrypt(complain))
+        // }
+
+        treatment_history__complaints = treatment_history__complaints != undefined && treatment_history__complaints.length ? treatment_history__complaints.map(complain => aes.encrypt(complain)) : medicalRecord.treatment_history.complaints
 
         if( patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
             
             return await this.medicalRecordModel.findByIdAndUpdate( {'_id': medicalRecord._id}, { $set: { 
-                'treatment_history.complaints':  treatment_history__complaints != undefined && treatment_history__complaints.length > 0 ? treatment_history__complaints: medicalRecord.treatment_history.complaints, 
+                // 'treatment_history.complaints':  treatment_history__complaints != undefined && treatment_history__complaints.length > 0 ? treatment_history__complaints: medicalRecord.treatment_history.complaints,
+                'treatment_history.complaints':  treatment_history__complaints, 
                 'treatment_history.history_of_illness': treatment_history__history_of_illness, 
                 'treatment_history.vital_signs': treatment_history__vital_signs, 
                 'treatment_history.medical_allergies': treatment_history__medical_allergies, 
