@@ -64,7 +64,7 @@ export class PrescriptionService {
                 doctor_email:      aes.encrypt(medicalProvider.email),
                 doctor_telephone:  aes.encrypt(medicalProvider.telephone),
             },
-            instructions: aes.encrypt(instructions)
+            instructions: instructions == undefined ? null : aes.encrypt(instructions)
         })
 
         medications.forEach( (medication) => { 
@@ -77,7 +77,9 @@ export class PrescriptionService {
 
             prescription.medications.push(medication) 
         } )
-        return prescription.save()
+        await prescription.save()
+
+        return this.getPrescriptionByID(prescription._id, user)
     }
 
 
@@ -175,7 +177,7 @@ export class PrescriptionService {
 
         });
 
-        prescription.instructions = aes.decrypt(prescription.instructions)
+        prescription.instructions = prescription.instructions == undefined ? null: aes.decrypt(prescription.instructions)
         const medicalRecord = await this. medicalRecordService.getMedicalRecordByID(prescription.medicalRecord.toString())
 
         if(user.role == Role.Admin || medicalRecord.recipients.includes( aes.encrypt(user.email) ) || prescription.patient_demographics.email == user.email) {
