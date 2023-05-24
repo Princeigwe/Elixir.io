@@ -212,7 +212,6 @@ export class MedicalRecordService {
     }
 
 
-
     // function to read the details of a medical record by its id
     // this method will be called for admin user or assigned doctor
     async getMedicalRecordByID(record_id: string) {
@@ -274,7 +273,6 @@ export class MedicalRecordService {
     }
 
 
-
     /**
      * This function allows a patient to grant read access to a medical provider to their medical
      * record
@@ -290,7 +288,7 @@ export class MedicalRecordService {
         const medicalProvider = await this.doctorService.getDoctorProfileByEmail(medical_provider_email)
 
         if( medicalRecord.patient_demographics.email == user.email ) {
-            await this.medicalRecordModel.updateOne({'_id': medicalRecord._id}, { $addToSet: { 'recipients': medical_provider_email } })
+            await this.medicalRecordModel.updateOne({'_id': medicalRecord._id}, { $addToSet: { 'recipients': aes.encrypt(medical_provider_email) } })
             return { message: `You have successfully granted read access to ${medicalProvider.firstName} ${medicalProvider.lastName}` }
         }
 
