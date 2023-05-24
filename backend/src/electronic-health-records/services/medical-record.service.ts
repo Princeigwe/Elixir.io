@@ -171,6 +171,14 @@ export class MedicalRecordService {
                 telephone : aes.decrypt(medicalRecord.patient_demographics['telephone'])
             }
 
+            const decryptedTreatmentHistory = {
+                complaints         : medicalRecord.treatment_history.complaints.length ? medicalRecord.treatment_history.complaints.map(complaint => aes.decrypt(complaint)) : [],
+                history_of_illness : medicalRecord.treatment_history.history_of_illness.length ? medicalRecord.treatment_history.history_of_illness.map(illness => aes.decrypt(illness)) : [],
+                vital_signs        : medicalRecord.treatment_history.vital_signs.length ? medicalRecord.treatment_history.vital_signs.map(vital_sign => aes.decrypt(vital_sign)) : [],
+                medical_allergies  : medicalRecord.treatment_history.medical_allergies.length ? medicalRecord.treatment_history.medical_allergies.map(medical_allergy => aes.decrypt(medical_allergy)) : [],
+                habits             : medicalRecord.treatment_history.habits.length ? medicalRecord.treatment_history.habits.map(habit => aes.decrypt(habit)) : []
+            }
+
             // decrypting the issued_by property of each medical record document
             const decryptedIssuedBy = {
                 doctor_firstName: aes.decrypt(medicalRecord.issued_by['doctor_firstName']),
@@ -188,7 +196,7 @@ export class MedicalRecordService {
             return { 
                 _id: medicalRecord._id.toString(), 
                 patient_demographics: decryptedPatientDemographics, 
-                treatment_history: medicalRecord.treatment_history, 
+                treatment_history: decryptedTreatmentHistory, 
                 issued_by: decryptedIssuedBy, 
                 updated_by: decryptedUpdatedBy,
                 createdAt: medicalRecord['createdAt'], 
@@ -214,8 +222,6 @@ export class MedicalRecordService {
         medicalRecord.patient_demographics.email     = aes.decrypt(medicalRecord.patient_demographics.email),
         medicalRecord.patient_demographics.address   = aes.decrypt(medicalRecord.patient_demographics.address),
         medicalRecord.patient_demographics.telephone = aes.decrypt(medicalRecord.patient_demographics.telephone)
-
-        console.log(medicalRecord)
 
         medicalRecord.treatment_history.complaints         = medicalRecord.treatment_history.complaints.length ? medicalRecord.treatment_history.complaints.map(complaint => aes.decrypt(complaint)) : []
         medicalRecord.treatment_history.history_of_illness = medicalRecord.treatment_history.history_of_illness.length ? medicalRecord.treatment_history.history_of_illness.map(illness => aes.decrypt(illness)) : []

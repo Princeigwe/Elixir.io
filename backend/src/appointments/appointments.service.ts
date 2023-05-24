@@ -50,7 +50,7 @@ export class AppointmentsService {
      * @returns a Promise that resolves to the saved appointment object.
      */
     async scheduleAppointment(user: User, date: Date, duration: string, description?: string, type?: AppointmentType) {
-        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
         const timestampInSeconds = givenDate.getTime() / 1000
@@ -118,7 +118,7 @@ export class AppointmentsService {
      * successfully rescheduled.
      */
     async rescheduleAppointmentByPatient(appointment_id: string, user: User, date: Date) {
-        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
@@ -386,7 +386,7 @@ export class AppointmentsService {
      * @returns The updated appointment is being returned.
      */
     async cancelAppointmentByPatient(appointment_id: string, user: User) {
-        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
 
         if(!patientProfile) {
