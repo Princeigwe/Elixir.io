@@ -152,22 +152,23 @@ export class MedicalRecordService {
         // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
         const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
 
-        // if(treatment_history__complaints && treatment_history__complaints.length){
-        //     treatment_history__complaints = treatment_history__complaints.map(complain => aes.encrypt(complain))
-        // }
-
-        treatment_history__complaints = treatment_history__complaints != undefined && treatment_history__complaints.length ? treatment_history__complaints.map(complain => aes.encrypt(complain)) : medicalRecord.treatment_history.complaints
+        treatment_history__complaints         = treatment_history__complaints != undefined && treatment_history__complaints.length ? treatment_history__complaints.map(complain => aes.encrypt(complain)) : medicalRecord.treatment_history.complaints
+        treatment_history__history_of_illness = treatment_history__history_of_illness != undefined && treatment_history__history_of_illness.length ? treatment_history__history_of_illness.map(illness => aes.encrypt(illness)) : medicalRecord.treatment_history.history_of_illness
+        treatment_history__vital_signs        = treatment_history__vital_signs.map(vital_sign => aes.encrypt(vital_sign)) // this cannot be undefined because of the UpdateMedicalRecordDto handling this function. the property is not optional
+        treatment_history__medical_allergies  = treatment_history__medical_allergies != undefined && treatment_history__medical_allergies.length ? treatment_history__medical_allergies.map( medical_allergy => aes.encrypt(medical_allergy)) : medicalRecord.treatment_history.medical_allergies
+        treatment_history__habits             = treatment_history__habits != undefined && treatment_history__habits.length ? treatment_history__habits.map(habit => aes.encrypt(habit)) : medicalRecord.treatment_history.habits
 
         if( patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
             
             return await this.medicalRecordModel.findByIdAndUpdate( {'_id': medicalRecord._id}, { $set: { 
-                // 'treatment_history.complaints':  treatment_history__complaints != undefined && treatment_history__complaints.length > 0 ? treatment_history__complaints: medicalRecord.treatment_history.complaints,
                 'treatment_history.complaints':  treatment_history__complaints, 
                 'treatment_history.history_of_illness': treatment_history__history_of_illness, 
                 'treatment_history.vital_signs': treatment_history__vital_signs, 
                 'treatment_history.medical_allergies': treatment_history__medical_allergies, 
-                'treatment_history.habits': treatment_history__habits, 'updated_by.doctor_firstName': aes.encrypt(loggedMedicalProvider.firstName), 
-                'updated_by.doctor_lastName': aes.encrypt(loggedMedicalProvider.lastName), 'updated_by.doctor_department': aes.encrypt(loggedMedicalProvider.department)  } }, 
+                'treatment_history.habits': treatment_history__habits, 
+                'updated_by.doctor_firstName': aes.encrypt(loggedMedicalProvider.firstName), 
+                'updated_by.doctor_lastName': aes.encrypt(loggedMedicalProvider.lastName), 
+                'updated_by.doctor_department': aes.encrypt(loggedMedicalProvider.department)  } }, 
                 {new: true}
             )
         }
