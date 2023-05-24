@@ -47,6 +47,7 @@ export class UpdateMedicalRecordDto {
 
     @ApiProperty({description: "vital signs observed"})
     @IsArray()
+    @ArrayNotEmpty()
     vital_signs: string[]
 
     @ApiPropertyOptional({description: "medical allergies of patient"})
