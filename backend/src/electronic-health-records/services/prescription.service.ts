@@ -117,7 +117,7 @@ export class PrescriptionService {
                 }
             } )
 
-            const decryptedInstructions = aes.decrypt(prescription.instructions)
+            const decryptedInstructions = prescription.instructions == undefined ? null: aes.decrypt(prescription.instructions)
 
             return {
                 _id                 : prescription._id.toString(),
@@ -223,7 +223,7 @@ export class PrescriptionService {
                 }
             } )
 
-            const decryptedInstructions = aes.decrypt(prescription.instructions)
+            const decryptedInstructions = prescription.instructions == undefined ? null: aes.decrypt(prescription.instructions)
 
             return {
                 _id                 : prescription._id.toString(),
@@ -279,7 +279,7 @@ export class PrescriptionService {
                 }
             } )
 
-            const decryptedInstructions = aes.decrypt(prescription.instructions)
+            const decryptedInstructions = prescription.instructions == undefined ? null : aes.decrypt(prescription.instructions)
 
             return {
                 _id                 : prescription._id.toString(),
