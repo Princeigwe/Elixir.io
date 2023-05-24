@@ -60,9 +60,11 @@ export class MedicalRecordService {
             // * the encrypted properties of the medical record are the patient's demographics data and the medical provider that created the record
             const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
 
-            if(complaints.length) { complaints = complaints.map(complaint => aes.encrypt(complaint)) }
-            if(history_of_illness.length) { history_of_illness = history_of_illness.map(illness => aes.encrypt(illness)) } 
-            if(vital_signs.length) {vital_signs = vital_signs.map(vital_sign => aes.encrypt(vital_sign))}
+            // these parameters cannot be empty because of the MedicalRecordDto
+            complaints = complaints.map(complaint => aes.encrypt(complaint))
+            history_of_illness = history_of_illness.map(illness => aes.encrypt(illness))
+            vital_signs = vital_signs.map(vital_sign => aes.encrypt(vital_sign))
+            
             if(medical_allergies){
                 if(medical_allergies.length) {medical_allergies = medical_allergies.map(allergy => aes.encrypt(allergy))}
             }
