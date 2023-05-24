@@ -50,7 +50,7 @@ export class AppointmentsService {
      * @returns a Promise that resolves to the saved appointment object.
      */
     async scheduleAppointment(user: User, date: Date, duration: string, description?: string, type?: AppointmentType) {
-        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
         const timestampInSeconds = givenDate.getTime() / 1000
@@ -118,7 +118,7 @@ export class AppointmentsService {
      * successfully rescheduled.
      */
     async rescheduleAppointmentByPatient(appointment_id: string, user: User, date: Date) {
-        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
@@ -169,7 +169,7 @@ export class AppointmentsService {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
-        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
+        const patient = await this.patientService.getPatientWithEmail(decryptedPatientEmail)
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
         const timestampInSeconds = givenDate.getTime() / 1000
@@ -217,7 +217,7 @@ export class AppointmentsService {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
-        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
+        const patient = await this.patientService.getPatientWithEmail(decryptedPatientEmail)
 
         if(!assignedDoctorProfile) {
             throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
@@ -281,7 +281,7 @@ export class AppointmentsService {
     * status.
     */
     async confirmAppointmentByPatient(appointment_id: string, user: User) {
-        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedDoctorEmail = aes.decrypt(appointment.doctor.email)
         const assignedDoctor = await this.doctorService.getDoctorProfileByEmail(decryptedDoctorEmail)
@@ -338,7 +338,7 @@ export class AppointmentsService {
 
 
     async createStreamCallSessionAndNotifyPartiesInvolved(patientEmail: string, doctorEmail: string, appointment_id: string) {
-        const patient = await this.patientService.getPatientByEmailForAppointment(patientEmail)
+        const patient = await this.patientService.getPatientWithEmail(patientEmail)
         const doctorName = `${patient.assignedDoctor.name}`
         const patientName = `${patient.firstName} ${patient.lastName}`
 
@@ -386,7 +386,7 @@ export class AppointmentsService {
      * @returns The updated appointment is being returned.
      */
     async cancelAppointmentByPatient(appointment_id: string, user: User) {
-        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
 
         if(!patientProfile) {
@@ -425,7 +425,7 @@ export class AppointmentsService {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
-        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
+        const patient = await this.patientService.getPatientWithEmail(decryptedPatientEmail)
 
         if(!assignedDoctorProfile) {
             throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)

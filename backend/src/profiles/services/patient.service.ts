@@ -61,7 +61,7 @@ export class PatientService {
     }
 
     // this will be used in the appointment module
-    async getPatientByEmailForAppointment(email: string) {
+    async getPatientWithEmail(email: string) {
         const patient = await this.patientModel.findOne({'email': email}).exec()
         if (!patient) {throw new NotFoundException("Patient Not Found")}
         return patient

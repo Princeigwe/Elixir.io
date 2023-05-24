@@ -123,7 +123,7 @@ export class MedicalRecordService {
         const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
 
         // getting the details of the patient that owns the medical record
-        const patient = await this.patientService.getPatientByEmailForAppointment( aes.decrypt(medicalRecord.patient_demographics.email) )
+        const patient = await this.patientService.getPatientWithEmail( aes.decrypt(medicalRecord.patient_demographics.email) )
 
         // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
         const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
