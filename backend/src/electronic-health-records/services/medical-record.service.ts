@@ -305,7 +305,7 @@ export class MedicalRecordService {
         const medicalProvider = await this.doctorService.getDoctorProfileByEmail(medical_provider_email)
 
         if( medicalRecord.patient_demographics.email == user.email ) {
-            await this.medicalRecordModel.updateOne({'_id': medicalRecord._id}, { $pull: { 'recipients': medical_provider_email } })
+            await this.medicalRecordModel.updateOne({'_id': medicalRecord._id}, { $pull: { 'recipients': aes.encrypt(medical_provider_email) } })
             return { message: `You have successfully revoked read access from ${medicalProvider.firstName} ${medicalProvider.lastName}` }
         }
 
