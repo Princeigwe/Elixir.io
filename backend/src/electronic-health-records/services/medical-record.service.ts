@@ -60,17 +60,15 @@ export class MedicalRecordService {
             // * the encrypted properties of the medical record are the patient's demographics data and the medical provider that created the record
             const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
 
-            let encryptedComplaints = []
-            let encryptedHistoryOfIllness = []
-            let encryptedVitalSigns = []
-            let encryptedMedicalALlergies = []
-            let encryptedHabits = []
-
-            if(complaints.length) { encryptedComplaints = complaints.map(complaint => aes.encrypt(complaint)) }
-            if(history_of_illness.length) { encryptedHistoryOfIllness = history_of_illness.map(illness => aes.encrypt(illness)) } 
-            if(vital_signs.length) {encryptedVitalSigns = vital_signs.map(vital_sign => aes.encrypt(vital_sign))}
-            if(medical_allergies.length) {encryptedMedicalALlergies = medical_allergies.map(allergy => aes.encrypt(allergy))}
-            if(habits.length) {encryptedHabits = habits.map(habit => aes.encrypt(habit))}
+            if(complaints.length) { complaints = complaints.map(complaint => aes.encrypt(complaint)) }
+            if(history_of_illness.length) { history_of_illness = history_of_illness.map(illness => aes.encrypt(illness)) } 
+            if(vital_signs.length) {vital_signs = vital_signs.map(vital_sign => aes.encrypt(vital_sign))}
+            if(medical_allergies){
+                if(medical_allergies.length) {medical_allergies = medical_allergies.map(allergy => aes.encrypt(allergy))}
+            }
+            if(habits){
+                if(habits.length) {habits = habits.map(habit => aes.encrypt(habit))}
+            }
 
             const medicalRecord = new this.medicalRecordModel({
                 patient_demographics: {
@@ -82,11 +80,11 @@ export class MedicalRecordService {
                     telephone: aes.encrypt(patient.telephone)
                 },
                 treatment_history: {
-                    complaints: encryptedComplaints,
-                    history_of_illness: encryptedHistoryOfIllness,
-                    vital_signs: encryptedVitalSigns,
-                    medical_allergies: encryptedMedicalALlergies,
-                    habits: encryptedHabits
+                    complaints: complaints,
+                    history_of_illness: history_of_illness,
+                    vital_signs: vital_signs,
+                    medical_allergies: medical_allergies,
+                    habits: habits
                 },
                 issued_by: {
                     doctor_firstName: aes.encrypt(loggedMedicalProvider.firstName),
@@ -147,7 +145,7 @@ export class MedicalRecordService {
         const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
 
         // getting the details of the patient that owns the medical record
-        const patient = await this.patientService.getPatientProfileByEmail(aes.decrypt(medicalRecord.patient_demographics.email))
+        const patient = await this.patientService.getPatientByEmailForAppointment(medicalRecord.patient_demographics.email)
 
         // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
         const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
