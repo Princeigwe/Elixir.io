@@ -143,11 +143,11 @@ export class MedicalRecordService {
         treatment_history__habits: string[] 
         ) {
         
-        const medicalRecord = await this.getMedicalRecordByID(record_id)
+        const medicalRecord = await this.medicalRecordModel.findById(record_id).exec()
         const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
 
         // getting the details of the patient that owns the medical record
-        const patient = await this.patientService.getPatientByEmailForAppointment(medicalRecord.patient_demographics.email)
+        const patient = await this.patientService.getPatientByEmailForAppointment( aes.decrypt(medicalRecord.patient_demographics.email) )
 
         // checking if the logged in doctor is a consultant in the department of the patient's assigned doctor
         const loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor = (loggedMedicalProvider['department'] == patient['assignedDoctor']['department'] && loggedMedicalProvider['hierarchy'] == DoctorHierarchy.Consultant)
@@ -160,7 +160,7 @@ export class MedicalRecordService {
 
         if( patient['assignedDoctor']['email'] == user.email || loggedMedicalProviderIsConsultantInDepartmentOfPatientAssignedDoctor ) {
             
-            return await this.medicalRecordModel.findByIdAndUpdate( {'_id': medicalRecord._id}, { $set: { 
+            await this.medicalRecordModel.findByIdAndUpdate( {'_id': medicalRecord._id}, { $set: { 
                 'treatment_history.complaints':  treatment_history__complaints, 
                 'treatment_history.history_of_illness': treatment_history__history_of_illness, 
                 'treatment_history.vital_signs': treatment_history__vital_signs, 
@@ -171,6 +171,8 @@ export class MedicalRecordService {
                 'updated_by.doctor_department': aes.encrypt(loggedMedicalProvider.department)  } }, 
                 {new: true}
             )
+
+            return await this.getMedicalRecordByID(record_id)
         }
         else{
             throw new HttpException('Forbidden action, as you are not responsible for this patient', HttpStatus.FORBIDDEN)
@@ -230,7 +232,7 @@ export class MedicalRecordService {
     // function to read the details of a medical record by its id
     // this method will be called for admin user or assigned doctor
     async getMedicalRecordByID(record_id: string) {
-        const medicalRecord = await this.medicalRecordModel.findById(record_id).exec()
+        let medicalRecord = await this.medicalRecordModel.findById(record_id).exec()
         if(!medicalRecord) { throw new NotFoundException("Record not found") }
 
         // decrypting the encrypted data
@@ -239,6 +241,14 @@ export class MedicalRecordService {
         medicalRecord.patient_demographics.email     = aes.decrypt(medicalRecord.patient_demographics.email),
         medicalRecord.patient_demographics.address   = aes.decrypt(medicalRecord.patient_demographics.address),
         medicalRecord.patient_demographics.telephone = aes.decrypt(medicalRecord.patient_demographics.telephone)
+
+        console.log(medicalRecord)
+
+        medicalRecord.treatment_history.complaints         = medicalRecord.treatment_history.complaints.length ? medicalRecord.treatment_history.complaints.map(complaint => aes.decrypt(complaint)) : []
+        medicalRecord.treatment_history.history_of_illness = medicalRecord.treatment_history.history_of_illness.length ? medicalRecord.treatment_history.history_of_illness.map(illness => aes.decrypt(illness)) : []
+        medicalRecord.treatment_history.vital_signs        = medicalRecord.treatment_history.vital_signs.length ? medicalRecord.treatment_history.vital_signs.map(vital_sign => aes.decrypt(vital_sign)) : []
+        medicalRecord.treatment_history.medical_allergies  = medicalRecord.treatment_history.medical_allergies.length ? medicalRecord.treatment_history.medical_allergies.map(medical_allergy => aes.decrypt(medical_allergy)) : []
+        medicalRecord.treatment_history.habits             = medicalRecord.treatment_history.habits.length ? medicalRecord.treatment_history.habits.map(habit => aes.decrypt(habit)) : []
 
         medicalRecord.issued_by['doctor_firstName']  = aes.decrypt(medicalRecord.issued_by['doctor_firstName'])
         medicalRecord.issued_by['doctor_lastName']   = aes.decrypt(medicalRecord.issued_by['doctor_lastName'])
