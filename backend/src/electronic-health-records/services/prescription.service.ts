@@ -9,6 +9,8 @@ import { DoctorService } from '../../profiles/services/doctor.service';
 import * as AesEncryption from 'aes-encryption'
 import {UserCategory} from '../../enums/user.category.enum'
 import { Role } from '../../enums/role.enum';
+import { OnEvent } from '@nestjs/event-emitter';
+import {UpdatedPatientProfileEvent} from '../../events/updatedPatientProfile.event'
 
 const aes = new AesEncryption()
 aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
@@ -327,6 +329,21 @@ export class PrescriptionService {
     async deletePrescription(prescription_id: string) {
         await this.prescriptionModel.deleteOne({'__id': prescription_id})
         throw new HttpException( "Prescription Deleted", HttpStatus.NO_CONTENT)
+    }
+
+
+    @OnEvent('updated.patient.profile')
+    async updatePatientDemographicsWhenPatientUpdatesBasicDetails(payload: UpdatedPatientProfileEvent) {
+        await this.prescriptionModel.updateMany(
+            {'patient_demographics.email': aes.encrypt(payload.email)}, 
+            { $set: { 
+                'patient_demographics.firstName': aes.encrypt(payload.firstName),
+                'patient_demographics.lastName': aes.encrypt(payload.lastName),
+                'patient_demographics.age': payload.age,
+                'patient_demographics.address': aes.encrypt(payload.address),
+                'patient_demographics.telephone': aes.encrypt(payload.telephone),
+            } })
+
     }
 
 }
