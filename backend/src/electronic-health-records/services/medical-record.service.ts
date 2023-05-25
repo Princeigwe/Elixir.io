@@ -11,6 +11,9 @@ import {UserCategory} from '../../enums/user.category.enum'
 import { PrescriptionService } from './prescription.service';
 import { ProgressNoteService } from './progress-note.service';
 import * as AesEncryption from 'aes-encryption'
+import { OnEvent } from '@nestjs/event-emitter';
+import {UpdatedPatientProfileEvent} from '../../events/updatedPatientProfile.event'
+
 
 const aes = new AesEncryption()
 aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
@@ -401,6 +404,21 @@ export class MedicalRecordService {
         }
         await this.medicalRecordModel.deleteOne({'__id': medical_record_id})
         throw new HttpException( "Record Deleted", HttpStatus.NO_CONTENT)
+    }
+
+
+    @OnEvent('updated.patient.profile')
+    async updatePatientDemographicsWhenPatientUpdatesBasicDetails(payload: UpdatedPatientProfileEvent) {
+        await this.medicalRecordModel.updateOne(
+            {'patient_demographics.email': aes.encrypt(payload.email)}, 
+            { $set: { 
+                'patient_demographics.firstName': aes.encrypt(payload.firstName),
+                'patient_demographics.lastName': aes.encrypt(payload.lastName),
+                'patient_demographics.age': payload.age,
+                'patient_demographics.address': aes.encrypt(payload.address),
+                'patient_demographics.telephone': aes.encrypt(payload.telephone),
+            } })
+
     }
 
 }
