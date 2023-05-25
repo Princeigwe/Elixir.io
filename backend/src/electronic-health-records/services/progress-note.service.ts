@@ -51,7 +51,9 @@ export class ProgressNoteService {
             }
         }) 
 
-        return progressNote.save()
+        await progressNote.save()
+
+        return await this.getProgressNoteByID(progressNote._id, user)
     }
 
 
@@ -202,7 +204,7 @@ export class ProgressNoteService {
             throw new HttpException('Forbidden action, as you are not authorized to make changes to this resource. If you are a medical provider, request read access to medical record tied to this progress note', HttpStatus.FORBIDDEN)
         }
 
-        return await this.progressNoteModel.findByIdAndUpdate({'_id': progress_note_id}, { $set: { 
+        await this.progressNoteModel.findByIdAndUpdate({'_id': progress_note_id}, { $set: { 
             'subjectiveInformation': subjectiveInformation == undefined ? progressNote.subjectiveInformation : aes.encrypt(subjectiveInformation),
             'objectiveInformation':  objectiveInformation  == undefined ? progressNote.objectiveInformation  : aes.encrypt(objectiveInformation),
             'assessment':            assessment            == undefined ? progressNote.assessment            : aes.encrypt(assessment),
@@ -211,6 +213,8 @@ export class ProgressNoteService {
             } },
             {new: true}
         )
+
+        return await this.getProgressNoteByID(progressNote._id, user)
     }
 
 
