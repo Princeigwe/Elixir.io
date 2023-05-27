@@ -32,7 +32,6 @@
     "@nestjs/platform-socket.io": "^9.4.2",
     "@nestjs/schedule": "^2.1.0",
     "@nestjs/swagger": "^6.2.1",
-    "@nestjs/throttler": "^4.0.0",
     "@nestjs/websockets": "^9.4.2",
     "@socket.io/redis-adapter": "^8.1.0",
     "@types/redis": "^4.0.11",
