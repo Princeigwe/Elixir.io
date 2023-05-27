@@ -16,7 +16,6 @@ import { TokenModule } from './token/token.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { StreamCallModule } from './stream-call/stream-call.module';
-import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -34,12 +33,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     TokenModule,
     ConversationsModule,
     AppointmentsModule,
-    StreamCallModule,
-    // setting rate limiting to 50 API calls per 3600 seconds(1hour)
-    ThrottlerModule.forRoot({
-      ttl: 3600,
-      limit: 50, 
-    }),
+    StreamCallModule
   ],
   // controllers: [AppController],
   // providers: [AppService],
