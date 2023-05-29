@@ -37,6 +37,7 @@
     "@types/redis": "^4.0.11",
     "@vonage/server-sdk": "^3.4.0",
     "aes-encryption": "^1.0.4",
+    "agora-rtc-sdk-ng": "^4.17.2",
     "aws-sdk": "^2.1223.0",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
