@@ -14,7 +14,7 @@ This means that if an API request takes longer than 60 seconds to receive a resp
 the request will be aborted and considered as timed out.
 */
 const OpenTok = require("opentok");
-const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY, process.env.VONAGE_VIDEO_SECRET, { timeout: 60000});
+const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY || "12345", process.env.VONAGE_VIDEO_SECRET || "12345", { timeout: 60000});
 
 
 
