@@ -120,7 +120,7 @@ export class StreamCallService {
 
         try {
             const response = await axios.post(url, data, options)
-            return response.data
+            return response.data.token
         } catch (error) {
             throw error
         }
