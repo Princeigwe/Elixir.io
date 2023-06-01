@@ -3,6 +3,8 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Session, SessionDocument } from './session.schema';
 import { User } from '../users/users.schema';
+const jwt = require('jsonwebtoken');
+import axios from 'axios'
 
 
 /* These lines of code are importing the `opentok` library and creating an instance of the `OpenTok`
@@ -28,6 +30,52 @@ export class StreamCallService {
 
 
     /**
+     * This is an async function that configures daily domain settings for advanced chat and people UI
+     * using the Daily API.
+     * @param {boolean} [enable_advanced_chat] - A boolean property that, when set to true, enables
+     * advanced chat features for end users. This includes the ability to use emoji reactions, an emoji
+     * picker in the chat input form, and the ability to send a Giphy chat message.
+     * @param {boolean} [enable_people_ui] - This parameter is a boolean property that, when set to
+     * true, enables the People UI feature in the Daily.co video call platform. This feature adds a
+     * People button in the call tray that reveals a People tab in the call sidebar. The tab lists all
+     * participants, and next to each name indicates audio status
+     * @returns the data from the response of a POST request to the Daily.co API with the specified
+     * configurations for enabling advanced chat and people UI, and authenticated using a bearer token.
+     */
+    async configureDailyDomainByAdmin(
+        enable_advanced_chat?: boolean, //Property that gives end users a richer chat experience. This includes:Emoji reactions to chat messages. Emoji picker in the chat input form. Ability to send a Giphy chat message
+        enable_people_ui?: boolean, // When set to true, a People button in the call tray reveals a People tab in the call sidebar. The tab lists all participants, and next to each name indicates audio status and an option to pin the participant.
+    ){
+        const url = "https://api.daily.co/v1/"
+        const token = process.env.DAILY_API_KEY
+        const configurations = {enable_advanced_chat, enable_people_ui}
+
+        try {
+            const response = await axios.post(url, { properties: configurations}, {headers: {"Authorization": `Bearer ${token}`}})
+            return response.data
+        } catch (error) {
+            throw error
+        }
+    }
+
+
+    async createJsonWebTokenForOpenTokRESTCalls() {
+        const payload = {
+            iss: process.env.VONAGE_VIDEO_API_KEY,
+            ist: 'project',
+            iat: Math.floor(Date.now() / 1000), // current timestamp in seconds
+            exp: Math.floor(Date.now() / 1000) + (3 * 60) // expire after 3 minutes
+        };
+
+        // using OpenTok API secret as the JWT secret key and sign payload as specified in the REST API docs
+        const secretKey = process.env.VONAGE_VIDEO_SECRET
+
+        const token = jwt.sign(payload, secretKey)
+        return token
+    }
+
+
+    /**
      * This function creates a new session for a patient and a doctor using OpenTok and saves it to a
      * database.
      * @param {string} patientEmail - A string representing the email address of the patient who is
@@ -37,45 +85,38 @@ export class StreamCallService {
      * @returns A Promise that resolves to a SessionDocument object.
      */
 
-    //todo: look at this later
-    // async createSession(patientEmail: string, doctorEmail: string, appointment_id: string): Promise<SessionDocument> {
-    //     const session = await this.sessionModel.findOne({patientEmail: patientEmail, doctorEmail: doctorEmail}).exec()
-    //     if(session) {
-    //         await this.sessionModel.deleteOne({patientEmail: patientEmail, doctorEmail: doctorEmail})
-    //     }
-    //     return new Promise<SessionDocument>((resolve, reject) => {
-    //         opentok.createSession({ mediaMode: "routed" }, async (error, session) => {
-    //             if (error) {
-    //             console.log("Error creating session:", error);
-    //             reject(error);
-    //             } 
-    //             else {
-    //                 try {
-    //                     const sessionRoom = await this.sessionModel.create({ sessionID: session.sessionId, patientEmail: patientEmail, doctorEmail: doctorEmail, appointment: appointment_id });
-    //                     await sessionRoom.save();
-    //                     console.log(sessionRoom);
-    //                     resolve(sessionRoom);
-    //                 } catch (error) {
-    //                     console.log(error);
-    //                     reject(error);
-    //                 }
-    //             }
-    //         });
-    //     });
+    // async createSession(patientEmail: string, doctorEmail: string, appointment_id: string) {
+    //     const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY || "12345", process.env.VONAGE_VIDEO_SECRET || "12345", { timeout: 60000});
+
     // }
 
-
-    // async getSessionDataAsPatient() {}
-
-
-    async getSessionRoomAsPatient(user: User) {
-        const sessionRoom = await this.sessionModel.findOne({'patientEmail': user.email})
-        if(!sessionRoom) {
-            throw new HttpException('Stream call session does not exist.', HttpStatus.NOT_FOUND)
+    //todo: look at this later
+    async createSession(patientEmail: string, doctorEmail: string, appointment_id: string): Promise<SessionDocument> {
+        const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY || "12345", process.env.VONAGE_VIDEO_SECRET || "12345", { timeout: 60000});
+        const session = await this.sessionModel.findOne({patientEmail: patientEmail, doctorEmail: doctorEmail}).exec()
+        if(session) {
+            await this.sessionModel.deleteOne({patientEmail: patientEmail, doctorEmail: doctorEmail})
         }
-        return sessionRoom
+        return new Promise<SessionDocument>((resolve, reject) => {
+            opentok.createSession({ mediaMode: "routed" }, async (error, session) => {
+                if (error) {
+                console.log("Error creating session:", error);
+                reject(error);
+                } 
+                else {
+                    try {
+                        const sessionRoom = await this.sessionModel.create({ sessionID: session.sessionId, patientEmail: patientEmail, doctorEmail: doctorEmail, appointment: appointment_id });
+                        await sessionRoom.save();
+                        console.log(sessionRoom);
+                        resolve(sessionRoom);
+                    } catch (error) {
+                        console.log(error);
+                        reject(error);
+                    }
+                }
+            });
+        });
     }
-
 
 
     /**
@@ -87,21 +128,22 @@ export class StreamCallService {
     */
 
     //todo: look at this later
-    // async generateToken(sessionID: string) {
-    //     const session = await this.sessionModel.findOne({ sessionID: sessionID}).populate('appointment').exec()
-    //     const appointment = session.appointment
-    //     const streamCallTokenExpirationDate = new Date(appointment['date'])
-    //     const appointmentDurationTime = appointment.duration
+    async generateToken(sessionID: string) {
+        const opentok = new OpenTok(process.env.VONAGE_VIDEO_API_KEY || "12345", process.env.VONAGE_VIDEO_SECRET || "12345", { timeout: 60000});
+        const session = await this.sessionModel.findOne({ sessionID: sessionID}).populate('appointment').exec()
+        const appointment = session.appointment
+        const streamCallTokenExpirationDate = new Date(appointment['date'])
+        const appointmentDurationTime = appointment.duration
 
-    //     const [hours, minutes] = appointmentDurationTime.split(":")
-    //     streamCallTokenExpirationDate.setHours( streamCallTokenExpirationDate.getHours() + parseInt(hours, 10) )
-    //     streamCallTokenExpirationDate.setMinutes( streamCallTokenExpirationDate.getMinutes() + parseInt(minutes, 10) )
+        const [hours, minutes] = appointmentDurationTime.split(":")
+        streamCallTokenExpirationDate.setHours( streamCallTokenExpirationDate.getHours() + parseInt(hours, 10) )
+        streamCallTokenExpirationDate.setMinutes( streamCallTokenExpirationDate.getMinutes() + parseInt(minutes, 10) )
 
-    //     const tokenExpirationTime = Math.floor(streamCallTokenExpirationDate.getTime() / 1000)
-    //     const options = {expireTime: tokenExpirationTime}
-    //     const token = opentok.generateToken(sessionID, options);
-    //     return token
-    // }
+        const tokenExpirationTime = Math.floor(streamCallTokenExpirationDate.getTime() / 1000)
+        const options = {expireTime: tokenExpirationTime}
+        const token = opentok.generateToken(sessionID, options);
+        return token
+    }
 
 
 }
