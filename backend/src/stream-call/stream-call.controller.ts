@@ -6,6 +6,7 @@ import { ConfigDailyDomainDto } from './dtos/config.Daily.domain.dto';
 import {Roles} from '../roles.decorator'
 import {Role} from '../enums/role.enum'
 import { RolesGuard } from '../roles.guard';
+import { CreateDailyRoomDto } from './dtos/create.Daily.room.dto'
 
 @Controller('stream-call')
 export class StreamCallController {
@@ -29,6 +30,11 @@ export class StreamCallController {
     @Roles(Role.Admin)
     async configureDailyDomainByAdmin(@Body() body: ConfigDailyDomainDto) {
         return await this.streamCallService.configureDailyDomainByAdmin(body.enable_advanced_chat, body.enable_people_ui)
+    }
+
+    @Post('create-daily-room')
+    async createDailySessionRoom(@Body() body: CreateDailyRoomDto) {
+        return await this.streamCallService.createDailySessionRoom(body.patientEmail, body.doctorEmail, body.appointment_id)
     }
 
 

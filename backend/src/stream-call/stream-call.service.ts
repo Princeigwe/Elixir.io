@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Session, SessionDocument } from './session.schema';
@@ -52,6 +52,54 @@ export class StreamCallService {
 
         try {
             const response = await axios.post(url, { properties: configurations}, {headers: {"Authorization": `Bearer ${token}`}})
+            return response.data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getAppointmentDetailsBySessionByID(sessionID: string) {
+        const session = await (await this.sessionModel.findById(sessionID)).populate('appointment')
+        const appointment = session.appointment
+        return appointment
+    }
+
+
+    async createDailySessionRoom(patientEmail: string, doctorEmail: string, appointment_id: string) {
+        const session = await this.sessionModel.findOne({patientEmail: patientEmail, doctorEmail: doctorEmail}).exec()
+        if(session) {
+            await this.sessionModel.deleteOne({patientEmail: patientEmail, doctorEmail: doctorEmail})
+        }
+        const sessionRoom = await this.sessionModel.create({ patientEmail: patientEmail, doctorEmail: doctorEmail, appointment: appointment_id });
+        await sessionRoom.save();
+        const appointment = await this.getAppointmentDetailsBySessionByID(sessionRoom._id)
+        const appointmentDate = new Date(appointment['date'])
+        const appointmentStartTimeInSeconds = Math.floor(appointmentDate.getTime()) / 1000
+
+        const appointmentDurationTime = appointment.duration
+        const [hours, minutes] = appointmentDurationTime.split(":")
+
+        appointmentDate.setHours( appointmentDate.getHours() + parseInt(hours, 10) )
+        appointmentDate.setMinutes( appointmentDate.getMinutes() + parseInt(minutes, 10) )
+
+        const appointmentEndTime = Math.floor(appointmentDate.getTime() / 1000)
+
+        const url = "https://api.daily.co/v1/rooms/"
+        const token = process.env.DAILY_API_KEY
+        const options = {headers: {"Authorization": `Bearer ${token}`}}
+        const data = {
+            privacy: "private",
+            properties: {
+                start_audio_off: true, // When a participant first joins a meeting in a room, keep their microphone muted.
+                start_video_off: true, // When a participant first joins a meeting in a room, keep their camera off.
+                nbf: appointmentStartTimeInSeconds,
+                exp: appointmentEndTime,
+                eject_at_room_exp: true, // If there's a meeting going on at room exp time, end the meeting by kicking everyone out
+            }
+        }
+
+        try {
+            const response = await axios.post(url, data, options)
             return response.data
         } catch (error) {
             throw error
