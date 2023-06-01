@@ -107,6 +107,27 @@ export class StreamCallService {
     }
 
 
+    async createDailyRoomWithMeetingToken(patientEmail: string, doctorEmail: string, appointment_id: string) {
+        const room = await this.createDailySessionRoom(patientEmail, doctorEmail, appointment_id)
+        const url = "https://api.daily.co/v1/meeting-tokens/"
+        const token = process.env.DAILY_API_KEY
+        const options = {headers: {"Authorization": `Bearer ${token}`}}
+        const data = {
+            properties: {
+                room_name: room.name,
+                exp: room.config.exp
+            }
+        }
+
+        try {
+            const response = await axios.post(url, data, options)
+            return response.data
+        } catch (error) {
+            throw error
+        }
+    }
+
+
     async createJsonWebTokenForOpenTokRESTCalls() {
         const payload = {
             iss: process.env.VONAGE_VIDEO_API_KEY,

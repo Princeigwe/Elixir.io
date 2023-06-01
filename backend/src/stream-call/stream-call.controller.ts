@@ -37,6 +37,11 @@ export class StreamCallController {
         return await this.streamCallService.createDailySessionRoom(body.patientEmail, body.doctorEmail, body.appointment_id)
     }
 
+    @Post('create-daily-room-token')
+    async createDailyRoomWithMeetingToken(@Body() body: CreateDailyRoomDto) {
+        return await this.streamCallService.createDailyRoomWithMeetingToken(body.patientEmail, body.doctorEmail, body.appointment_id)
+    }
+
 
     // @Get('/:sessionID')
     // async generateToken( @Param('sessionID') sessionID: string ){
