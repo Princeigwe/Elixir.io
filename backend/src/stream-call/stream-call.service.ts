@@ -107,15 +107,14 @@ export class StreamCallService {
     }
 
 
-    async createDailyRoomWithMeetingToken(patientEmail: string, doctorEmail: string, appointment_id: string) {
-        const room = await this.createDailySessionRoom(patientEmail, doctorEmail, appointment_id)
+    async createMeetingTokenForDailyRoom(roomName: string, roomExp: number) {
         const url = "https://api.daily.co/v1/meeting-tokens/"
         const token = process.env.DAILY_API_KEY
         const options = {headers: {"Authorization": `Bearer ${token}`}}
         const data = {
             properties: {
-                room_name: room.name,
-                exp: room.config.exp
+                room_name: roomName,
+                exp: roomExp
             }
         }
 

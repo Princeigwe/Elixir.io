@@ -7,6 +7,7 @@ import {Roles} from '../roles.decorator'
 import {Role} from '../enums/role.enum'
 import { RolesGuard } from '../roles.guard';
 import { CreateDailyRoomDto } from './dtos/create.Daily.room.dto'
+import {CreateDailyRoomTokenDto } from './dtos/create.Daily.room.token.dto'
 
 @Controller('stream-call')
 export class StreamCallController {
@@ -38,8 +39,8 @@ export class StreamCallController {
     }
 
     @Post('create-daily-room-token')
-    async createDailyRoomWithMeetingToken(@Body() body: CreateDailyRoomDto) {
-        return await this.streamCallService.createDailyRoomWithMeetingToken(body.patientEmail, body.doctorEmail, body.appointment_id)
+    async createDailyRoomWithMeetingToken(@Body() body: CreateDailyRoomTokenDto) {
+        return await this.streamCallService.createMeetingTokenForDailyRoom(body.roomName, body.roomExp)
     }
 
 
