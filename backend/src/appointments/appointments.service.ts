@@ -50,7 +50,7 @@ export class AppointmentsService {
      * @returns a Promise that resolves to the saved appointment object.
      */
     async scheduleAppointment(user: User, date: Date, duration: string, description?: string, type?: AppointmentType) {
-        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
         const timestampInSeconds = givenDate.getTime() / 1000
@@ -88,6 +88,7 @@ export class AppointmentsService {
 
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
+
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
         await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
@@ -118,7 +119,7 @@ export class AppointmentsService {
      * successfully rescheduled.
      */
     async rescheduleAppointmentByPatient(appointment_id: string, user: User, date: Date) {
-        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
@@ -169,7 +170,7 @@ export class AppointmentsService {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
-        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
+        const patient = await this.patientService.getPatientWithEmail(decryptedPatientEmail)
         const currentTimeInSeconds = new Date().getTime() / 1000
         const givenDate = new Date(date);
         const timestampInSeconds = givenDate.getTime() / 1000
@@ -217,7 +218,7 @@ export class AppointmentsService {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
-        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
+        const patient = await this.patientService.getPatientWithEmail(decryptedPatientEmail)
 
         if(!assignedDoctorProfile) {
             throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)
@@ -243,8 +244,9 @@ export class AppointmentsService {
         // send sms notification to the patient, notifying them of the confirmed appointment
         await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
+
         if(updatedAppointment.type == AppointmentType.Virtual) {
-            await this.createStreamCallSessionAndNotifyPartiesInvolved(decryptedPatientEmail, user.email, appointment._id)
+            await this.createDailyRoomSessionForVirtualAppointment(decryptedPatientEmail, user.email, appointment._id)
         }
 
         const decryptedDetails = {
@@ -281,7 +283,7 @@ export class AppointmentsService {
     * status.
     */
     async confirmAppointmentByPatient(appointment_id: string, user: User) {
-        const patientProfile = await this.patientService.getPatientByEmailForAppointment(user.email)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedDoctorEmail = aes.decrypt(appointment.doctor.email)
         const assignedDoctor = await this.doctorService.getDoctorProfileByEmail(decryptedDoctorEmail)
@@ -311,7 +313,7 @@ export class AppointmentsService {
         await vonageSMS.sendAppointmentConfirmationMessageByPatient(assignedDoctor.telephone, patientName, updatedAppointment.date)
 
         if(updatedAppointment.type == AppointmentType.Virtual) {
-            await this.createStreamCallSessionAndNotifyPartiesInvolved(user.email, decryptedDoctorEmail, appointment._id)
+            await this.createDailyRoomSessionForVirtualAppointment(user.email, decryptedDoctorEmail, appointment._id)
         }
 
         const decryptedDetails = {
@@ -336,20 +338,26 @@ export class AppointmentsService {
         return updatedAppointment
     }
 
-
-    async createStreamCallSessionAndNotifyPartiesInvolved(patientEmail: string, doctorEmail: string, appointment_id: string) {
-        const patient = await this.patientService.getPatientByEmailForAppointment(patientEmail)
+    /**
+     * This function creates a daily session room for a virtual appointment between a patient and a
+     * doctor, generates meeting tokens for both parties, and sends email invitations with the meeting
+     * links.
+     * @param {string} patientEmail - The email address of the patient who has the virtual appointment.
+     * @param {string} doctorEmail - The email address of the doctor who will be participating in the
+     * virtual appointment.
+     * @param {string} appointment_id - `appointment_id` is a string parameter that represents the
+     * unique identifier of a virtual appointment. It is used to create a daily session room for the
+     * virtual appointment and generate meeting tokens for the patient and doctor to access the room.
+     */
+    async createDailyRoomSessionForVirtualAppointment(patientEmail: string, doctorEmail: string, appointment_id: string) {
+        const patient = await this.patientService.getPatientWithEmail(patientEmail)
         const doctorName = `${patient.assignedDoctor.name}`
         const patientName = `${patient.firstName} ${patient.lastName}`
 
-        // create a stream call session
-        const session = await this.streamCallService.createSession(patientEmail, doctorEmail, appointment_id)
-
-        // create a token for the doctor of the stream call session
-        const doctorToken = await this.streamCallService.generateToken(session.sessionID)
-
-        // create a token for the patient of the stream call session
-        const patientToken = await this.streamCallService.generateToken(session.sessionID)
+        const room = await this.streamCallService.createDailySessionRoom(patientEmail, doctorEmail, appointment_id)
+        
+        const doctorToken = await this.streamCallService.createMeetingTokenForDailyRoom(room.name, room.config.exp)
+        const patientToken = await this.streamCallService.createMeetingTokenForDailyRoom(room.name, room.config.exp)
 
         // patient stream call data
         const patientSessionData = {
@@ -357,7 +365,7 @@ export class AppointmentsService {
             to: [patientEmail,],
             subject: `Stream Call with ${doctorName}`,
             html: `Dear ${patient.firstName} ${patient.lastName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${patientToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your doctor. 
+            This <a href="http://localhost:3000/api/v1/stream-call/${room.name}/${patientToken}/">link</a> grants you access to a stream call, where important matters can be discussed privately with your doctor. 
             To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
         }
 
@@ -367,12 +375,13 @@ export class AppointmentsService {
             to: [patient.assignedDoctor.email,],
             subject: `Stream Call with ${patientName}`,
             html: `Dear ${doctorName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${doctorToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your patient. 
+            This <a href="http://localhost:3000/api/v1/stream-call/${room.name}/${doctorToken}/">link</a> grants you access to a stream call, where important matters can be discussed privately with your patient. 
             To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
         }
 
         await emailSender.sendMail(patientSessionData)
         await emailSender.sendMail(doctorSessionData)
+
     }
 
 
@@ -386,7 +395,7 @@ export class AppointmentsService {
      * @returns The updated appointment is being returned.
      */
     async cancelAppointmentByPatient(appointment_id: string, user: User) {
-        const patientProfile = await this.patientService.getPatientProfileByEmail(user)
+        const patientProfile = await this.patientService.getPatientWithEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
 
         if(!patientProfile) {
@@ -425,7 +434,7 @@ export class AppointmentsService {
         const assignedDoctorProfile = await this.doctorService.getDoctorProfileByEmail(user.email)
         const appointment = await this.appointmentModel.findById(appointment_id).exec()
         const decryptedPatientEmail = aes.decrypt(appointment.patient.email)
-        const patient = await this.patientService.getPatientByEmailForAppointment(decryptedPatientEmail)
+        const patient = await this.patientService.getPatientWithEmail(decryptedPatientEmail)
 
         if(!assignedDoctorProfile) {
             throw new HttpException('Medical provider profile with this email address does not exist.', HttpStatus.NOT_FOUND)

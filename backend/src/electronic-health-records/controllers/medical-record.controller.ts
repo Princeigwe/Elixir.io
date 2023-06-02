@@ -90,7 +90,7 @@ export class MedicalRecordController {
     @ApiResponse({status: 200, description: "This returns the medical record of a patient for the authorized medical provider"})
     @ApiResponse({status: 403,  description: "Forbidden action. Request for access to medical record from patient"})
     @UseGuards(JwtAuthGuard)
-    @Get('read-access/:medical_record_id/')
+    @Get('read-action/:medical_record_id/')
     async readActionOfMedicalRecordByMedicalProvider(@Request() request, @Param('medical_record_id') medical_record_id: string) {
         const user = request.user
         return await this.medicalRecordService.readActionOfMedicalRecordByMedicalProvider(medical_record_id, user)

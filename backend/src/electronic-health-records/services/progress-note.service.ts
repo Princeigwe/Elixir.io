@@ -7,6 +7,8 @@ import * as AesEncryption from 'aes-encryption'
 import { Role } from '../../enums/role.enum';
 import { DoctorService } from '../../profiles/services/doctor.service';
 import { MedicalRecordService } from './medical-record.service';
+import { OnEvent } from '@nestjs/event-emitter';
+import {UpdatedPatientProfileEvent} from '../../events/updatedPatientProfile.event'
 
 const aes = new AesEncryption()
 aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
@@ -51,7 +53,9 @@ export class ProgressNoteService {
             }
         }) 
 
-        return progressNote.save()
+        await progressNote.save()
+
+        return await this.getProgressNoteByID(progressNote._id, user)
     }
 
 
@@ -202,7 +206,7 @@ export class ProgressNoteService {
             throw new HttpException('Forbidden action, as you are not authorized to make changes to this resource. If you are a medical provider, request read access to medical record tied to this progress note', HttpStatus.FORBIDDEN)
         }
 
-        return await this.progressNoteModel.findByIdAndUpdate({'_id': progress_note_id}, { $set: { 
+        await this.progressNoteModel.findByIdAndUpdate({'_id': progress_note_id}, { $set: { 
             'subjectiveInformation': subjectiveInformation == undefined ? progressNote.subjectiveInformation : aes.encrypt(subjectiveInformation),
             'objectiveInformation':  objectiveInformation  == undefined ? progressNote.objectiveInformation  : aes.encrypt(objectiveInformation),
             'assessment':            assessment            == undefined ? progressNote.assessment            : aes.encrypt(assessment),
@@ -211,6 +215,8 @@ export class ProgressNoteService {
             } },
             {new: true}
         )
+
+        return await this.getProgressNoteByID(progressNote._id, user)
     }
 
 
@@ -284,6 +290,21 @@ export class ProgressNoteService {
     async deleteAllProgressNotes() {
         await this.progressNoteModel.deleteMany()
         throw new HttpException( "Progress notes deleted", HttpStatus.NO_CONTENT)
+    }
+
+
+    @OnEvent('updated.patient.profile')
+    async updatePatientDemographicsWhenPatientUpdatesBasicDetails(payload: UpdatedPatientProfileEvent) {
+        await this.progressNoteModel.updateMany(
+            {'patient_demographics.email': aes.encrypt(payload.email)}, 
+            { $set: { 
+                'patient_demographics.firstName': aes.encrypt(payload.firstName),
+                'patient_demographics.lastName': aes.encrypt(payload.lastName),
+                'patient_demographics.age': payload.age,
+                'patient_demographics.address': aes.encrypt(payload.address),
+                'patient_demographics.telephone': aes.encrypt(payload.telephone),
+            } })
+
     }
 
 }

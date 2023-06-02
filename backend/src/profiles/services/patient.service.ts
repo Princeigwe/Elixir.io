@@ -61,7 +61,7 @@ export class PatientService {
     }
 
     // this will be used in the appointment module
-    async getPatientByEmailForAppointment(email: string) {
+    async getPatientWithEmail(email: string) {
         const patient = await this.patientModel.findOne({'email': email}).exec()
         if (!patient) {throw new NotFoundException("Patient Not Found")}
         return patient
@@ -110,10 +110,26 @@ export class PatientService {
     }
 
 
+    // async editBasicPatientProfileOfLoggedInUser(attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>, user: User) {
+    //     const ability = this.caslAbilityFactory.createForUser(user)
+
+    //     const patient = await this.getPatientProfileByEmail(user)
+    //     if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
+    //         Object.assign(patient, attrs)
+    //         // emit the patient's data, so that it can reflect in the assigned doctor's profile
+    //         this.eventEmitter.emit('updated.patient.profile', new UpdatedPatientProfileEvent(patient.firstName, patient.lastName, patient.email, patient.age, patient.address, patient.telephone, patient.occupation, patient.maritalStatus))
+    //         return patient.save()
+    //     }
+    //     else {
+    //         throw new HttpException('Forbidden action', HttpStatus.BAD_REQUEST)
+    //     }
+    // }
+
+
     async editBasicPatientProfileOfLoggedInUser(attrs: Pick<Patient, 'firstName' | 'lastName' | 'age' | 'address' | 'telephone' | 'occupation' | 'maritalStatus'>, user: User) {
         const ability = this.caslAbilityFactory.createForUser(user)
 
-        const patient = await this.getPatientProfileByEmail(user)
+        const patient = await this.getPatientWithEmail(user.email)
         if( ability.can(Action.Update, patient) || ability.can(Action.Manage, 'all') ) {
             Object.assign(patient, attrs)
             // emit the patient's data, so that it can reflect in the assigned doctor's profile
@@ -125,11 +141,6 @@ export class PatientService {
         }
     }
 
-    // this method will only be executed by a medical provider
-    async addToPatientPrescriptionById(id: string) {}
-
-    // this method will only be executed by a medical provider
-    async editPatientPrescriptionById() {}
 
     /* 
         this action will be executed by a consultant after they are referred to a patient after admission.

@@ -1,4 +1,4 @@
-import { IsOptional, IsEmail, IsString, IsNumber, IsArray } from "class-validator"
+import { IsOptional, IsArray, ArrayNotEmpty } from "class-validator"
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 
 
@@ -6,19 +6,22 @@ export class MedicalRecordDto {
 
     @ApiProperty({description: "the patent's complaints", required: true})
     @IsArray()
+    @ArrayNotEmpty()
     complaints: string[]
 
     @ApiProperty({description: "the patient's history of illness", required: true})
     @IsArray()
+    @ArrayNotEmpty()
     history_of_illness: string[]
 
     @ApiProperty({description: "vital signs observed", required: true})
     @IsArray()
+    @ArrayNotEmpty()
     vital_signs: string[]
 
     @ApiPropertyOptional({description: "medical allergies of patient"})
     @IsArray()
-    @IsOptional()
+    @IsOptional() 
     medical_allergies: string[]
 
     @ApiPropertyOptional({description: "habits of patient"})
@@ -44,6 +47,7 @@ export class UpdateMedicalRecordDto {
 
     @ApiProperty({description: "vital signs observed"})
     @IsArray()
+    @ArrayNotEmpty()
     vital_signs: string[]
 
     @ApiPropertyOptional({description: "medical allergies of patient"})

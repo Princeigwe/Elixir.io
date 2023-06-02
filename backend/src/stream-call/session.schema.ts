@@ -8,10 +8,6 @@ export type SessionDocument = Session & Document
 
 @Schema()
 export class Session {
-
-    @Prop()
-    sessionID: string;
-
     @Prop()
     patientEmail: string;
 
