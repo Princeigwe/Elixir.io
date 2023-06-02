@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Session, SessionDocument } from './session.schema';
 import { User } from '../users/users.schema';
 const jwt = require('jsonwebtoken');
-import axios from 'axios'
+const axios = require('axios');
 import * as AesEncryption from 'aes-encryption'
 
 
