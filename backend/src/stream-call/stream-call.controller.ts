@@ -17,13 +17,20 @@ export class StreamCallController {
     ) {}
 
 
-    @Get('/:cipher/:key/:code')
-    @Render('stream_call')
-    async streamCall( ) {}
+    // @Get('/:cipher/:key/:code')
+    // @Render('stream_call')
+    // async streamCall( ) {}
 
-    @Get('/agora')
-    @Render('stream_call_agora')
-    async streamCallAgora( ) {}
+    // @Get('/agora')
+    // @Render('stream_call_agora')
+    // async streamCallAgora( ) {}
+
+    @Get('/:room/:token')
+    @Render('stream_call_daily')
+    async streamCallDaily(@Param('room') room: string, @Param('token') token: string) {
+        const dailyDomain = process.env.DAILY_DOMAIN
+        return { room: room, token: token, dailyDomain: dailyDomain }
+    }
 
 
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -33,20 +40,16 @@ export class StreamCallController {
         return await this.streamCallService.configureDailyDomainByAdmin(body.enable_advanced_chat, body.enable_people_ui)
     }
 
-    @Post('create-daily-room')
-    async createDailySessionRoom(@Body() body: CreateDailyRoomDto) {
-        return await this.streamCallService.createDailySessionRoom(body.patientEmail, body.doctorEmail, body.appointment_id)
-    }
-
-    @Post('create-daily-room-token')
-    async createDailyRoomWithMeetingToken(@Body() body: CreateDailyRoomTokenDto) {
-        return await this.streamCallService.createMeetingTokenForDailyRoom(body.roomName, body.roomExp)
-    }
-
-
-    // @Get('/:sessionID')
-    // async generateToken( @Param('sessionID') sessionID: string ){
-    //     return await this.streamCallService.generateToken(sessionID)
+    // @Post('create-daily-room')
+    // async createDailySessionRoom(@Body() body: CreateDailyRoomDto) {
+    //     return await this.streamCallService.createDailySessionRoom(body.patientEmail, body.doctorEmail, body.appointment_id)
     // }
+
+    // @Post('create-daily-room-token')
+    // async createDailyRoomWithMeetingToken(@Body() body: CreateDailyRoomTokenDto) {
+    //     return await this.streamCallService.createMeetingTokenForDailyRoom(body.roomName, body.roomExp)
+    // }
+
+
 
 }
