@@ -56,6 +56,17 @@ export class StreamCallService {
     }
 
 
+    /**
+     * This function creates a private session room for a patient and doctor for a given appointment
+     * using the Daily API.
+     * @param {string} patientEmail - The email address of the patient who is booking the appointment.
+     * @param {string} doctorEmail - The email address of the doctor who will be conducting the
+     * session.
+     * @param {string} appointment_id - The ID of the appointment for which a session room is being
+     * created.
+     * @returns the data object from the response of a POST request to the Daily.co API to create a new
+     * session room for a given patient and doctor with a specified appointment ID.
+     */
     async createDailySessionRoom(patientEmail: string, doctorEmail: string, appointment_id: string) {
         const session = await this.sessionModel.findOne({patientEmail: aes.encrypt(patientEmail), doctorEmail: aes.encrypt(doctorEmail)}).exec()
         if(session) {
@@ -98,6 +109,15 @@ export class StreamCallService {
     }
 
 
+    /**
+    * This function creates a meeting token for a Daily room with a specified name and expiration time.
+    * @param {string} roomName - The name of the Daily.co room for which a meeting token is being
+    * created.
+    * @param {number} roomExp - roomExp is the expiration time of the Daily room in seconds. After this
+    * time, the room will automatically close and cannot be accessed anymore.
+    * @returns a Promise that resolves to a Daily.co meeting token for a given room name and expiration
+    * time.
+    */
     async createMeetingTokenForDailyRoom(roomName: string, roomExp: number) {
         const url = "https://api.daily.co/v1/meeting-tokens/"
         const token = process.env.DAILY_API_KEY
