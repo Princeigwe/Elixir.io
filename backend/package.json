@@ -94,6 +94,9 @@
     "typescript": "<4.8"
   },
   "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    },
     "moduleFileExtensions": [
       "js",
       "json",
