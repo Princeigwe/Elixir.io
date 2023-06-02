@@ -88,9 +88,9 @@ export class AppointmentsService {
 
         const patientName = `${patientProfile.firstName} ${patientProfile.lastName}`
 
-        //todo: uncomment this later
+
         // send sms notification to the patient assigned doctor, notifying them of the scheduled appointment
-        // await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
+        await vonageSMS.sendScheduleMessage( assignedDoctorProfile.telephone, patientName, appointment.date )
 
         appointment.save()
 
@@ -241,11 +241,10 @@ export class AppointmentsService {
         
         var updatedAppointment = await this.appointmentModel.findById(appointment_id)
 
-        // todo: uncomment this
         // send sms notification to the patient, notifying them of the confirmed appointment
-        // await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
+        await vonageSMS.sendAppointmentConfirmationMessageByMedicalProvider(patient.telephone, doctorName, updatedAppointment.date)
 
-        //todo: look at this later
+
         if(updatedAppointment.type == AppointmentType.Virtual) {
             await this.createDailyRoomSessionForVirtualAppointment(decryptedPatientEmail, user.email, appointment._id)
         }
@@ -339,6 +338,17 @@ export class AppointmentsService {
         return updatedAppointment
     }
 
+    /**
+     * This function creates a daily session room for a virtual appointment between a patient and a
+     * doctor, generates meeting tokens for both parties, and sends email invitations with the meeting
+     * links.
+     * @param {string} patientEmail - The email address of the patient who has the virtual appointment.
+     * @param {string} doctorEmail - The email address of the doctor who will be participating in the
+     * virtual appointment.
+     * @param {string} appointment_id - `appointment_id` is a string parameter that represents the
+     * unique identifier of a virtual appointment. It is used to create a daily session room for the
+     * virtual appointment and generate meeting tokens for the patient and doctor to access the room.
+     */
     async createDailyRoomSessionForVirtualAppointment(patientEmail: string, doctorEmail: string, appointment_id: string) {
         const patient = await this.patientService.getPatientWithEmail(patientEmail)
         const doctorName = `${patient.assignedDoctor.name}`
