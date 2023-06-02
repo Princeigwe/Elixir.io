@@ -248,7 +248,6 @@ export class AppointmentsService {
         //todo: look at this later
         if(updatedAppointment.type == AppointmentType.Virtual) {
             await this.createDailyRoomSessionForVirtualAppointment(decryptedPatientEmail, user.email, appointment._id)
-            // await this.createStreamCallSessionAndNotifyPartiesInvolved(decryptedPatientEmail, user.email, appointment._id)
         }
 
         const decryptedDetails = {
@@ -314,10 +313,8 @@ export class AppointmentsService {
         // send sms notification to the doctor, notifying them of the confirmed appointment
         await vonageSMS.sendAppointmentConfirmationMessageByPatient(assignedDoctor.telephone, patientName, updatedAppointment.date)
 
-        // todo: look at this later
-
         if(updatedAppointment.type == AppointmentType.Virtual) {
-            await this.createStreamCallSessionAndNotifyPartiesInvolved(user.email, decryptedDoctorEmail, appointment._id)
+            await this.createDailyRoomSessionForVirtualAppointment(user.email, decryptedDoctorEmail, appointment._id)
         }
 
         const decryptedDetails = {
@@ -358,7 +355,7 @@ export class AppointmentsService {
             to: [patientEmail,],
             subject: `Stream Call with ${doctorName}`,
             html: `Dear ${patient.firstName} ${patient.lastName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${room.name}/${patientToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your doctor. 
+            This <a href="http://localhost:3000/api/v1/stream-call/${room.name}/${patientToken}/">link</a> grants you access to a stream call, where important matters can be discussed privately with your doctor. 
             To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
         }
 
@@ -368,53 +365,13 @@ export class AppointmentsService {
             to: [patient.assignedDoctor.email,],
             subject: `Stream Call with ${patientName}`,
             html: `Dear ${doctorName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${room.name}/${doctorToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your patient. 
+            This <a href="http://localhost:3000/api/v1/stream-call/${room.name}/${doctorToken}/">link</a> grants you access to a stream call, where important matters can be discussed privately with your patient. 
             To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
         }
 
         await emailSender.sendMail(patientSessionData)
         await emailSender.sendMail(doctorSessionData)
 
-    }
-
-    //todo: look at this late
-    async createStreamCallSessionAndNotifyPartiesInvolved(patientEmail: string, doctorEmail: string, appointment_id: string) {
-        const patient = await this.patientService.getPatientWithEmail(patientEmail)
-        const doctorName = `${patient.assignedDoctor.name}`
-        const patientName = `${patient.firstName} ${patient.lastName}`
-
-        // todo: look at this later
-        // create a stream call session
-        const session = await this.streamCallService.createSession(patientEmail, doctorEmail, appointment_id)
-
-        // create a token for the doctor of the stream call session
-        const doctorToken = await this.streamCallService.generateToken(session.sessionID)
-
-        // create a token for the patient of the stream call session
-        const patientToken = await this.streamCallService.generateToken(session.sessionID)
-
-        // patient stream call data
-        const patientSessionData = {
-            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
-            to: [patientEmail,],
-            subject: `Stream Call with ${doctorName}`,
-            html: `Dear ${patient.firstName} ${patient.lastName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${patientToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your doctor. 
-            To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
-        }
-
-        // doctor stream call data
-        const doctorSessionData = {
-            from: process.env.ELASTIC_EMAIL_FROM_EMAIL,
-            to: [patient.assignedDoctor.email,],
-            subject: `Stream Call with ${patientName}`,
-            html: `Dear ${doctorName},
-            This <a href="http://localhost:3000/api/v1/stream-call/${process.env.VONAGE_VIDEO_API_KEY}/${session.sessionID}/${doctorToken}">link</a> grants you access to a stream call, where important matters can be discussed privately with your patient. 
-            To ensure the confidentiality and integrity of conversation, please refrain from sharing this link with any other individuals.`
-        }
-
-        await emailSender.sendMail(patientSessionData)
-        await emailSender.sendMail(doctorSessionData)
     }
 
 
