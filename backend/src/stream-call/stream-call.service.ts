@@ -5,6 +5,11 @@ import { Session, SessionDocument } from './session.schema';
 import { User } from '../users/users.schema';
 const jwt = require('jsonwebtoken');
 import axios from 'axios'
+import * as AesEncryption from 'aes-encryption'
+
+
+const aes = new AesEncryption()
+aes.setSecretKey(process.env.ENCRYPTION_KEY || '11122233344455566677788822244455555555555555555231231321313aaaff')
 
 
 
@@ -52,11 +57,11 @@ export class StreamCallService {
 
 
     async createDailySessionRoom(patientEmail: string, doctorEmail: string, appointment_id: string) {
-        const session = await this.sessionModel.findOne({patientEmail: patientEmail, doctorEmail: doctorEmail}).exec()
+        const session = await this.sessionModel.findOne({patientEmail: aes.encrypt(patientEmail), doctorEmail: aes.encrypt(doctorEmail)}).exec()
         if(session) {
-            await this.sessionModel.deleteOne({patientEmail: patientEmail, doctorEmail: doctorEmail})
+            await this.sessionModel.deleteOne({patientEmail: aes.encrypt(patientEmail), doctorEmail: aes.encrypt(doctorEmail)})
         }
-        const sessionRoom = await this.sessionModel.create({ patientEmail: patientEmail, doctorEmail: doctorEmail, appointment: appointment_id });
+        const sessionRoom = await this.sessionModel.create({ patientEmail: aes.encrypt(patientEmail), doctorEmail: aes.encrypt(doctorEmail), appointment: appointment_id });
         await sessionRoom.save();
         const appointment = await this.getAppointmentDetailsBySessionByID(sessionRoom._id)
         const appointmentDate = new Date(appointment['date'])
