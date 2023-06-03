@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus, UseInterceptors, CacheInterceptor, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus, UseInterceptors, UseGuards } from '@nestjs/common';
 import {UsersService} from './users.service'
 import {CreateUserDto} from './dtos/createUser.dto'
 import {ApiTags, ApiParam, ApiResponse, ApiQuery} from '@nestjs/swagger'
@@ -38,7 +38,6 @@ export class UsersController {
     })
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.Admin)
-    @UseInterceptors(CacheInterceptor) 
     @Get(':_id')
     async getUserByID(@Param('_id') _id:any ) {
         return await this.usersService.getUserByID(_id)
@@ -56,7 +55,6 @@ export class UsersController {
     })
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.Admin)
-    @UseInterceptors(CacheInterceptor)
     @Get()
     async getUsers(@Query('email') email?: string) {
         if (email) {return await this.usersService.getUserByEmail(email)}
@@ -75,7 +73,6 @@ export class UsersController {
     })
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.Admin)
-    @UseInterceptors(CacheInterceptor)
     @Delete(':_id')
     async deleteUserByID(@Param('_id') _id:any) {
         await this.usersService.deleteUserByID(_id)
@@ -94,7 +91,6 @@ export class UsersController {
     })
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.Admin)
-    @UseInterceptors(CacheInterceptor)
     @Delete()
     async deleteUsers(@Query('email') email: string) {
         if (email) {

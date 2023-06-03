@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors, ClassSerializerInterceptor, Patch, Delete, CacheInterceptor } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards, Request, Get, UseInterceptors, ClassSerializerInterceptor, Patch, Delete } from '@nestjs/common';
 import { MedicalRecordService } from '../services/medical-record.service';
 import { MedicalRecordDto, UpdateMedicalRecordDto } from '../dtos/medical.record.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -54,7 +54,6 @@ export class MedicalRecordController {
     @ApiOperation({description: "Gets all the medical records to be viewed by an admin"})
     @ApiResponse({status: 403,  description: "Forbidden Resource"})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get()
     @Roles(Role.Admin) 
     async getMedicalRecords() {
@@ -66,7 +65,6 @@ export class MedicalRecordController {
     @ApiResponse({status: 200, description: "This returns the medical record of a logged in patient"})
     @ApiResponse({status: 400, description: "Record not found"})
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get('auth-patient/')
     async getLoggedInPatientRecord(@Request() request) {
         const user = request.user
@@ -80,7 +78,6 @@ export class MedicalRecordController {
     @ApiResponse({status: 200, description: "This returns the medical record of a patient for the admin"})
     @ApiResponse({status: 403,  description: "Forbidden Resource"})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get(':medical_record_id/')
     @Roles(Role.Admin)
     async getMedicalRecordByID( @Param('medical_record_id') medical_record_id: string) {
@@ -93,7 +90,6 @@ export class MedicalRecordController {
     @ApiResponse({status: 200, description: "This returns the medical record of a patient for the authorized medical provider"})
     @ApiResponse({status: 403,  description: "Forbidden action. Request for access to medical record from patient"})
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get('read-action/:medical_record_id/')
     async readActionOfMedicalRecordByMedicalProvider(@Request() request, @Param('medical_record_id') medical_record_id: string) {
         const user = request.user

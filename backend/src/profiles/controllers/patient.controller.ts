@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Body, Post, Delete, UseGuards, Request, UseInterceptors, UploadedFile, HttpException, HttpStatus, CacheInterceptor } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Body, Post, Delete, UseGuards, Request, UseInterceptors, UploadedFile, HttpException, HttpStatus} from '@nestjs/common';
 import {PatientService} from '../services/patient.service'
 import {EditPatientDto} from '../dtos/edit.patient.dto'
 import {JwtAuthGuard} from '../../auth/guards/jwt-auth.guard'
@@ -19,7 +19,6 @@ export class PatientController {
     constructor(private patientService: PatientService) {}
 
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get("/my-profile")
     async getPatientProfileOfLoggedInUser(@Request() request) {
         const user = request.user
@@ -32,14 +31,12 @@ export class PatientController {
         required: false,
         description: "GET patient by ObjectId"
     })
-    @UseInterceptors(CacheInterceptor)
     @Get('/:_id')
     async getPatientProfileById(@Param('_id') _id: string) {
         return await this.patientService.getPatientProfileById(_id)
     }
 
     @ApiOperation({description: "Get array of patients"})
-    @UseInterceptors(CacheInterceptor)
     @Get()
     async getPatientProfiles() {
         return await this.patientService.getPatientProfiles()

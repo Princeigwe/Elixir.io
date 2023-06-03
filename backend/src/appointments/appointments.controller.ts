@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Request, UseGuards, Param, Patch, Get, Delete, CacheInterceptor, UseInterceptors } from '@nestjs/common';
+import { Controller, Body, Post, Request, UseGuards, Param, Patch, Get, Delete } from '@nestjs/common';
 import { ScheduleAppointmentDto } from './dtos/schedule.appointment.dto';
 import { RescheduleAppointmentDto } from './dtos/reschedule.appointment.dto';
 import { AppointmentsService } from './appointments.service';
@@ -19,7 +19,6 @@ export class AppointmentsController {
     @ApiResponse({status: 200, description: "This returns the appointments of logged in user"})
     @ApiResponse({status: 400, description: "If no appointment is found"})
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get()
     async getAppointments(@Request() request) {
         const user = request.user
@@ -32,7 +31,6 @@ export class AppointmentsController {
     @ApiResponse({status: 200, description: "This returns the appointment"})
     @ApiResponse({status: 400, description: "If appointment is found"})
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get('/:appointment_id')
     async getAppointmentById(@Request() request, @Param('appointment_id') appointment_id: string) {
         const user = request.user

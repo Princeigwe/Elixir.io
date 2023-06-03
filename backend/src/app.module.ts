@@ -1,5 +1,5 @@
 import {MongooseModule} from '@nestjs/mongoose'
-import { Module, CacheModule, CacheStore } from '@nestjs/common';
+import { Module, CacheModule, CacheStore, CacheInterceptor } from '@nestjs/common';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -17,6 +17,7 @@ import { ConversationsModule } from './conversations/conversations.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { StreamCallModule } from './stream-call/stream-call.module';
 import * as redisStore from 'cache-manager-redis-store';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 // import * as RedisStore from 'cache-manager-redis-store';
 
 // import {createClient} from 'redis';
@@ -56,6 +57,12 @@ import * as redisStore from 'cache-manager-redis-store';
     })
   ],
   // controllers: [AppController],
-  // providers: [AppService],
+  // to bind CacheInterceptor to all GET endpoints across all modules
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor, 
+    },
+  ],
 })
 export class AppModule {}

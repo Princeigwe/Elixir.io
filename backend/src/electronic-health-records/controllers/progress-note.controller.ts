@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards, Request, Get, Query, Patch, Delete, CacheInterceptor, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards, Request, Get, Query, Patch, Delete } from '@nestjs/common';
 import { ProgressNoteService } from '../services/progress-note.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { ProgressNoteDto } from '../dtos/progress.note.dto';
@@ -35,7 +35,6 @@ export class ProgressNoteController {
     @ApiResponse({status: 403, description: 'Forbidden Resource'})
     @ApiResponse({status: 200})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get()
     @Roles(Role.Admin)
     async getAllProgressNotes( @Request() request, @Query('medical_record_id') medical_record_id: string) {
@@ -53,7 +52,6 @@ export class ProgressNoteController {
     @ApiResponse({status: 404,  description: "Progress notes not found."})
     @ApiResponse({status: 200,  description: "Returns progress notes"})
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get('/auth-patient')
     async getProgressNotesOfLoggedInPatient( @Request() request ) {
         const user = request.user
@@ -67,7 +65,6 @@ export class ProgressNoteController {
     @ApiResponse({status: 403, description: "Forbidden action, as you are not authorized to access resource. If you are a medical provider, request read access to medical record tied to this progress note"})
     @ApiResponse({status: 404, description: "Progress note not found"})
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(CacheInterceptor)
     @Get(':progress_note_id')
     async getProgressNoteByID( @Param('progress_note_id') progress_note_id: string, @Request() request ) {
         const user = request.user
