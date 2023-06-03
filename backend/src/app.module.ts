@@ -52,8 +52,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       isGlobal: true, // make caching available to all modules
       ttl: 30000, // cached data time to live in milliseconds (30 seconds), because cache-manager used is of version 5
       store: redisStore as unknown as CacheStore,
-      host: 'localhost',
-      port: 6379,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
     })
   ],
   // controllers: [AppController],
