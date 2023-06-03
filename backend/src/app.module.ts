@@ -1,5 +1,5 @@
 import {MongooseModule} from '@nestjs/mongoose'
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -33,7 +33,11 @@ import { StreamCallModule } from './stream-call/stream-call.module';
     TokenModule,
     ConversationsModule,
     AppointmentsModule,
-    StreamCallModule
+    StreamCallModule,
+    CacheModule.register({ 
+      isGlobal: true, // make caching available to all modules
+      ttl: 30000 // cached data time to live in milliseconds (30 seconds), because cache-manager used is of version 5
+    })
   ],
   // controllers: [AppController],
   // providers: [AppService],

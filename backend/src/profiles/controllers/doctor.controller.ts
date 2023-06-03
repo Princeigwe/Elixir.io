@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query, HttpException, HttpStatus, Request, Post, UseInterceptors, UploadedFile} from '@nestjs/common';
+import { Controller, Get, Param, Delete, Patch, Body, UseGuards, Query, HttpException, HttpStatus, Request, Post, UseInterceptors, UploadedFile, CacheInterceptor} from '@nestjs/common';
 import {DoctorService} from '../services/doctor.service'
 import {EditDoctorDto} from '../dtos/edit.doctor.dto'
 import {AssignDoctorToDepartmentDto} from '../dtos/assign.doctor.department.dto'
@@ -39,6 +39,7 @@ export class DoctorController {
         description: 'Returns doctor objects'
     })
     @UseGuards(JwtAuthGuard)
+    @UseInterceptors(CacheInterceptor)
     @Get()
     async getDoctorProfiles(@Query('firstName') firstName?: string, @Query('lastName') lastName?: string) { // to pass test
         if(firstName || lastName || firstName && lastName) { 
@@ -62,6 +63,7 @@ export class DoctorController {
         description: 'Doctor not found'
     })
     @UseGuards(JwtAuthGuard)
+    @UseInterceptors(CacheInterceptor)
     @Get(':_id')
     async getDoctorProfileById(@Param('_id') _id: string) {
         return await this.doctorService.getDoctorProfileById(_id)

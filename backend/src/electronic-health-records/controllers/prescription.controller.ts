@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Request, UseGuards, Get, Query, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Param, Request, UseGuards, Get, Query, Delete, CacheInterceptor, UseInterceptors } from '@nestjs/common';
 import { PrescriptionService } from '../services/prescription.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { MedicationDto, PrescriptionDto } from '../dtos/prescription.dto';
@@ -32,6 +32,7 @@ export class PrescriptionController {
     @ApiResponse({status: 404,  description: "Prescriptions not found."})
     @ApiResponse({status: 200,  description: "Returns prescriptions"})
     @UseGuards(JwtAuthGuard)
+    @UseInterceptors(CacheInterceptor)
     @Get('auth-patient/')
     async getPrescriptionsOfLoggedInPatient( @Request() request ) {
         const user = request.user
@@ -44,6 +45,7 @@ export class PrescriptionController {
     @ApiResponse({status: 403, description: "Forbidden action, as you are not authorized to access resource. If you are a medical provider, request read access to medical record tied to this prescription"})
     @ApiResponse({status: 404, description: "Progress note not found"})
     @UseGuards(JwtAuthGuard)
+    @UseInterceptors(CacheInterceptor)
     @Get('/:prescription_id')
     async getPrescriptionByID( @Param('prescription_id') prescription_id: string, @Request() request ) {
         const user = request.user
@@ -55,6 +57,7 @@ export class PrescriptionController {
     @ApiResponse({status: 403, description: 'Forbidden Resource'})
     @ApiResponse({status: 200})
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseInterceptors(CacheInterceptor)
     @Get()
     @Roles(Role.Admin)
     async getPrescriptions( @Request() request, @Query('medical_record_id') medical_record_id?: string ) {
@@ -73,6 +76,7 @@ export class PrescriptionController {
     @ApiResponse({status: 403, description: "Unauthorized access to prescriptions. If you are a medical provider, request read access to medical record"})
     @ApiResponse({status: 200})
     @UseGuards(JwtAuthGuard)
+    @UseInterceptors(CacheInterceptor)
     @Get('patient-prescriptions/:medical_record_id')
     async filterPrescriptionsTiedToMedicalRecord( @Param('medical_record_id') medical_record_id: string, @Request() request ) {
         const user = request.user

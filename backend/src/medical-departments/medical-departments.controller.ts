@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Body, Get, Delete, Param,Query } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, Delete, Param,Query , CacheInterceptor, UseInterceptors} from '@nestjs/common';
 import {MedicalDepartmentsService} from './medical-departments.service'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import {RolesGuard} from '../roles.guard'
@@ -40,6 +40,7 @@ export class MedicalDepartmentsController {
         required: false,
         description: "This is the query key to get department by name",
     })
+    @UseInterceptors(CacheInterceptor)
     @Get()
     async getOrSearchMedicalDepartments(@Query('name') name?: string) { // name is optional in order to pass test
         if(name) {
