@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Request, UseGuards, Get, Query, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Param, Request, UseGuards, Get, Query, Delete} from '@nestjs/common';
 import { PrescriptionService } from '../services/prescription.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { MedicationDto, PrescriptionDto } from '../dtos/prescription.dto';

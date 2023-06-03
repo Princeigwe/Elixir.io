@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Body, Post, Delete, UseGuards, Request, UseInterceptors, UploadedFile, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Body, Post, Delete, UseGuards, Request, UseInterceptors, UploadedFile, HttpException, HttpStatus} from '@nestjs/common';
 import {PatientService} from '../services/patient.service'
 import {EditPatientDto} from '../dtos/edit.patient.dto'
 import {JwtAuthGuard} from '../../auth/guards/jwt-auth.guard'

@@ -1,5 +1,5 @@
 import {MongooseModule} from '@nestjs/mongoose'
-import { Module } from '@nestjs/common';
+import { Module, CacheModule, CacheStore, CacheInterceptor } from '@nestjs/common';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -16,6 +16,20 @@ import { TokenModule } from './token/token.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { StreamCallModule } from './stream-call/stream-call.module';
+import * as redisStore from 'cache-manager-redis-store';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+// import * as RedisStore from 'cache-manager-redis-store';
+
+// import {createClient} from 'redis';
+
+
+// const redisClient = createClient({
+//   host: 'localhost',
+//   port: 6379,
+// });
+
+// const redisStore = new RedisStore(redisClient);
+
 
 @Module({
   imports: [
@@ -33,9 +47,22 @@ import { StreamCallModule } from './stream-call/stream-call.module';
     TokenModule,
     ConversationsModule,
     AppointmentsModule,
-    StreamCallModule
+    StreamCallModule,
+    CacheModule.register({ 
+      isGlobal: true, // make caching available to all modules
+      ttl: 30000, // cached data time to live in milliseconds (30 seconds), because cache-manager used is of version 5
+      store: redisStore as unknown as CacheStore,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+    })
   ],
   // controllers: [AppController],
-  // providers: [AppService],
+  // to bind CacheInterceptor to all GET endpoints across all modules
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor, 
+    },
+  ],
 })
 export class AppModule {}

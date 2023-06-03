@@ -1,8 +1,12 @@
-import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Query, Param, HttpException, HttpStatus, UseInterceptors, UseGuards } from '@nestjs/common';
 import {UsersService} from './users.service'
 import {CreateUserDto} from './dtos/createUser.dto'
 import {ApiTags, ApiParam, ApiResponse, ApiQuery} from '@nestjs/swagger'
 import {SanitizeMongooseModelInterceptor} from 'nestjs-mongoose-exclude'
+import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
+import {RolesGuard} from '../roles.guard'
+import {Roles} from '../roles.decorator'
+import { Role } from '../enums/role.enum';
 
 @ApiTags('Users') // grouping the users endpoints for Swagger
 
@@ -32,6 +36,8 @@ export class UsersController {
         status: 200,
         description: " Returns a user object from the database "
     })
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Get(':_id')
     async getUserByID(@Param('_id') _id:any ) {
         return await this.usersService.getUserByID(_id)
@@ -47,6 +53,8 @@ export class UsersController {
         status: 200,
         description: " Returns all users in the database"
     })
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Get()
     async getUsers(@Query('email') email?: string) {
         if (email) {return await this.usersService.getUserByEmail(email)}
@@ -63,6 +71,8 @@ export class UsersController {
         status: 204,
         description: " No Content"
     })
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Delete(':_id')
     async deleteUserByID(@Param('_id') _id:any) {
         await this.usersService.deleteUserByID(_id)
@@ -79,6 +89,8 @@ export class UsersController {
         status: 204,
         description: " No Content"
     })
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Delete()
     async deleteUsers(@Query('email') email: string) {
         if (email) {

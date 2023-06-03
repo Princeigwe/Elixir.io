@@ -8,7 +8,9 @@ import {Role} from '../enums/role.enum'
 import { RolesGuard } from '../roles.guard';
 import { CreateDailyRoomDto } from './dtos/create.Daily.room.dto'
 import {CreateDailyRoomTokenDto } from './dtos/create.Daily.room.token.dto'
+import { ApiOperation, ApiBody, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Stream Call')
 @Controller('stream-call')
 export class StreamCallController {
 
@@ -17,14 +19,7 @@ export class StreamCallController {
     ) {}
 
 
-    // @Get('/:cipher/:key/:code')
-    // @Render('stream_call')
-    // async streamCall( ) {}
-
-    // @Get('/agora')
-    // @Render('stream_call_agora')
-    // async streamCallAgora( ) {}
-
+    @ApiOperation({description: "Endpoint to go on stream call. This endpoint is called from the user's email address"})
     @Get('/:room/:token')
     @Render('stream_call_daily')
     async streamCallDaily(@Param('room') room: string, @Param('token') token: string) {
@@ -33,6 +28,8 @@ export class StreamCallController {
     }
 
 
+    @ApiOperation({description: "Endpoint to configure stream call feature by the admin. Reference to ConfigDailyDomainDto."})
+    @ApiBody({type: ConfigDailyDomainDto})
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Post('configure-daily-domain')
     @Roles(Role.Admin)
