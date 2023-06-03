@@ -1,5 +1,5 @@
 import {MongooseModule} from '@nestjs/mongoose'
-import { Module, CacheModule } from '@nestjs/common';
+import { Module, CacheModule, CacheStore } from '@nestjs/common';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -16,6 +16,19 @@ import { TokenModule } from './token/token.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { StreamCallModule } from './stream-call/stream-call.module';
+import * as redisStore from 'cache-manager-redis-store';
+// import * as RedisStore from 'cache-manager-redis-store';
+
+// import {createClient} from 'redis';
+
+
+// const redisClient = createClient({
+//   host: 'localhost',
+//   port: 6379,
+// });
+
+// const redisStore = new RedisStore(redisClient);
+
 
 @Module({
   imports: [
@@ -36,7 +49,10 @@ import { StreamCallModule } from './stream-call/stream-call.module';
     StreamCallModule,
     CacheModule.register({ 
       isGlobal: true, // make caching available to all modules
-      ttl: 30000 // cached data time to live in milliseconds (30 seconds), because cache-manager used is of version 5
+      ttl: 30000, // cached data time to live in milliseconds (30 seconds), because cache-manager used is of version 5
+      store: redisStore as unknown as CacheStore,
+      host: 'localhost',
+      port: 6379,
     })
   ],
   // controllers: [AppController],
