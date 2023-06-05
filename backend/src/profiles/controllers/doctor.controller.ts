@@ -12,6 +12,7 @@ import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 
 import {FileInterceptor} from '@nestjs/platform-express'
 import { UploadAvatarDto } from '../dtos/upload.avatar.dto';
+import {PromoteDemoteDoctorHierarchyDto} from '../dtos/promote-demote-doctor-hierarchy.dto'
 
 
 @ApiTags('Doctors')
@@ -166,6 +167,7 @@ export class DoctorController {
     }
 
 
+
     @ApiResponse({
         status: 200,
         description: "Returns the doctor's profile with update hierarchy"
@@ -178,17 +180,14 @@ export class DoctorController {
         status: 400,
         description: "Consultant hierarchy cannot be promoted any further"
     })
-    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required"})
+    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required. Reference: PromoteDemoteDoctorHierarchyDto"})
+    @ApiBody({type: PromoteDemoteDoctorHierarchyDto})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Patch('promote-doctor-hierarchy/:firstName/:lastName/:email/:department')
+    @Patch('promote-doctor-hierarchy')
     @Roles(Role.Admin) 
-    async promoteDoctorHierarchy(
-        @Param('firstName') firstName: string, 
-        @Param('lastName') lastName: string, 
-        @Param('email') email: string,
-        @Param('department') department: MedicalDepartments,) 
+    async promoteDoctorHierarchy(@Body() body: PromoteDemoteDoctorHierarchyDto) 
     {
-        return this.doctorService.promoteDoctorHierarchy(firstName, lastName, email, department)
+        return this.doctorService.promoteDoctorHierarchy(body.firstName, body.lastName, body.email, body.department)
     }
 
 
