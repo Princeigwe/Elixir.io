@@ -13,7 +13,7 @@ Elixir is an API targeting the healthcare industry, built with a focus on enhanc
 - Patient record management: Securely manage and encrypt medical records, prescriptions, and progress notes.
 - Access control: Grant read access to specific healthcare providers, facilitating collaboration and comprehensive medical decision-making.
 
-For comprehensive details about each feature, please refer to the [Elixir.io documentation](https://www.google.com/imgres?imgurl=https%3A%2F%2Fmedia.istockphoto.com%2Fid%2F155388466%2Fphoto%2Fwork-in-progress-road-sign.jpg%3Fs%3D612x612%26w%3D0%26k%3D20%26c%3D0NHTuN1htzUKODz7gDMs4HkoOnPccb_yksD-L-vICLQ%3D&tbnid=KGU1kuRQIVTZ8M&vet=12ahUKEwjY_PCdmKv_AhU3mScCHZdCC44QMygsegUIARCvAg..i&imgrefurl=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fwork-in-progress-sign&docid=d_Ip9fESQHbuYM&w=612&h=408&q=still%20in%20progress%20pictures&ved=2ahUKEwjY_PCdmKv_AhU3mScCHZdCC44QMygsegUIARCvAg) site, where you'll find in-depth explanations.
+For comprehensive details about each feature, please refer to the [Elixir.io documentation](https://www.google.com/imgres?imgurl=https%3A%2F%2Fmedia.istockphoto.com%2Fid%2F155388466%2Fphoto%2Fwork-in-progress-road-sign.jpg%3Fs%3D612x612%26w%3D0%26k%3D20%26c%3D0NHTuN1htzUKODz7gDMs4HkoOnPccb_yksD-L-vICLQ%3D&tbnid=KGU1kuRQIVTZ8M&vet=12ahUKEwjY_PCdmKv_AhU3mScCHZdCC44QMygsegUIARCvAg..i&imgrefurl=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fwork-in-progress-sign&docid=d_Ip9fESQHbuYM&w=612&h=408&q=still%20in%20progress%20pictures&ved=2ahUKEwjY_PCdmKv_AhU3mScCHZdCC44QMygsegUIARCvAg) site, where you'll find in-depth explanations. You can also explore the Swagger documentation directly at the [base_url/api](base_url/api).
 
 ## Technologies Utilized
 
