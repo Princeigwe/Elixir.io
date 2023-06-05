@@ -276,7 +276,6 @@ export class DoctorService {
         // this deletes the user model tied to the doctor profile
         const doctor = await this.doctorModel.findOne({'firstName': firstName, 'lastName': lastName, 'email': email, 'department': department, 'hierarchy': hierarchy})
         const doctorUserObjectID = doctor['user']
-        console.log(doctorUserObjectID)
         await this.usersService.deleteUserByID(doctorUserObjectID)
 
         // emitting the data that will be used to delete a member from a department

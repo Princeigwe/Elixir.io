@@ -12,6 +12,8 @@ import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 
 import {FileInterceptor} from '@nestjs/platform-express'
 import { UploadAvatarDto } from '../dtos/upload.avatar.dto';
+import {PromoteDemoteDoctorHierarchyDto} from '../dtos/promote-demote-doctor-hierarchy.dto'
+import {DeleteDoctorDto} from '../dtos/delete-doctor.dto'
 
 
 @ApiTags('Doctors')
@@ -150,20 +152,17 @@ export class DoctorController {
 
     }
 
-    @ApiOperation({description: "DELETE a doctor profile by names, department, and hierarchy, by an admin. JWT authentication required"})
+    @ApiOperation({description: "DELETE a doctor profile by names, department, and hierarchy, by an admin. JWT authentication required. Reference DeleteDoctorDto"})
+    @ApiBody({type: DeleteDoctorDto})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Delete(':firstName/:lastName/:department/:hierarchy')
+    @Delete('/by-detail')
     @Roles(Role.Admin)
-    async deleteDoctorByNamesEmailDepartmentAndHierarchy(
-        @Param('firstName') firstName: string, 
-        @Param('lastName') lastName: string, 
-        @Param('email') email: string,
-        @Param('department') department: MedicalDepartments, 
-        @Param('hierarchy') hierarchy: DoctorHierarchy) {
+    async deleteDoctorByNamesEmailDepartmentAndHierarchy(@Body() body: DeleteDoctorDto) {
 
-        await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy);
+        await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(body.firstName, body.lastName, body.email, body.department, body.hierarchy);
         throw new HttpException("Doctor Profile Deleted", HttpStatus.NO_CONTENT) 
     }
+
 
 
     @ApiResponse({
@@ -178,19 +177,15 @@ export class DoctorController {
         status: 400,
         description: "Consultant hierarchy cannot be promoted any further"
     })
-    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required"})
+    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required. Reference: PromoteDemoteDoctorHierarchyDto"})
+    @ApiBody({type: PromoteDemoteDoctorHierarchyDto})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Patch('promote-doctor-hierarchy/:firstName/:lastName/:email/:department')
+    @Patch('promote-doctor-hierarchy')
     @Roles(Role.Admin) 
-    async promoteDoctorHierarchy(
-        @Param('firstName') firstName: string, 
-        @Param('lastName') lastName: string, 
-        @Param('email') email: string,
-        @Param('department') department: MedicalDepartments,) 
+    async promoteDoctorHierarchy(@Body() body: PromoteDemoteDoctorHierarchyDto) 
     {
-        return this.doctorService.promoteDoctorHierarchy(firstName, lastName, email, department)
+        return this.doctorService.promoteDoctorHierarchy(body.firstName, body.lastName, body.email, body.department)
     }
-
 
 
     @ApiResponse({
@@ -205,17 +200,12 @@ export class DoctorController {
         status: 400,
         description: "Medical Student hierarchy cannot be demoted any further"
     })
-    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required"})
+    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required. Reference: PromoteDemoteDoctorHierarchyDto"})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Patch('demote-doctor-hierarchy/:firstName/:lastName/:email/:department')
+    @Patch('demote-doctor-hierarchy')
     @Roles(Role.Admin) 
-    async demoteDoctorHierarchy(
-        @Param('firstName') firstName: string, 
-        @Param('lastName') lastName: string, 
-        @Param('email') email: string,
-        @Param('department') department: MedicalDepartments,
-    ) {
-        return this.doctorService.demoteDoctorHierarchy(firstName, lastName, email, department)
+    async demoteDoctorHierarchy(@Body() body: PromoteDemoteDoctorHierarchyDto) {
+        return this.doctorService.demoteDoctorHierarchy(body.firstName, body.lastName, body.email, body.department)
     }
 
 }
