@@ -27,12 +27,12 @@ jobs:
           steps:
             - run:
                 name: build Docker image
-                command: docker build -t princeigwe/elixir.io:latest .
+                command: docker build -t $DOCKER_USERNAME/elixir.io:latest .
             - run: 
                 name: push Docker image
                 command: |
                   docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD docker.io
-                  docker push princeigwe/elixir.io:latest
+                  docker push $DOCKER_USERNAME/elixir.io:latest
 
 
 workflows:
