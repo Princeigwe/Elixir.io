@@ -17,7 +17,8 @@ import { ConversationsModule } from './conversations/conversations.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { StreamCallModule } from './stream-call/stream-call.module';
 import * as redisStore from 'cache-manager-redis-store';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 // import * as RedisStore from 'cache-manager-redis-store';
 
 // import {createClient} from 'redis';
@@ -54,14 +55,25 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       store: redisStore as unknown as CacheStore,
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
+    }),
+    // Allowing 15 API requests per 60 seconds
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 15,
     })
   ],
   // controllers: [AppController],
+
   // to bind CacheInterceptor to all GET endpoints across all modules
   providers: [
     {
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor, 
+    },
+    // to throttle all incoming requests across all modules
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
