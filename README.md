@@ -21,7 +21,7 @@ For comprehensive details about each feature, please refer to the [Elixir.io doc
 - **Docker**: A tool that allows you to build, package, and distribute your applications as containers, ensuring consistency across different environments.
 - **CircleCI**: A continuous integration and delivery platform that automates the build, test, and deployment processes of your application.
 - **MongoDB**: A popular NoSQL database that provides a flexible and scalable data storage solution for your application.
-- **Socket.io**: A library that enables real-time, bidirectional communication between the client and the server, allowing for instant updates and notifications.
+- **Socket.io**: A library that enables real-time, bidirectional communication between the client and the server, allowing for instant updates and notifications. [events used: "message", "error"].
 - **Redis**: An in-memory data structure store that can be used as a cache or a message broker, enhancing the performance and scalability of your application.
 - **Vonage**: A communication platform that provides APIs for sending SMS, making voice and video calls, and handling other communication functionalities in your application.
 - **Daily**: A service that offers real-time video and audio communication capabilities through WebRTC, allowing for seamless video conferencing and collaboration.
@@ -96,4 +96,4 @@ The following environment variables need to be set in the `.env` file:
 
 
 
-*...built with love, from the heart of the Alchemist :atom_symbol:.*
+*...built with love, from the heart of the Alchemist:atom_symbol:.*
