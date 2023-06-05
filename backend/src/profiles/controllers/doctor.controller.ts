@@ -13,6 +13,7 @@ import {DoctorHierarchy} from '../../enums/doctor.hierarchy.enum'
 import {FileInterceptor} from '@nestjs/platform-express'
 import { UploadAvatarDto } from '../dtos/upload.avatar.dto';
 import {PromoteDemoteDoctorHierarchyDto} from '../dtos/promote-demote-doctor-hierarchy.dto'
+import {DeleteDoctorDto} from '../dtos/delete-doctor.dto'
 
 
 @ApiTags('Doctors')
@@ -151,18 +152,14 @@ export class DoctorController {
 
     }
 
-    @ApiOperation({description: "DELETE a doctor profile by names, department, and hierarchy, by an admin. JWT authentication required"})
+    @ApiOperation({description: "DELETE a doctor profile by names, department, and hierarchy, by an admin. JWT authentication required. Reference DeleteDoctorDto"})
+    @ApiBody({type: DeleteDoctorDto})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Delete(':firstName/:lastName/:department/:hierarchy')
+    @Delete('/by-detail')
     @Roles(Role.Admin)
-    async deleteDoctorByNamesEmailDepartmentAndHierarchy(
-        @Param('firstName') firstName: string, 
-        @Param('lastName') lastName: string, 
-        @Param('email') email: string,
-        @Param('department') department: MedicalDepartments, 
-        @Param('hierarchy') hierarchy: DoctorHierarchy) {
+    async deleteDoctorByNamesEmailDepartmentAndHierarchy(@Body() body: DeleteDoctorDto) {
 
-        await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(firstName, lastName, email, department, hierarchy);
+        await this.doctorService.deleteDoctorByNamesEmailDepartmentAndHierarchy(body.firstName, body.lastName, body.email, body.department, body.hierarchy);
         throw new HttpException("Doctor Profile Deleted", HttpStatus.NO_CONTENT) 
     }
 
