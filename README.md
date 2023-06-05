@@ -96,4 +96,4 @@ The following environment variables need to be set in the `.env` file:
 
 
 
-*...built with love, from the heart of the Alchemist:atom_symbol:.*
+*...built with love, from the heart of the Alchemist :atom_symbol:.*
