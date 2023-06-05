@@ -191,7 +191,6 @@ export class DoctorController {
     }
 
 
-
     @ApiResponse({
         status: 200,
         description: "Returns the doctor's profile with update hierarchy"
@@ -204,17 +203,12 @@ export class DoctorController {
         status: 400,
         description: "Medical Student hierarchy cannot be demoted any further"
     })
-    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required"})
+    @ApiOperation({description: "UPDATES doctor profile hierarchy by an admin. JWT authentication required. Reference: PromoteDemoteDoctorHierarchyDto"})
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Patch('demote-doctor-hierarchy/:firstName/:lastName/:email/:department')
+    @Patch('demote-doctor-hierarchy')
     @Roles(Role.Admin) 
-    async demoteDoctorHierarchy(
-        @Param('firstName') firstName: string, 
-        @Param('lastName') lastName: string, 
-        @Param('email') email: string,
-        @Param('department') department: MedicalDepartments,
-    ) {
-        return this.doctorService.demoteDoctorHierarchy(firstName, lastName, email, department)
+    async demoteDoctorHierarchy(@Body() body: PromoteDemoteDoctorHierarchyDto) {
+        return this.doctorService.demoteDoctorHierarchy(body.firstName, body.lastName, body.email, body.department)
     }
 
 }
