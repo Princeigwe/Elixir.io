@@ -31,12 +31,14 @@ export class PatientController {
         required: false,
         description: "GET patient by ObjectId"
     })
+    @UseGuards(JwtAuthGuard)
     @Get('/:_id')
     async getPatientProfileById(@Param('_id') _id: string) {
         return await this.patientService.getPatientProfileById(_id)
     }
 
     @ApiOperation({description: "Get array of patients"})
+    @UseGuards(JwtAuthGuard)
     @Get()
     async getPatientProfiles() {
         return await this.patientService.getPatientProfiles()

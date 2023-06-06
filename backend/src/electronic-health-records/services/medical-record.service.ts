@@ -69,6 +69,9 @@ export class MedicalRecordService {
         if( existingMedicalRecord ){
             throw new HttpException('An existing record exists for this patient, please make relevant changes to it.', HttpStatus.BAD_REQUEST)
         }
+        else if(!patient.firstName || !patient.lastName || !patient.email || !patient.age || !patient.address || !patient.telephone) {
+            throw new HttpException("Patient is required to complete their profile, before creation of medical record", HttpStatus.BAD_REQUEST)
+        }
 
         // getting the logged in doctor's profile
         const loggedMedicalProvider = await this.doctorService.getDoctorProfileByEmail(user.email)
