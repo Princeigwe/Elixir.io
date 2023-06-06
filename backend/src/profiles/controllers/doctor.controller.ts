@@ -49,6 +49,13 @@ export class DoctorController {
         return await this.doctorService.getDoctorProfiles()
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('my-profile')
+    async getDoctorProfileByEmail(@Request() request) {
+        const user = request.user
+        return await this.doctorService.getDoctorProfileByEmail(user.email)
+    }
+
 
     @ApiOperation({description: 'GET doctor by ObjectId. JWT authentication required'})
     @ApiParam({
