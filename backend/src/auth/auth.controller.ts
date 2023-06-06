@@ -154,7 +154,7 @@ export class AuthController {
     async auth0GoogleCallback( @Request() request, @Response() response ) {
         const user =  request.user
         const elixirIOUser = await this.authService.registerUserPatientAfterOauthFlowIfNotInExistence(user.email)
-        const cookie = await this.authService.putJwtInCookieOnLogin(user.id)
+        const cookie = await this.authService.putJwtInCookieOnLogin(elixirIOUser._id)
         response.setHeader('Set-Cookie', cookie)
         return response.send(elixirIOUser)
     }
