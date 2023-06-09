@@ -7,7 +7,7 @@ Elixir is an API targeting the healthcare industry, built with a focus on enhanc
 ## Features
 
 - Real-time messaging: Seamlessly communicate with healthcare providers within a secure and private environment.
-- Appointment management: Schedule, reschedule, or cancel appointments with ease.
+- Appointment management: Schedule, reschedule, cancel, or confirm appointments with ease.
 - Automated notifications: Receive timely and relevant updates regarding appointments and healthcare updates.
 - Stream call: Enable virtual consultations and face-to-face interactions regardless of geographical locations.
 - Patient record management: Securely manage and encrypt medical records, prescriptions, and progress notes.
