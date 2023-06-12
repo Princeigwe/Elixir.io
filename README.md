@@ -13,7 +13,7 @@ Elixir is an API targeting the healthcare industry, built with a focus on enhanc
 - Patient record management: Securely manage and encrypt medical records, prescriptions, and progress notes.
 - Access control: Grant read access to specific healthcare providers, facilitating collaboration and comprehensive medical decision-making.
 
-For comprehensive details about each feature, please refer to the [Elixir.io documentation](https://the-bubble.gitbook.io/elixir.io-documentation/) site, where you'll find in-depth explanations. You can also explore the Swagger documentation directly at the [base_url/api](base_url/api).
+For comprehensive details about each feature, please refer to the [Elixir.io documentation](https://the-bubble.gitbook.io/elixir.io-documentation/) site, where you'll find in-depth explanations. You can also explore the Swagger documentation directly at the [<base_url>/api](base_url/api).
 
 ## Technologies Utilized
 
