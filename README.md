@@ -94,6 +94,9 @@ The following environment variables need to be set in the `.env` file:
 - MONGO_INITDB_ROOT_USERNAME
 - MONGO_INITDB_ROOT_PASSWORD
 
+## Demo Video: 
+[Demo](https://vimeo.com/835237320?share=copy)
+
 
 
 *...built with love, from the heart of the Alchemist :atom_symbol:.*
