@@ -97,6 +97,8 @@ The following environment variables need to be set in the `.env` file:
 ## Demo Video: 
 [Demo](https://vimeo.com/835237320?share=copy)
 
+## Medium Article(as promised in the demo):
+[Article](https://princeigwe.medium.com/empowering-care-through-technology-unveiling-the-story-behind-my-health-tech-project-b1e6d7be61ea)
 
 
 *...built with love, from the heart of the Alchemist :atom_symbol:.*
